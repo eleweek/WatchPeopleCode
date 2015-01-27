@@ -1,9 +1,28 @@
 {% extends "bootstrap/base.html" %}  
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block html_attribs %} lang="en"{% endblock html_attribs %}
 
-{% block title %}Hello!{% endblock %}
+{% block styles %}
+  {{super()}}
+  <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}">
+{% endblock %}
+
+{% block title %}Watch people code{% endblock %}
 
 {% block content %}
-  <h2>Hello world!</h2>
+  <form action="" method="POST" class="form form-subscribe" role="form">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h1 class="panel-title">Subscribe</h1>
+      </div>
+
+      <div class="panel-body">
+        <div class="form-group">
+        <input type="email" class="form-control" placeholder="Email adress" value="">
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Subscribe</button>
+      </div>
+    </div>
+  </form>
 {% endblock %}
