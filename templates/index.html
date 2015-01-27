@@ -19,9 +19,12 @@
 
       <div class="panel-body">
         <div class="form-group">
-        <input type="email" class="form-control" placeholder="Email adress" value="">
+          {{ form.hidden_tag() }}
+          {{ wtf.form_field(form.email, value="") }}
+          {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'primary'}) }}
+          {# <input type="email" class="form-control" placeholder="Email address" value="">
         </div>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Subscribe</button>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Subscribe</button>#}
       </div>
     </div>
   </form>
