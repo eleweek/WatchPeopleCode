@@ -6,6 +6,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+venv
 .Python
 env/
 build/
@@ -52,3 +53,10 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Temporary files
+*.swo
+*.swp
+
+# Enviroment
+.env
