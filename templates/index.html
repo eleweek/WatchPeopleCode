@@ -28,12 +28,12 @@
           <div class="panel-heading">
             <h1 class="panel-title">Subscribe</h1>
           </div>
-
-          <div class="panel-body">
-            <div class="form-group">
-            <input type="email" class="form-control" placeholder="Email adress" value="">
-            </div>
-            <button class="btn btn-lg btn-primary btn-block" type="submit">Subscribe</button>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            {{ form.hidden_tag() }}
+            {{ wtf.form_field(form.email, value="") }}
+            {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'primary'}) }}
           </div>
         </div>
       </form>
