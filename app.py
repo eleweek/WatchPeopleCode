@@ -1,9 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.properties import ColumnProperty
 from flask_wtf import Form
-from wtforms import TextField, SubmitField, validators
+from wtforms import StringField, SubmitField, validators
 from wtforms.validators import ValidationError
 
 import praw
@@ -136,7 +136,7 @@ def validate_email_unique(form, field):
 
 
 class SubscribeForm(Form):
-    email = TextField("Email address", [validators.Required(), validators.Email(), validate_email_unique])
+    email = StringField("Email address", [validators.DataRequired(), validators.Email(), validate_email_unique])
     submit_button = SubmitField('Subscribe')
 
 
@@ -152,6 +152,7 @@ def index():
         db.session.add(subscriber)
         db.session.commit()
         added_successfully = True
+        return redirect(url_for('.index'))
 
     return render_template('index.html', form=form, live_streams=live_streams, added_successfully=added_successfully)
 
