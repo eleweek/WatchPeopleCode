@@ -15,8 +15,8 @@
 {% block content %}
   <div class="container">
     <h1 class="text-center"> Alpha version of <a href="http://www.reddit.com/r/WatchPeopleCode/">/r/WatchPeopleCode</a> app </h1>
-    <h2 class="text-center"> Livestreams available: {{live_stream_ids|length}}</h2>
-    {% if not live_stream_ids %}
+    <h2 class="text-center"> Livestreams available: {{live_streams|length}}</h2>
+    {% if not live_streams %}
       <div class="text-center">No live streams right now. Maybe 
         <a href="https://docs.google.com/spreadsheets/d/1ANp6WewbBsFKuIPy0lybki8UldhXSd29LjcjS2PNCjU/">watch some of the previous ones?</a>
       </div>
