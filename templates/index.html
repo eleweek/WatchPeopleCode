@@ -11,21 +11,37 @@
 {% block title %}Watch people code{% endblock %}
 
 {% block content %}
-  <form action="" method="POST" class="form form-subscribe" role="form">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h1 class="panel-title">Subscribe</h1>
+  <div class="container">
+      <h1> Alpha version of <a href="http://www.reddit.com/r/WatchPeopleCode/">/r/WatchPeopleCode</a> app </h1>
+      <h2> Livestreams available: {{live_stream_ids|length}}</h2>
+      <div class="col-md-8">
+          {% for id in live_stream_ids %}
+            <iframe id="ytplayer" type="text/html" width="640" height="390"
+                                                               src="http://www.youtube.com/embed/{{id}}?autoplay=0"
+             frameborder="0"/>
+            </iframe>
+          {% else %}
+            No live streams right now. Maybe <a href="https://docs.google.com/spreadsheets/d/1ANp6WewbBsFKuIPy0lybki8UldhXSd29LjcjS2PNCjU/">watch some of the previous ones?</a>
+          {% endfor %}
       </div>
+      <div class="col-md-4">
+          {% if added_successfully %}
+            Your email has been added successfully!
+          {% endif %}
+          <form action="" method="POST" class="form form-subscribe" role="form">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h1 class="panel-title">Subscribe to mailing list</h1>
+              </div>
 
-      <div class="panel-body">
-        <div class="form-group">
-          {{ form.hidden_tag() }}
-          {{ wtf.form_field(form.email, value="") }}
-          {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'primary'}) }}
-          {# <input type="email" class="form-control" placeholder="Email address" value="">
-        </div>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Subscribe</button>#}
+              <div class="panel-body">
+                <div class="form-group">
+                  {{ form.hidden_tag() }}
+                  {{ wtf.form_field(form.email, value="") }}
+                  {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'primary'}) }}
+                </div>
+              </div>
+          </form>
       </div>
-    </div>
-  </form>
+  </div>
 {% endblock %}
