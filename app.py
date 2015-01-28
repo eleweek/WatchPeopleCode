@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from flask_bootstrap import Bootstrap
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.properties import ColumnProperty
@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-app.secret_key = os.environ['SECRET_KEY'] 
+app.secret_key = os.environ['SECRET_KEY']
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 Bootstrap(app)
 db = SQLAlchemy(app)
@@ -89,6 +89,7 @@ def index():
         db.session.add(subscriber)
         db.session.commit()
         added_successfully = True
+        return redirect(url_for('.index'))
 
     return render_template('index.html', form=form, live_stream_ids=live_stream_ids, added_successfully=added_successfully)
 
