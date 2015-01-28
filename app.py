@@ -11,6 +11,7 @@ import os
 from utils import youtube_video_id, is_live_yt_stream, twitch_channel, is_live_twitch_stream
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
+import random
 
 app = Flask(__name__)
 app.secret_key = os.environ['SECRET_KEY']
@@ -34,11 +35,13 @@ class YoutubeStream(object):
 
     def html_code(self):
         return """
-              <iframe id="ytplayer" type="text/html" width="640" height="390
-                                                                 src="http://www.youtube.com/embed/{}?autoplay=0"
-               frameborder="0"/>
-              </iframe>
+                <iframe width="640" height="390"
+                src="http://www.youtube.com/embed/{}">
+                </iframe>
               """.format(self.id)
+
+
+past_streams = map(YoutubeStream, ['FvgDADZ7nyM', '2dNdULtjpmk', '1fx-6dsMovc', '3ZEFMGC4M8I', '4Ukk5lEQBa4', 'uOV4EceS27E', 'OmqmQfIlYcI'])
 
 
 class TwitchStream(object):
@@ -153,7 +156,8 @@ def index():
         flash("you've subscribed successfully", "success")
         return redirect(url_for('.index'))
 
-    return render_template('index.html', form=form, live_streams=live_streams)
+    random_past_stream = random.choice(past_streams) if not live_streams else None
+    return render_template('index.html', form=form, live_streams=live_streams, random_past_stream=random_past_stream)
 
 
 if __name__ == '__main__':

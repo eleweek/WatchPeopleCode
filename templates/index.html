@@ -16,34 +16,31 @@
   <div class="container">
     <h1 class="text-center"> Alpha version of <a href="http://www.reddit.com/r/WatchPeopleCode/">/r/WatchPeopleCode</a> app </h1>
     <h2 class="text-center"> Livestreams available: {{live_streams|length}}</h2>
-    {% if not live_streams %}
-      <div class="text-center">No live streams right now. Maybe 
-        <a href="https://docs.google.com/spreadsheets/d/1ANp6WewbBsFKuIPy0lybki8UldhXSd29LjcjS2PNCjU/">watch some of the previous ones?</a>
-      </div>
-      <br>
-      <div class="center-block">
-    {% else %}
       <div class="col-md-8">
         {% for stream in live_streams %}
           {{ stream.html_code() |safe }}
+        {% else %}
+          <h3>How about watching a recording of a past stream? </h3>
+          {{ random_past_stream.html_code() | safe }}
+          <p><a href="https://docs.google.com/spreadsheets/d/1ANp6WewbBsFKuIPy0lybki8UldhXSd29LjcjS2PNCjU/">Big list of past streams</a></p>
         {% endfor %}
       </div>
       <div class="col-md-4">
-    {% endif %}
-    <form action="" method="POST" class="form form-subscribe" role="form">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h1 class="panel-title">Subscribe to mailing list</h1>
-        </div>
+        <form action="" method="POST" class="form form-subscribe" role="form">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h1 class="panel-title">Subscribe to mailing list</h1>
+            </div>
 
-        <div class="panel-body">
-          <div class="form-group">
-            {{ form.hidden_tag() }}
-            {{ wtf.form_field(form.email, value="") }}
-            {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'primary'}) }}
+            <div class="panel-body">
+              <div class="form-group">
+                {{ form.hidden_tag() }}
+                {{ wtf.form_field(form.email, value="") }}
+                {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'primary'}) }}
+              </div>
+            </div>
           </div>
-        </div>
-    </form>
+        </form>
     </div>
   </div>
 
