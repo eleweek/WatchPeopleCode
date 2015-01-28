@@ -26,7 +26,12 @@ def youtube_video_id(url):
     return None
 
 
-def is_live_stream(yt_video_id, yt_key):
+def twitch_channel(url):
+    query = urlparse(url)
+    return query.path[1:] if query.hostname == 'twitch.tv' or query.hostname == 'www.twitch.tv' else None
+
+
+def is_live_yt_stream(yt_video_id, yt_key):
     r = requests.get("https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet&key={}".format(yt_video_id, yt_key))
     r.raise_for_status()
     for item in r.json()['items']:
@@ -34,3 +39,9 @@ def is_live_stream(yt_video_id, yt_key):
             return True
 
     return False
+
+
+def is_live_twitch_stream(twitch_channel):
+    r = requests.get("https://api.twitch.tv/kraken/streams/{}".format(twitch_channel))
+    r.raise_for_status()
+    return r.json()['stream'] is not None

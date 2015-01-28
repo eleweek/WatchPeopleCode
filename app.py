@@ -8,12 +8,12 @@ from wtforms.validators import ValidationError
 
 import praw
 import os
-from utils import youtube_video_id, is_live_stream
+from utils import youtube_video_id, is_live_yt_stream, twitch_channel, is_live_twitch_stream
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
-app.secret_key = os.environ['SECRET_KEY'] 
+app.secret_key = os.environ['SECRET_KEY']
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 Bootstrap(app)
 db = SQLAlchemy(app)
@@ -22,20 +22,80 @@ reddit_user_agent = "/r/WatchPeopleCode app"
 youtube_api_key = os.environ['ytokkey']
 
 
+class YoutubeStream(object):
+    def __init__(self, id):
+        self.id = id
+
+    def __eq__(self, other):
+        return type(self) == type(other) and self.id == other.id
+
+    def __hash__(self):
+        return hash(self.id)
+
+    def html_code(self):
+        return """
+              <iframe id="ytplayer" type="text/html" width="640" height="390
+                                                                 src="http://www.youtube.com/embed/{}?autoplay=0"
+               frameborder="0"/>
+              </iframe>
+              """.format(self.id)
+
+
+class TwitchStream(object):
+    def __init__(self, channel):
+        self.channel = channel
+
+    def __eq__(self, other):
+        return type(self) == type(other) and self.channel == other.channel
+
+    def __hash__(self):
+        return hash(self.channel)
+
+    def html_code(self):
+        return """
+               <object type="application/x-shockwave-flash"
+                       height="390" 
+                       width="640" 
+                       id="live_embed_player_flash"
+                       data="http://www.twitch.tv/widgets/live_embed_player.swf?channel={}"
+                       bgcolor="#000000">
+                 <param  name="allowFullScreen"
+                         value="true" />
+                 <param  name="allowScriptAccess"
+                         value="always" />
+                 <param  name="allowNetworking"
+                         value="all" />
+                 <param  name="movie"
+                         value="http://www.twitch.tv/widgets/live_embed_player.swf" />
+                 <param  name="flashvars"
+                         value="hostname=www.twitch.tv&channel={}&auto_play=false" />
+               </object>
+               """.format(self.channel, self.channel)
+
+
+def create_stream_from_url(url):
+    ytid = youtube_video_id(url)
+    if ytid is not None:
+        return YoutubeStream(ytid) if is_live_yt_stream(ytid, youtube_api_key) else None
+
+    tc = twitch_channel(url)
+    if tc is not None:
+        return TwitchStream(tc) if is_live_twitch_stream(tc) else None
+
+    return None
+
+
 class CurrentLiveStreams:
-    ids = None
+    _streams = None
     _last_time_checked = None
 
     @classmethod
-    def get_ids(self):
+    def get_streams(self):
         if self._last_time_checked is None or datetime.now() - self._last_time_checked > timedelta(seconds=59):
-            print "GETTING IDS"
             self._last_time_checked = datetime.now()
-            self.ids = self._get_current_live_streams_ids()
-        else:
-            print "CACHED"
+            self._streams = self._get_current_live_streams()
 
-        return self.ids
+        return self._streams
 
     @classmethod
     def _extract_links_from_selftexts(self, selftext_html):
@@ -43,17 +103,20 @@ class CurrentLiveStreams:
         return [a['href'] for a in soup.findAll('a')]
 
     @classmethod
-    def _get_current_live_streams_ids(self):
+    def _get_current_live_streams(self):
         r = praw.Reddit(user_agent=reddit_user_agent)
         r.config.decode_html_entities = True
 
-        submissions = list(r.get_subreddit('watchpeoplecode').get_new(limit=20))
-        submission_urls = [s.url for s in submissions]
-        selfposts_urls = sum([self._extract_links_from_selftexts(s.selftext_html) for s in submissions if s.selftext_html], [])
-        youtube_ids = set(filter(None, [youtube_video_id(s) for s in selfposts_urls + submission_urls]))
-        live_stream_ids = [yt_id for yt_id in youtube_ids if is_live_stream(yt_id, youtube_api_key)]
+        submissions = r.get_subreddit('watchpeoplecode').get_new(limit=20)
+        live_streams = set()
+        for s in submissions:
+            selfposts_urls = sum([self._extract_links_from_selftexts(s.selftext_html) for s in submissions if s.selftext_html], [])
+            for url in selfposts_urls + [s.url]:
+                stream = create_stream_from_url(url)
+                if stream:
+                    live_streams.add(stream)
 
-        return live_stream_ids
+        return live_streams
 
 
 class CaseInsensitiveComparator(ColumnProperty.Comparator):
@@ -79,7 +142,7 @@ class SubscribeForm(Form):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    live_stream_ids = CurrentLiveStreams.get_ids()
+    live_streams = CurrentLiveStreams.get_streams()
 
     form = SubscribeForm()
     added_successfully = False
@@ -90,7 +153,7 @@ def index():
         db.session.commit()
         added_successfully = True
 
-    return render_template('index.html', form=form, live_stream_ids=live_stream_ids, added_successfully=added_successfully)
+    return render_template('index.html', form=form, live_streams=live_streams, added_successfully=added_successfully)
 
 
 if __name__ == '__main__':
