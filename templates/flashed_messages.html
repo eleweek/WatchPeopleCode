@@ -1,0 +1,21 @@
+{% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            {% if category == 'error' %}
+                {% set icon = 'glyphicon glyphicon-exclamation-sign' %}
+                {% set bs_category = 'danger' %}
+            {% elif category == 'success' %}
+                {% set icon = 'glyphicon glyphicon-ok-sign' %}
+                {% set bs_category = 'success' %}
+            {% else %}
+                {% set icon = 'glyphicon glyphicon-info-sign' %}
+                {% set bs_category = 'info' %}
+            {% endif %}
+            <div class="alert alert-{{ bs_category }} alert-dismissible">
+                <span class="{{ icon }}"></span>&nbsp;
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                {{ message|safe }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_bootstrap import Bootstrap
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.properties import ColumnProperty
@@ -54,8 +54,8 @@ class TwitchStream(object):
     def html_code(self):
         return """
                <object type="application/x-shockwave-flash"
-                       height="390" 
-                       width="640" 
+                       height="390"
+                       width="640"
                        id="live_embed_player_flash"
                        data="http://www.twitch.tv/widgets/live_embed_player.swf?channel={}"
                        bgcolor="#000000">
@@ -145,16 +145,15 @@ def index():
     live_streams = CurrentLiveStreams.get_streams()
 
     form = SubscribeForm()
-    added_successfully = False
     if request.method == "POST" and form.validate_on_submit():
         subscriber = Subscriber()
         form.populate_obj(subscriber)
         db.session.add(subscriber)
         db.session.commit()
-        added_successfully = True
+        flash("you've subscribed successfully", "success")
         return redirect(url_for('.index'))
 
-    return render_template('index.html', form=form, live_streams=live_streams, added_successfully=added_successfully)
+    return render_template('index.html', form=form, live_streams=live_streams)
 
 
 if __name__ == '__main__':
