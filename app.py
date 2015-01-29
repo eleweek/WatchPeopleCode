@@ -101,8 +101,8 @@ class CurrentLiveStreams:
     @classmethod
     def get_streams(self):
         if self._last_time_checked is None or datetime.now() - self._last_time_checked > timedelta(seconds=59):
-            self._last_time_checked = datetime.now()
             self._streams = self._get_current_live_streams()
+            self._last_time_checked = datetime.now()
 
         return self._streams
 
@@ -151,7 +151,11 @@ class SubscribeForm(Form):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    live_streams = CurrentLiveStreams.get_streams()
+    try:
+        live_streams = CurrentLiveStreams.get_streams()
+    except:
+        live_streams = None
+        flash("Error while getting list of streams. Please try refreshing the page", "error")
 
     form = SubscribeForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -168,7 +172,10 @@ def index():
 
 @app.route('/json')
 def json():
-    return jsonify(stream_urls=[s.normal_url() for s in CurrentLiveStreams.get_streams()])
+    try:
+        return jsonify(stream_urls=[s.normal_url() for s in CurrentLiveStreams.get_streams()])
+    except:
+        return jsonify(error=True)
 
 if __name__ == '__main__':
     app.run(debug=True)

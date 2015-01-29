@@ -15,15 +15,21 @@
 {% block content %}
   <div class="container">
     <h1 class="text-center"> Alpha version of <a href="http://www.reddit.com/r/WatchPeopleCode/">/r/WatchPeopleCode</a> app </h1>
-    <h2 class="text-center"> Livestreams available: {{live_streams|length}}</h2>
+    {% if live_streams is not none %}
+        <h2 class="text-center"> Livestreams available: {{live_streams|length}}</h2>
+    {% else %}
+        <h2 class="text-center"> Error getting live streams. :( Maybe try refreshing the page? </h2>
+    {% endif %}
     <p class="text-center"><a href="https://docs.google.com/spreadsheets/d/1ANp6WewbBsFKuIPy0lybki8UldhXSd29LjcjS2PNCjU/">Big list of past streams</a></p>
       <div class="col-md-8">
-        {% for stream in live_streams %}
-          {{ stream.html_code() |safe }}
+        {% if live_streams %}
+            {% for stream in live_streams %}
+              {{ stream.html_code() |safe }}
+            {% endfor %}
         {% else %}
           <h3>How about watching a recording of a past stream? </h3>
           {{ random_past_stream.html_code() | safe }}
-        {% endfor %}
+        {% endif %}
       </div>
       <div class="col-md-4">
         <form action="" method="POST" class="form form-subscribe" role="form">
