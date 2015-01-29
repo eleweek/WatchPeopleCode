@@ -54,6 +54,9 @@ class YoutubeStream(Stream):
     def __hash__(self):
         return hash(self.ytid)
 
+    def __repr__(self):
+        return '<YoutubeStream %d %r>' % (self.id, self.ytid)
+
     def html_code(self):
         return """
                 <iframe width="640" height="390"
@@ -78,6 +81,9 @@ class TwitchStream(Stream):
 
     def __hash__(self):
         return hash(self.channel)
+
+    def __repr__(self):
+        return '<TwitchStream %d %r>' % (self.id, self.channel)
 
     def html_code(self):
         return """
@@ -159,6 +165,9 @@ class CaseInsensitiveComparator(ColumnProperty.Comparator):
 class Subscriber(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.column_property(db.Column(db.String(256), unique=True, nullable=False), comparator_factory=CaseInsensitiveComparator)
+
+    def __repr__(self):
+        return '<Subscriber %d %r>' % (self.id, self.email)
 
 
 def validate_email_unique(form, field):
