@@ -16,13 +16,13 @@
   <div class="container">
     <h1 class="text-center"> Alpha version of <a href="http://www.reddit.com/r/WatchPeopleCode/">/r/WatchPeopleCode</a> app </h1>
     <h2 class="text-center"> Livestreams available: {{live_streams|length}}</h2>
+    <p class="text-center"><a href="https://docs.google.com/spreadsheets/d/1ANp6WewbBsFKuIPy0lybki8UldhXSd29LjcjS2PNCjU/">Big list of past streams</a></p>
       <div class="col-md-8">
         {% for stream in live_streams %}
           {{ stream.html_code() |safe }}
         {% else %}
           <h3>How about watching a recording of a past stream? </h3>
           {{ random_past_stream.html_code() | safe }}
-          <p><a href="https://docs.google.com/spreadsheets/d/1ANp6WewbBsFKuIPy0lybki8UldhXSd29LjcjS2PNCjU/">Big list of past streams</a></p>
         {% endfor %}
       </div>
       <div class="col-md-4">
