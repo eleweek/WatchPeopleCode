@@ -45,6 +45,8 @@ class Stream(db.Model):
 
 
 class YoutubeStream(Stream):
+    ytid = db.Column(db.String(11), unique=True)
+
     def __init__(self, id):
         self.ytid = id
 
@@ -76,6 +78,8 @@ past_streams = map(YoutubeStream, ['FvgDADZ7nyM', '2dNdULtjpmk', '1fx-6dsMovc', 
 
 
 class TwitchStream(Stream):
+    channel = db.Column(db.String(25), unique=True)
+
     def __init__(self, channel):
         self.channel = channel
 
@@ -117,14 +121,24 @@ class TwitchStream(Stream):
     }
 
 
-def create_stream_from_url(url):
+def get_or_create_stream_from_url(url):
     ytid = youtube_video_id(url)
     if ytid is not None:
-        return YoutubeStream(ytid) if is_live_yt_stream(ytid, youtube_api_key) else None
+        ys = YoutubeStream.query.filter_by(ytid=ytid).first()
+        if not ys:
+            ys = YoutubeStream(ytid)
+            db.session.add(ys)
+
+        return ys if is_live_yt_stream(ytid, youtube_api_key) else None
 
     tc = twitch_channel(url)
     if tc is not None:
-        return TwitchStream(tc) if is_live_twitch_stream(tc) else None
+        ts = TwitchStream.query.filter_by(channel=tc).first()
+        if not ts:
+            ts = TwitchStream(tc)
+            db.session.add(ts)
+
+        return ts if is_live_twitch_stream(tc) else None
 
     return None
 
@@ -156,10 +170,11 @@ class CurrentLiveStreams:
         for s in submissions:
             selfposts_urls = self._extract_links_from_selftexts(s.selftext_html) if s.selftext_html else []
             for url in selfposts_urls + [s.url]:
-                stream = create_stream_from_url(url)
+                stream = get_or_create_stream_from_url(url)
                 if stream:
                     live_streams.add(stream)
 
+        db.session.commit()
         return live_streams
 
 
