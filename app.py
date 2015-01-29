@@ -34,28 +34,42 @@ reddit_user_agent = "/r/WatchPeopleCode app"
 youtube_api_key = os.environ['ytokkey']
 
 
-class YoutubeStream(object):
+class Stream(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(50))
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'stream'
+    }
+
+
+class YoutubeStream(Stream):
     def __init__(self, id):
-        self.id = id
+        self.ytid = id
 
     def __eq__(self, other):
-        return type(self) == type(other) and self.id == other.id
+        return type(self) == type(other) and self.ytid == other.ytid
 
     def __hash__(self):
-        return hash(self.id)
+        return hash(self.ytid)
 
     def html_code(self):
         return """
                 <iframe width="640" height="390"
                 src="http://www.youtube.com/embed/{}">
                 </iframe>
-              """.format(self.id)
+              """.format(self.ytid)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'youtube_stream'
+    }
 
 
 past_streams = map(YoutubeStream, ['FvgDADZ7nyM', '2dNdULtjpmk', '1fx-6dsMovc', '3ZEFMGC4M8I', '4Ukk5lEQBa4', 'uOV4EceS27E', 'OmqmQfIlYcI'])
 
 
-class TwitchStream(object):
+class TwitchStream(Stream):
     def __init__(self, channel):
         self.channel = channel
 
@@ -85,6 +99,10 @@ class TwitchStream(object):
                          value="hostname=www.twitch.tv&channel={}&auto_play=false" />
                </object>
                """.format(self.channel, self.channel)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'twitch_stream'
+    }
 
 
 def create_stream_from_url(url):
