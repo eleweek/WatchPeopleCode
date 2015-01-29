@@ -191,9 +191,10 @@ class SubscribeForm(Form):
 def index():
     try:
         live_streams = CurrentLiveStreams.get_streams()
-    except:
+    except Exception as e:
         live_streams = None
         flash("Error while getting list of streams. Please try refreshing the page", "error")
+        app.logger.exception(e)
 
     form = SubscribeForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -212,7 +213,8 @@ def index():
 def json():
     try:
         return jsonify(stream_urls=[s.normal_url() for s in CurrentLiveStreams.get_streams()])
-    except:
+    except Exception as e:
+        app.logger.exception(e)
         return jsonify(error=True)
 
 if __name__ == '__main__':

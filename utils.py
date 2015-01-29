@@ -28,7 +28,8 @@ def youtube_video_id(url):
 
 def twitch_channel(url):
     query = urlparse(url)
-    return query.path[1:] if query.hostname == 'twitch.tv' or query.hostname == 'www.twitch.tv' else None
+    channel = query.path.strip('/').split('/')[0] if query.hostname == 'twitch.tv' or query.hostname == 'www.twitch.tv' else None
+    return channel if channel else None
 
 
 def is_live_yt_stream(yt_video_id, yt_key):
