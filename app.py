@@ -5,6 +5,8 @@ from sqlalchemy.orm.properties import ColumnProperty
 from flask_wtf import Form
 from wtforms import StringField, SubmitField, validators
 from wtforms.validators import ValidationError
+from flask.ext.script import Manager
+from flask.ext.migrate import Migrate, MigrateCommand
 
 import praw
 import os
@@ -18,20 +20,42 @@ app.secret_key = os.environ['SECRET_KEY']
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 Bootstrap(app)
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+manager = Manager(app)
+manager.add_command('db', MigrateCommand)
+
+
+@manager.command
+def run():
+    app.run(debug=True)
+
 
 reddit_user_agent = "/r/WatchPeopleCode app"
 youtube_api_key = os.environ['ytokkey']
 
 
-class YoutubeStream(object):
+class Stream(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(50))
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'stream'
+    }
+
+
+class YoutubeStream(Stream):
     def __init__(self, id):
-        self.id = id
+        self.ytid = id
 
     def __eq__(self, other):
-        return type(self) == type(other) and self.id == other.id
+        return type(self) == type(other) and self.ytid == other.ytid
 
     def __hash__(self):
-        return hash(self.id)
+        return hash(self.ytid)
+
+    def __repr__(self):
+        return '<YoutubeStream %d %r>' % (self.id, self.ytid)
 
     def normal_url(self):
         return "http://www.youtube.com/watch?v={}".format(self.id)
@@ -41,13 +65,17 @@ class YoutubeStream(object):
                 <iframe width="640" height="390"
                 src="http://www.youtube.com/embed/{}">
                 </iframe>
-              """.format(self.id)
+              """.format(self.ytid)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'youtube_stream'
+    }
 
 
 past_streams = map(YoutubeStream, ['FvgDADZ7nyM', '2dNdULtjpmk', '1fx-6dsMovc', '3ZEFMGC4M8I', '4Ukk5lEQBa4', 'uOV4EceS27E', 'OmqmQfIlYcI'])
 
 
-class TwitchStream(object):
+class TwitchStream(Stream):
     def __init__(self, channel):
         self.channel = channel
 
@@ -56,6 +84,9 @@ class TwitchStream(object):
 
     def __hash__(self):
         return hash(self.channel)
+
+    def __repr__(self):
+        return '<TwitchStream %d %r>' % (self.id, self.channel)
 
     def normal_url(self):
         return "http://www.twitch.tv/" + self.channel
@@ -80,6 +111,10 @@ class TwitchStream(object):
                          value="hostname=www.twitch.tv&channel={}&auto_play=false" />
                </object>
                """.format(self.channel, self.channel)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'twitch_stream'
+    }
 
 
 def create_stream_from_url(url):
@@ -137,6 +172,9 @@ class Subscriber(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.column_property(db.Column(db.String(256), unique=True, nullable=False), comparator_factory=CaseInsensitiveComparator)
 
+    def __repr__(self):
+        return '<Subscriber %d %r>' % (self.id, self.email)
+
 
 def validate_email_unique(form, field):
     email = field.data
@@ -178,4 +216,4 @@ def json():
         return jsonify(error=True)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    manager.run()
