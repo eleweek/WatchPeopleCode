@@ -5,6 +5,8 @@ from sqlalchemy.orm.properties import ColumnProperty
 from flask_wtf import Form
 from wtforms import StringField, SubmitField, validators
 from wtforms.validators import ValidationError
+from flask.ext.script import Manager
+from flask.ext.migrate import Migrate, MigrateCommand
 
 import praw
 import os
@@ -18,6 +20,15 @@ app.secret_key = os.environ['SECRET_KEY']
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 Bootstrap(app)
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+manager = Manager(app)
+manager.add_command('db', MigrateCommand)
+
+
+@manager.command
+def run():
+    app.run(debug=True)
+
 
 reddit_user_agent = "/r/WatchPeopleCode app"
 youtube_api_key = os.environ['ytokkey']
@@ -161,4 +172,4 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    manager.run()
