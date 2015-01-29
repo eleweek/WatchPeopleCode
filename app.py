@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_bootstrap import Bootstrap
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.properties import ColumnProperty
@@ -33,6 +33,9 @@ class YoutubeStream(object):
     def __hash__(self):
         return hash(self.id)
 
+    def normal_url(self):
+        return "http://www.youtube.com/watch?v={}".format(self.id)
+
     def html_code(self):
         return """
                 <iframe width="640" height="390"
@@ -53,6 +56,9 @@ class TwitchStream(object):
 
     def __hash__(self):
         return hash(self.channel)
+
+    def normal_url(self):
+        return "http://www.twitch.tv/" + self.channel
 
     def html_code(self):
         return """
@@ -159,6 +165,10 @@ def index():
     random_past_stream = random.choice(past_streams) if not live_streams else None
     return render_template('index.html', form=form, live_streams=live_streams, random_past_stream=random_past_stream)
 
+
+@app.route('/json')
+def json():
+    return jsonify(stream_urls=[s.normal_url() for s in CurrentLiveStreams.get_streams()])
 
 if __name__ == '__main__':
     app.run(debug=True)
