@@ -113,7 +113,7 @@ class CurrentLiveStreams:
         submissions = r.get_subreddit('watchpeoplecode').get_new(limit=20)
         live_streams = set()
         for s in submissions:
-            selfposts_urls = sum([self._extract_links_from_selftexts(s.selftext_html) for s in submissions if s.selftext_html], [])
+            selfposts_urls = self._extract_links_from_selftexts(s.selftext_html) if s.selftext_html else []
             for url in selfposts_urls + [s.url]:
                 stream = create_stream_from_url(url)
                 if stream:
