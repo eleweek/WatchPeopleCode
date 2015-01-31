@@ -162,7 +162,7 @@ class CurrentLiveStreams:
         r.config.decode_html_entities = True
 
         submissions = r.get_subreddit('watchpeoplecode').get_new(limit=20)
-        live_streams = set()
+        new_live_streams = set()
         # TODO : don't forget about http vs https
         # TODO better way of caching api requests
         checked_stream_urls = set()
@@ -170,13 +170,21 @@ class CurrentLiveStreams:
             selfposts_urls = self._extract_links_from_selftexts(s.selftext_html) if s.selftext_html else []
             for url in selfposts_urls + [s.url]:
                 if url not in checked_stream_urls:
-                    stream = get_or_create_stream_from_url(url)
+                    # FIXME super ugly workaround :(
+                    for i in xrange(10):
+                        try:
+                            stream = get_or_create_stream_from_url(url)
+                            break
+                        except:
+                            if i == 9:
+                                raise
+
                     checked_stream_urls.add(url)
                     if stream:
-                        live_streams.add(stream)
+                        new_live_streams.add(stream)
 
         db.session.commit()
-        return live_streams
+        return new_live_streams
 
 
 class CaseInsensitiveComparator(ColumnProperty.Comparator):

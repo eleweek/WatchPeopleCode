@@ -50,7 +50,7 @@ def requests_get_with_retries(url, retries_num=5):
 
 
 def is_live_yt_stream(yt_video_id, yt_key):
-    r = requests_get_with_retries("https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet&key={}".format(yt_video_id, yt_key))
+    r = requests_get_with_retries("https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet&key={}".format(yt_video_id, yt_key), retries_num=15)
     r.raise_for_status()
     for item in r.json()['items']:
         if item['snippet']['liveBroadcastContent'] == 'live':
