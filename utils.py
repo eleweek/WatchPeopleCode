@@ -28,7 +28,12 @@ def youtube_video_id(url):
 
 def twitch_channel(url):
     query = urlparse(url)
-    channel = query.path.strip('/').split('/')[0] if query.hostname == 'twitch.tv' or query.hostname == 'www.twitch.tv' else None
+    path_elements = query.path.strip('/').split('/')
+    if len(path_elements) == 1:
+        channel = path_elements[0] if query.hostname == 'twitch.tv' or query.hostname == 'www.twitch.tv' else None
+    else:
+        return None
+
     return channel if channel else None
 
 
@@ -37,8 +42,8 @@ def requests_get_with_retries(url, retries_num=5):
     session = requests.Session()
 
     # `mount` a custom adapter that retries failed connections for HTTP and HTTPS requests.
-    session.mount("http://", requests.adapters.HTTPAdapter(max_retries=1))
-    session.mount("https://", requests.adapters.HTTPAdapter(max_retries=1))
+    session.mount("http://", requests.adapters.HTTPAdapter(max_retries=retries_num))
+    session.mount("https://", requests.adapters.HTTPAdapter(max_retries=retries_num))
 
     # Rejoice with new fault tolerant behaviour!
     return session.get(url=url)
