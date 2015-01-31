@@ -32,8 +32,20 @@ def twitch_channel(url):
     return channel if channel else None
 
 
+def requests_get_with_retries(url, retries_num=5):
+    # Use a `Session` instance to customize how `requests` handles making HTTP requests.
+    session = requests.Session()
+
+    # `mount` a custom adapter that retries failed connections for HTTP and HTTPS requests.
+    session.mount("http://", requests.adapters.HTTPAdapter(max_retries=1))
+    session.mount("https://", requests.adapters.HTTPAdapter(max_retries=1))
+
+    # Rejoice with new fault tolerant behaviour!
+    return session.get(url=url)
+
+
 def is_live_yt_stream(yt_video_id, yt_key):
-    r = requests.get("https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet&key={}".format(yt_video_id, yt_key))
+    r = requests_get_with_retries("https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet&key={}".format(yt_video_id, yt_key))
     r.raise_for_status()
     for item in r.json()['items']:
         if item['snippet']['liveBroadcastContent'] == 'live':
@@ -43,6 +55,6 @@ def is_live_yt_stream(yt_video_id, yt_key):
 
 
 def is_live_twitch_stream(twitch_channel):
-    r = requests.get("https://api.twitch.tv/kraken/streams/{}".format(twitch_channel))
+    r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(twitch_channel))
     r.raise_for_status()
     return r.json()['stream'] is not None
