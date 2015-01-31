@@ -27,8 +27,8 @@
               {{ stream.html_code() |safe }}
             {% endfor %}
         {% else %}
-          <h3>How about watching a recording of a past stream? </h3>
-          {{ random_past_stream.html_code() | safe }}
+          <h3>How about watching this past recording(if it is a live stream -- you're lucky ;) )? </h3>
+          {{ random_stream.html_code() | safe }}
         {% endif %}
       </div>
       <div class="col-md-4">

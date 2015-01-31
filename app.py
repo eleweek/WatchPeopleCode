@@ -74,9 +74,6 @@ class YoutubeStream(Stream):
     }
 
 
-past_streams = map(YoutubeStream, ['FvgDADZ7nyM', '2dNdULtjpmk', '1fx-6dsMovc', '3ZEFMGC4M8I', '4Ukk5lEQBa4', 'uOV4EceS27E', 'OmqmQfIlYcI'])
-
-
 class TwitchStream(Stream):
     channel = db.Column(db.String(25), unique=True)
 
@@ -220,8 +217,8 @@ def index():
         flash("you've subscribed successfully", "success")
         return redirect(url_for('.index'))
 
-    random_past_stream = random.choice(past_streams) if not live_streams else None
-    return render_template('index.html', form=form, live_streams=live_streams, random_past_stream=random_past_stream)
+    random_stream = YoutubeStream.query.order_by(db.func.random()).first()
+    return render_template('index.html', form=form, live_streams=live_streams, random_stream=random_stream)
 
 
 @app.route('/json')
