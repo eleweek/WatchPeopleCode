@@ -24,11 +24,14 @@
       <div class="col-md-8">
         {% if live_streams %}
             {% for stream in live_streams %}
+              <a href={{ stream.normal_url() }}> {{ stream.normal_url() }}</a>
               {{ stream.html_code() |safe }}
+              <hr>
             {% endfor %}
         {% else %}
-          <h3>How about watching this past recording(if it is a live stream -- you're lucky ;) )? </h3>
+          <a href={{ random_stream.normal_url() }}> {{ random_stream.normal_url() }}</a>
           {{ random_stream.html_code() | safe }}
+          <hr>
         {% endif %}
       </div>
       <div class="col-md-4">

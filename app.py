@@ -59,7 +59,7 @@ class YoutubeStream(Stream):
         return '<YoutubeStream %d %r>' % (self.id, self.ytid)
 
     def normal_url(self):
-        return "http://www.youtube.com/watch?v={}".format(self.id)
+        return "http://www.youtube.com/watch?v={}".format(self.ytid)
 
     def html_code(self):
         return """
