@@ -42,6 +42,7 @@
           {% for stream in upcoming_streams %}
             <a href={{ stream.normal_url() }}> {{ stream.normal_url() }}</a>
             {{ stream.html_code() | safe }}
+            <hr>
           {% endfor %}
         {% endif %}
 
