@@ -20,6 +20,7 @@
     {% else %}
         <h2 class="text-center"> Error getting live streams. :( Maybe try refreshing the page? </h2>
     {% endif %}
+    <p class="text-center"> The app automatically gets live stream from /r/WatchPeopleCode subreddit, so if you want to start live streaming, submit a link to your youtube stream or twitch channel to <a href="http://www.reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode </a></p>
     <p class="text-center"><a href="https://docs.google.com/spreadsheets/d/1ANp6WewbBsFKuIPy0lybki8UldhXSd29LjcjS2PNCjU/">Big list of past streams</a></p>
       <div class="col-md-8">
         {% if live_streams %}
@@ -35,7 +36,9 @@
         {% endif %}
 
         {% if upcoming_streams is not none %}
-          <h4>Upcoming streams:</h4><br>
+          <h4>Live Coding Sunday: upcoming streams</h4><br>
+          <p> Live Coding Sunday is an event in <a href="http://reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode </a></p>
+          <p> Take a look at <a href="http://www.reddit.com/r/WatchPeopleCode/comments/2ueou9/reminder_live_coding_sunday_starts_in_2_hours/"> the thread here</a> </p>
           {% for stream in upcoming_streams %}
             <a href={{ stream.normal_url() }}> {{ stream.normal_url() }}</a>
             {{ stream.html_code() | safe }}
