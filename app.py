@@ -36,8 +36,8 @@ class Stream(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(50))
     scheduled_start_time = db.Column(db.DateTime())
-    is_live = db.Column(db.Boolean())
-    is_completed = db.Column(db.Boolean())
+    is_live = db.Column(db.Boolean(), default=False, server_default="false")
+    is_completed = db.Column(db.Boolean(), default=False, server_default="false")
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -219,7 +219,8 @@ def index():
         return redirect(url_for('.index'))
 
     random_stream = YoutubeStream.query.order_by(db.func.random()).first()
-    return render_template('index.html', form=form, live_streams=live_streams, random_stream=random_stream)
+    upcoming_streams = Stream.query.filter_by(is_live=False, is_completed=False).filter(Stream.scheduled_start_time != None)
+    return render_template('index.html', form=form, live_streams=live_streams, random_stream=random_stream, upcoming_streams=upcoming_streams)
 
 
 @app.route('/json')
