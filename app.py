@@ -74,7 +74,7 @@ class YoutubeStream(Stream):
 
 
 class TwitchStream(Stream):
-    channel = db.Column(db.String(25), unique=True)
+    channel = db.Column(db.String(25))
 
     def __init__(self, channel):
         self.channel = channel
