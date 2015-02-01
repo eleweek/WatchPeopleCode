@@ -12,7 +12,6 @@ import praw
 import os
 from utils import youtube_video_id, is_live_yt_stream, twitch_channel, is_live_twitch_stream
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.secret_key = os.environ['SECRET_KEY']
@@ -142,52 +141,39 @@ def get_or_create_stream_from_url(url):
     return None
 
 
-class CurrentLiveStreams:
-    _streams = None
-    _last_time_checked = None
+def extract_links_from_selftexts(selftext_html):
+    soup = BeautifulSoup(selftext_html)
+    return [a['href'] for a in soup.findAll('a')]
 
-    @classmethod
-    def get_streams(self):
-        if self._last_time_checked is None or datetime.now() - self._last_time_checked > timedelta(seconds=59):
-            self._streams = self._get_current_live_streams()
-            self._last_time_checked = datetime.now()
 
-        return self._streams
+def get_current_live_streams():
+    r = praw.Reddit(user_agent=reddit_user_agent)
+    r.config.decode_html_entities = True
 
-    @classmethod
-    def _extract_links_from_selftexts(self, selftext_html):
-        soup = BeautifulSoup(selftext_html)
-        return [a['href'] for a in soup.findAll('a')]
+    submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
+    new_live_streams = set()
+    # TODO : don't forget about http vs https
+    # TODO better way of caching api requests
+    checked_stream_urls = set()
+    for s in submissions:
+        selfposts_urls = extract_links_from_selftexts(s.selftext_html) if s.selftext_html else []
+        for url in selfposts_urls + [s.url]:
+            if url not in checked_stream_urls:
+                # FIXME super ugly workaround :(
+                for i in xrange(10):
+                    try:
+                        stream = get_or_create_stream_from_url(url)
+                        break
+                    except:
+                        if i == 9:
+                            raise
 
-    @classmethod
-    def _get_current_live_streams(self):
-        r = praw.Reddit(user_agent=reddit_user_agent)
-        r.config.decode_html_entities = True
+                checked_stream_urls.add(url)
+                if stream:
+                    new_live_streams.add(stream)
 
-        submissions = r.get_subreddit('watchpeoplecode').get_new(limit=20)
-        new_live_streams = set()
-        # TODO : don't forget about http vs https
-        # TODO better way of caching api requests
-        checked_stream_urls = set()
-        for s in submissions:
-            selfposts_urls = self._extract_links_from_selftexts(s.selftext_html) if s.selftext_html else []
-            for url in selfposts_urls + [s.url]:
-                if url not in checked_stream_urls:
-                    # FIXME super ugly workaround :(
-                    for i in xrange(10):
-                        try:
-                            stream = get_or_create_stream_from_url(url)
-                            break
-                        except:
-                            if i == 9:
-                                raise
-
-                    checked_stream_urls.add(url)
-                    if stream:
-                        new_live_streams.add(stream)
-
-        db.session.commit()
-        return new_live_streams
+    db.session.commit()
+    return new_live_streams
 
 
 class CaseInsensitiveComparator(ColumnProperty.Comparator):
@@ -217,7 +203,7 @@ class SubscribeForm(Form):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     try:
-        live_streams = CurrentLiveStreams.get_streams()
+        live_streams = Stream.query.filter_by(is_live=True).all()
     except Exception as e:
         live_streams = None
         flash("Error while getting list of streams. Please try refreshing the page", "error")
