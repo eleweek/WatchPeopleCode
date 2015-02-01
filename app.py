@@ -36,7 +36,7 @@ youtube_api_key = os.environ['ytokkey']
 class Stream(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(50))
-    schelduled_start_time = db.Column(db.DateTime())
+    scheduled_start_time = db.Column(db.DateTime())
     is_live = db.Column(db.Boolean())
     is_completed = db.Column(db.Boolean())
 
