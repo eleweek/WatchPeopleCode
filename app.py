@@ -38,6 +38,7 @@ class Stream(db.Model):
     scheduled_start_time = db.Column(db.DateTime())
     is_live = db.Column(db.Boolean(), default=False, server_default="false")
     is_completed = db.Column(db.Boolean(), default=False, server_default="false")
+    status = db.Column(db.Enum('upcoming', 'live', 'completed', name='stream_status'))
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -203,7 +204,7 @@ class SubscribeForm(Form):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     try:
-        live_streams = Stream.query.filter_by(is_live=True).order_by(Stream.scheduled_start_time.desc().nullslast()).all()
+        live_streams = Stream.query.filter_by(status='live').order_by(Stream.scheduled_start_time.desc().nullslast()).all()
     except Exception as e:
         live_streams = None
         flash("Error while getting list of streams. Please try refreshing the page", "error")
@@ -219,14 +220,14 @@ def index():
         return redirect(url_for('.index'))
 
     random_stream = YoutubeStream.query.order_by(db.func.random()).first()
-    upcoming_streams = Stream.query.filter_by(is_live=False, is_completed=False).filter(Stream.scheduled_start_time != None).order_by(Stream.scheduled_start_time.asc())
+    upcoming_streams = Stream.query.filter_by(status='upcoming').order_by(Stream.scheduled_start_time.asc())
     return render_template('index.html', form=form, live_streams=live_streams, random_stream=random_stream, upcoming_streams=upcoming_streams)
 
 
 @app.route('/json')
 def json():
     try:
-        return jsonify(stream_urls=Stream.query.filter_by(is_live=True).all())
+        return jsonify(stream_urls=Stream.query.filter_by(status='live').all())
     except Exception as e:
         app.logger.exception(e)
         return jsonify(error=True)
