@@ -47,19 +47,3 @@ def requests_get_with_retries(url, retries_num=5):
 
     # Rejoice with new fault tolerant behaviour!
     return session.get(url=url)
-
-
-def is_live_yt_stream(yt_video_id, yt_key):
-    r = requests_get_with_retries("https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet&key={}".format(yt_video_id, yt_key), retries_num=15)
-    r.raise_for_status()
-    for item in r.json()['items']:
-        if item['snippet']['liveBroadcastContent'] == 'live':
-            return True
-
-    return False
-
-
-def is_live_twitch_stream(twitch_channel):
-    r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(twitch_channel))
-    r.raise_for_status()
-    return r.json()['stream'] is not None

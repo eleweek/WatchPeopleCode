@@ -1,26 +1,26 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
-from app import get_current_live_streams, db, Stream
+from app import db, Stream, get_new_streams
+from sqlalchemy import or_
 
 sched = BlockingScheduler()
 
 
 @sched.scheduled_job('interval', seconds=20)
 def update_state():
-    print "updating_state"
-    for ls in Stream.query:
-        if ls.status == 'live':
-            ls.status = 'completed'
+    for ls in Stream.query.filter(or_(Stream.status != 'completed', Stream.status == None)):
+        try:
+            ls._get_api_status()
+        except Exception as e:
+            db.session.rollback()
+            print e
+            raise
 
     try:
-        live_streams = get_current_live_streams()
+        get_new_streams()
     except Exception as e:
         db.session.rollback()
         print e
         raise
-
-    print live_streams
-    for ls in live_streams:
-        ls.status = 'live'
 
     db.session.commit()
 

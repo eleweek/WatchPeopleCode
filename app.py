@@ -10,7 +10,7 @@ from flask.ext.migrate import Migrate, MigrateCommand
 
 import praw
 import os
-from utils import youtube_video_id, is_live_yt_stream, twitch_channel, is_live_twitch_stream
+from utils import youtube_video_id, twitch_channel, requests_get_with_retries
 from bs4 import BeautifulSoup
 
 app = Flask(__name__)
@@ -59,6 +59,19 @@ class YoutubeStream(Stream):
     def __repr__(self):
         return '<YoutubeStream %d %r>' % (self.id, self.ytid)
 
+    def _get_api_status(self):
+        r = requests_get_with_retries(
+            "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet&key={}".format(self.ytid, youtube_api_key), retries_num=15)
+        r.raise_for_status()
+        for item in r.json()['items']:
+            if item['kind'] == 'youtube#video':
+                if item['snippet']['liveBroadcastContent'] == 'live':
+                    self.status = 'live'
+                elif item['snippet']['liveBroadcastContent'] == 'upcoming':
+                    self.status = 'upcoming'
+                else:
+                    self.status = 'completed'
+
     def normal_url(self):
         return "http://www.youtube.com/watch?v={}".format(self.ytid)
 
@@ -89,6 +102,12 @@ class TwitchStream(Stream):
     def __repr__(self):
         return '<TwitchStream %d %r>' % (self.id, self.channel)
 
+    def _get_api_status(self):
+        r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
+        r.raise_for_status()
+        if r.json()['stream'] is not None:
+            self.status = 'live'
+
     def normal_url(self):
         return "http://www.twitch.tv/" + self.channel
 
@@ -118,24 +137,20 @@ class TwitchStream(Stream):
     }
 
 
-def get_or_create_stream_from_url(url):
+def get_new_stream_from_url(url):
     ytid = youtube_video_id(url)
     if ytid is not None:
-        ys = YoutubeStream.query.filter_by(ytid=ytid).first()
-        if not ys:
-            ys = YoutubeStream(ytid)
-            db.session.add(ys)
-
-        return ys if is_live_yt_stream(ytid, youtube_api_key) else None
+        if YoutubeStream.query.filter_by(ytid=ytid).first() is None:
+            return YoutubeStream(ytid)
+        else:
+            return None
 
     tc = twitch_channel(url)
     if tc is not None:
-        ts = TwitchStream.query.filter_by(channel=tc).first()
-        if not ts:
-            ts = TwitchStream(tc)
-            db.session.add(ts)
-
-        return ts if is_live_twitch_stream(tc) else None
+        if TwitchStream.query.filter_by(channel=tc).first() is None:
+            return TwitchStream(tc)
+        else:
+            return None
 
     return None
 
@@ -145,34 +160,32 @@ def extract_links_from_selftexts(selftext_html):
     return [a['href'] for a in soup.findAll('a')]
 
 
-def get_current_live_streams():
+def get_new_streams():
     r = praw.Reddit(user_agent=reddit_user_agent)
     r.config.decode_html_entities = True
 
     submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
-    new_live_streams = set()
+    new_streams = set()
     # TODO : don't forget about http vs https
     # TODO better way of caching api requests
-    checked_stream_urls = set()
     for s in submissions:
         selfposts_urls = extract_links_from_selftexts(s.selftext_html) if s.selftext_html else []
         for url in selfposts_urls + [s.url]:
-            if url not in checked_stream_urls:
-                # FIXME super ugly workaround :(
-                for i in xrange(10):
-                    try:
-                        stream = get_or_create_stream_from_url(url)
-                        break
-                    except:
-                        if i == 9:
-                            raise
+            # FIXME super ugly workaround :(
+            for i in xrange(10):
+                try:
+                    stream = get_new_stream_from_url(url)
+                    break
+                except:
+                    if i == 9:
+                        raise
 
-                checked_stream_urls.add(url)
-                if stream:
-                    new_live_streams.add(stream)
+            if stream:
+                stream._get_api_status()
+                db.session.add(stream)
+                new_streams.add(stream)
 
     db.session.commit()
-    return new_live_streams
 
 
 class CaseInsensitiveComparator(ColumnProperty.Comparator):
