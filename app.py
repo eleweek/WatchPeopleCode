@@ -109,6 +109,8 @@ class TwitchStream(Stream):
         r.raise_for_status()
         if r.json()['stream'] is not None:
             self.status = 'live'
+        else:
+            self.status = None
 
     def normal_url(self):
         return "http://www.twitch.tv/" + self.channel
