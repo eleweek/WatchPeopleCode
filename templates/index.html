@@ -49,9 +49,7 @@
         {% endif %}
 
         {% if upcoming_streams is not none %}
-          <h4>Live Coding Sunday: upcoming streams</h4><br>
-          <p> Live Coding Sunday is an event in <a href="http://reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode </a></p>
-          <p> Take a look at <a href="http://www.reddit.com/r/WatchPeopleCode/comments/2ueou9/reminder_live_coding_sunday_starts_in_2_hours/"> the thread here</a> </p>
+          <h4> Upcoming streams </h4><br>
           {% for stream in upcoming_streams %}
             <a href={{ stream.normal_url() }}> {{ stream.normal_url() }}</a>
             {{ stream.html_code() | safe }}
