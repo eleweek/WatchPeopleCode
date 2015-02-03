@@ -165,12 +165,7 @@ class SubscribeForm(Form):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    try:
-        live_streams = Stream.query.filter_by(status='live').order_by(Stream.scheduled_start_time.desc().nullslast()).all()
-    except Exception as e:
-        live_streams = None
-        flash("Error while getting list of streams. Please try refreshing the page", "error")
-        app.logger.exception(e)
+    live_streams = Stream.query.filter_by(status='live').order_by(Stream.scheduled_start_time.desc().nullslast()).all()
 
     form = SubscribeForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -181,7 +176,7 @@ def index():
         flash("you've subscribed successfully", "success")
         return redirect(url_for('.index'))
 
-    random_stream = YoutubeStream.query.order_by(db.func.random()).first()
+    random_stream = YoutubeStream.query.filter(YoutubeStream.status != 'upcoming').order_by(db.func.random()).first()
     upcoming_streams = Stream.query.filter_by(status='upcoming').order_by(Stream.scheduled_start_time.asc())
     return render_template('index.html', form=form, live_streams=live_streams, random_stream=random_stream, upcoming_streams=upcoming_streams)
 
