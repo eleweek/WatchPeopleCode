@@ -8,9 +8,8 @@ sched = BlockingScheduler()
 def update_state():
     print "updating_state"
     for ls in Stream.query:
-        if ls.is_live:
-            ls.is_completed = True
-        ls.is_live = False
+        if ls.status == 'live':
+            ls.status = 'completed'
 
     try:
         live_streams = get_current_live_streams()
@@ -21,8 +20,7 @@ def update_state():
 
     print live_streams
     for ls in live_streams:
-        ls.is_live = True
-        ls.is_completed = False
+        ls.status = 'live'
 
     db.session.commit()
 
