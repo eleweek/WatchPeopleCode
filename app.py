@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, g
 from flask_bootstrap import Bootstrap
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.properties import ColumnProperty
@@ -19,6 +19,11 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
+
+
+@app.before_first_request
+def add_ga_tracking_code():
+    g.ga_tracking_code = os.environ['GA_TRACKING_CODE']
 
 
 @manager.command
