@@ -36,8 +36,6 @@ class Stream(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(50))
     scheduled_start_time = db.Column(db.DateTime())
-    is_live = db.Column(db.Boolean(), default=False, server_default="false")
-    is_completed = db.Column(db.Boolean(), default=False, server_default="false")
     status = db.Column(db.Enum('upcoming', 'live', 'completed', name='stream_status'))
 
     __mapper_args__ = {
