@@ -9,6 +9,8 @@ from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 
 import os
+import requests
+import json
 from utils import requests_get_with_retries
 
 app = Flask(__name__)
@@ -34,11 +36,17 @@ def run():
 youtube_api_key = os.environ['ytokkey']
 
 
+subscription = db.Table('subscription',
+                        db.Column('stream_id', db.Integer(), db.ForeignKey('stream.id')),
+                        db.Column('subscriber_id', db.Integer(), db.ForeignKey('subscriber.id')))
+
+
 class Stream(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(50))
     scheduled_start_time = db.Column(db.DateTime())
     status = db.Column(db.Enum('upcoming', 'live', 'completed', name='stream_status'))
+    subscribers = db.relationship('Subscriber', secondary=subscription, backref=db.backref('streams', lazy='dynamic'))
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -190,6 +198,7 @@ def stream_json():
     except Exception as e:
         app.logger.exception(e)
         return jsonify(error=True)
+
 
 if __name__ == '__main__':
     manager.run()
