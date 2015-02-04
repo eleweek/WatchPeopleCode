@@ -21,6 +21,8 @@ app.config['MAILGUN_API_URL'] = os.environ['MAILGUN_API_URL']
 app.config['MAILGUN_API_KEY'] = os.environ['MAILGUN_API_KEY']
 app.config['MAILGUN_TEST_OPTION'] = True if os.environ['MAILGUN_TEST_OPTION'] == 'True' else False
 app.config['NOTIFICATION_EMAIL'] = os.environ['MAILGUN_SMTP_LOGIN']
+app.config['REDDIT_PASSWORD'] = os.environ['REDDIT_PASSWORD']
+app.config['REDDIT_USERNAME'] = os.environ['REDDIT_USERNAME']
 Bootstrap(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -53,6 +55,7 @@ class Stream(db.Model):
     status = db.Column(db.Enum('upcoming', 'live', 'completed', name='stream_status'))
     title = db.Column(db.String(100))
     subscribers = db.relationship('Subscriber', secondary=subscription, backref=db.backref('streams', lazy='dynamic'))
+    # reddit_thread = db.Column(db.String(255))
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -235,7 +238,6 @@ def notify(stream):
         html = render_template('mails/notification.html', stream=stream)
         recipient_vars = {email: {} for email in stream.subscribers}
         send_message(recipient_vars, subject, text, html)
-
 
 if __name__ == '__main__':
     manager.run()
