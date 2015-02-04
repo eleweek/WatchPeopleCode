@@ -9,9 +9,16 @@ import traceback
 import datetime
 
 
+reddit_user_agent = "/r/WatchPeopleCode app"
+r = praw.Reddit(user_agent=reddit_user_agent)
+r.config.decode_html_entities = True
+r.login(app.config['REDDIT_USERNAME'], app.config['REDDIT_PASSWORD'])
+
+
 def get_stream_from_url(url, only_new=False):
-    ytid = youtube_video_id(url)
     db_stream = None
+
+    ytid = youtube_video_id(url)
     if ytid is not None:
         db_stream = YoutubeStream.query.filter_by(ytid=ytid).first()
         if db_stream is None:
@@ -31,13 +38,7 @@ def extract_links_from_selftexts(selftext_html):
     return [a['href'] for a in soup.findAll('a')]
 
 
-reddit_user_agent = "/r/WatchPeopleCode app"
-
-
 def get_new_streams():
-    r = praw.Reddit(user_agent=reddit_user_agent)
-    r.config.decode_html_entities = True
-
     submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
     new_streams = set()
     # TODO : don't forget about http vs https
@@ -45,14 +46,7 @@ def get_new_streams():
     for s in submissions:
         selfposts_urls = extract_links_from_selftexts(s.selftext_html) if s.selftext_html else []
         for url in selfposts_urls + [s.url]:
-            # FIXME super ugly workaround :(
-            for i in xrange(10):
-                try:
-                    stream = get_stream_from_url(url, only_new=True)
-                    break
-                except:
-                    if i == 9:
-                        raise
+            stream = get_stream_from_url(url, only_new=True)
 
             if stream:
                 stream._update_status()
@@ -65,12 +59,9 @@ def get_new_streams():
 sched = BlockingScheduler()
 
 
+@sched.scheduled_job('interval', seconds=50)
 def update_flairs():
     try:
-        r = praw.Reddit(user_agent=reddit_user_agent)
-        r.config.decode_html_entities = True
-        r.login(app.config['REDDIT_USERNAME'], app.config['REDDIT_PASSWORD'])
-
         submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
         for s in submissions:
             selfposts_urls = extract_links_from_selftexts(s.selftext_html) if s.selftext_html else []
@@ -101,7 +92,7 @@ def update_flairs():
         traceback.print_exc()
 
 
-@sched.scheduled_job('interval', seconds=4)
+@sched.scheduled_job('interval', seconds=20)
 def update_state():
     for ls in Stream.query.filter(or_(Stream.status != 'completed', Stream.status == None)):
         try:
@@ -119,7 +110,5 @@ def update_state():
         raise
 
     db.session.commit()
-
-    update_flairs()
 
 sched.start()
