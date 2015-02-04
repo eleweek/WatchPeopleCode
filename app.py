@@ -9,9 +9,9 @@ from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 
 import os
-import requests
 import json
 from utils import requests_get_with_retries
+
 
 app = Flask(__name__)
 app.secret_key = os.environ['SECRET_KEY']
@@ -46,6 +46,7 @@ class Stream(db.Model):
     type = db.Column(db.String(50))
     scheduled_start_time = db.Column(db.DateTime())
     status = db.Column(db.Enum('upcoming', 'live', 'completed', name='stream_status'))
+    title = db.Column(db.String(100))
     subscribers = db.relationship('Subscriber', secondary=subscription, backref=db.backref('streams', lazy='dynamic'))
 
     __mapper_args__ = {
@@ -75,6 +76,7 @@ class YoutubeStream(Stream):
         r.raise_for_status()
         for item in r.json()['items']:
             if item['kind'] == 'youtube#video':
+                self.title = item['snippet']['title']
                 if item['snippet']['liveBroadcastContent'] == 'live':
                     self.status = 'live'
                 elif item['snippet']['liveBroadcastContent'] == 'upcoming':
@@ -115,10 +117,13 @@ class TwitchStream(Stream):
     def _update_status(self):
         r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
         r.raise_for_status()
-        if r.json()['stream'] is not None:
+        stream = r.json()['stream']
+        if stream is not None:
             self.status = 'live'
+            self.title = stream['channel']['status']
         else:
             self.status = None
+            self.title = None
 
     def normal_url(self):
         return "http://www.twitch.tv/" + self.channel
