@@ -61,7 +61,7 @@ class YoutubeStream(Stream):
     def __repr__(self):
         return '<YoutubeStream %d %r>' % (self.id, self.ytid)
 
-    def _get_api_status(self):
+    def _update_status(self):
         r = requests_get_with_retries(
             "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet&key={}".format(self.ytid, youtube_api_key), retries_num=15)
         r.raise_for_status()
@@ -104,7 +104,7 @@ class TwitchStream(Stream):
     def __repr__(self):
         return '<TwitchStream %d %r>' % (self.id, self.channel)
 
-    def _get_api_status(self):
+    def _update_status(self):
         r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
         r.raise_for_status()
         if r.json()['stream'] is not None:

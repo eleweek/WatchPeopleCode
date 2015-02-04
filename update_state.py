@@ -54,7 +54,7 @@ def get_new_streams():
                         raise
 
             if stream:
-                stream._get_api_status()
+                stream._update_status()
                 db.session.add(stream)
                 new_streams.add(stream)
 
@@ -68,7 +68,7 @@ sched = BlockingScheduler()
 def update_state():
     for ls in Stream.query.filter(or_(Stream.status != 'completed', Stream.status == None)):
         try:
-            ls._get_api_status()
+            ls._update_status()
         except Exception as e:
             db.session.rollback()
             print e
