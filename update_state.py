@@ -69,8 +69,9 @@ def update_flairs():
                 stream = get_stream_from_url(url)
                 if stream:
                     flair_choices = s.get_flair_choices()['choices']
+                    current_flair_text = s.get_flair_choices()[u'current'][u'flair_text']
                     status_to_flair_text = {"live": u"Live",
-                                            "completed": u"Finished",  # TODO, careful, only for youtube
+                                            "completed": u"Recording Available",  # TODO, careful, only for youtube
                                             "upcoming": u"Upcoming",
                                             None: None}
 
@@ -80,7 +81,7 @@ def update_flairs():
                         created_dt = datetime.datetime.utcfromtimestamp(s.created_utc)
                         now = datetime.datetime.utcnow()
                         if now - created_dt > datetime.timedelta(hours=12):
-                            flair_text = None
+                            flair_text = current_flair_text if current_flair_text == "Finished" else None
 
                     if flair_text is not None:
                         for fc in flair_choices:
