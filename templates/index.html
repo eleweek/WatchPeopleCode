@@ -43,6 +43,7 @@
               <hr>
             {% endfor %}
         {% else %}
+          <h4> How about watching a random recorded stream? </h4>
           <a href={{ random_stream.normal_url() }}> {{ random_stream.title if random_stream.title else random_stream.normal_url() }}</a>
           {{ random_stream.html_code() | safe }}
           <hr>
