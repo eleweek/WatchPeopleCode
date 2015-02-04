@@ -9,6 +9,7 @@ from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 
 import os
+import requests
 import json
 from utils import requests_get_with_retries
 
@@ -16,6 +17,10 @@ from utils import requests_get_with_retries
 app = Flask(__name__)
 app.secret_key = os.environ['SECRET_KEY']
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['MAILGUN_API_URL'] = os.environ['MAILGUN_API_URL']
+app.config['MAILGUN_API_KEY'] = os.environ['MAILGUN_API_KEY']
+app.config['MAILGUN_TEST_OPTION'] = True if os.environ['MAILGUN_TEST_OPTION'] == 'True' else False
+app.config['NOTIFICATION_EMAIL'] = os.environ['MAILGUN_SMTP_LOGIN']
 Bootstrap(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -203,6 +208,33 @@ def stream_json():
     except Exception as e:
         app.logger.exception(e)
         return jsonify(error=True)
+
+
+def send_message(recipient_vars, subject, text, html):
+    print app.config['MAILGUN_API_URL']
+    print app.config['MAILGUN_API_KEY']
+    print app.config['MAILGUN_TEST_OPTION']
+    return requests.post(
+        app.config['MAILGUN_API_URL'],
+        auth=("api", app.config['MAILGUN_API_KEY']),
+        data={"from": "WatchPeopleCode <{}>".format(app.config['NOTIFICATION_EMAIL']),
+              "to": recipient_vars.keys(),
+              "subject": subject,
+              "text": text,
+              "html": html,
+              "recipient-variables": (json.dumps(recipient_vars)),
+              "o:testmode": app.config['MAILGUN_TEST_OPTION']
+              })
+
+
+def notify(stream):
+    for subscribers in stream.subscribers:
+        # this is stub, fix before use
+        subject = "WatchPeopleCode: A stream start soon"
+        text = render_template('mails/notification.txt', stream=stream)
+        html = render_template('mails/notification.html', stream=stream)
+        recipient_vars = {email: {} for email in stream.subscribers}
+        send_message(recipient_vars, subject, text, html)
 
 
 if __name__ == '__main__':
