@@ -184,7 +184,7 @@ def index():
 
 
 @app.route('/json')
-def json():
+def stream_json():
     try:
         return jsonify(stream_urls=[st.normal_url() for st in Stream.query.filter_by(status='live')])
     except Exception as e:
