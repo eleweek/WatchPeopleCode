@@ -92,6 +92,8 @@ class YoutubeStream(Stream):
                     self.status = 'upcoming'
                 else:
                     self.status = 'completed'
+        else:  # e.g. if video is private
+            self.status = 'completed'  # TODO maybe "unavailable"?
 
     def normal_url(self):
         return "http://www.youtube.com/watch?v={}".format(self.ytid)
