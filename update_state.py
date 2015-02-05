@@ -38,14 +38,17 @@ def extract_links_from_selftexts(selftext_html):
     return [a['href'] for a in soup.findAll('a')]
 
 
+def get_submission_urls(submission):
+    return [submission.url] + extract_links_from_selftexts(submission.selftext_html) if submission.selftext_html else []
+
+
 def get_new_streams():
     submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
     new_streams = set()
     # TODO : don't forget about http vs https
     # TODO better way of caching api requests
     for s in submissions:
-        selfposts_urls = extract_links_from_selftexts(s.selftext_html) if s.selftext_html else []
-        for url in selfposts_urls + [s.url]:
+        for url in get_submission_urls(s):
             stream = get_stream_from_url(url, s.id, only_new=True)
 
             if stream:
@@ -64,8 +67,7 @@ def update_flairs():
     try:
         submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
         for s in submissions:
-            selfposts_urls = extract_links_from_selftexts(s.selftext_html) if s.selftext_html else []
-            for url in selfposts_urls + [s.url]:
+            for url in get_submission_urls(s):
                 stream = get_stream_from_url(url, s.id)
                 if stream:
                     flair_choices = s.get_flair_choices()['choices']
