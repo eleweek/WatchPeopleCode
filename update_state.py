@@ -112,4 +112,5 @@ def update_state():
 
     db.session.commit()
 
-sched.start()
+if __name__ == '__main__':
+    sched.start()
