@@ -11,6 +11,7 @@ from flask.ext.migrate import Migrate, MigrateCommand
 import os
 import requests
 import json
+from datetime import datetime
 from utils import requests_get_with_retries
 
 
@@ -109,9 +110,14 @@ class YoutubeStream(Stream):
 
 class TwitchStream(Stream):
     channel = db.Column(db.String(25))
+    channel = db.Column(db.String(25))
+    last_time_live = db.Column(db.DateTime())
+    submission_id = db.Column(db.String())
 
-    def __init__(self, channel):
+    def __init__(self, channel, submission_id):
         self.channel = channel
+        self.submission_id = submission_id
+        self.status = 'upcoming'
 
     def __eq__(self, other):
         return type(self) == type(other) and self.channel == other.channel
@@ -120,7 +126,7 @@ class TwitchStream(Stream):
         return hash(self.channel)
 
     def __repr__(self):
-        return '<TwitchStream %d %r>' % (self.id, self.channel)
+        return '<TwitchStream %d %r %r>' % (self.id, self.channel, self.submission_id)
 
     def _update_status(self):
         r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
@@ -129,9 +135,11 @@ class TwitchStream(Stream):
         if stream is not None:
             self.status = 'live'
             self.title = stream['channel']['status']
+            self.last_time_live = datetime.utcnow() 
         else:
-            self.status = None
-            self.title = None
+            if self.status == 'live':
+                if datetime.utcnow() - self.last_time_live > datetime.timedelta(hours=1):
+                    self.status = 'completed'
 
     def normal_url(self):
         return "http://www.twitch.tv/" + self.channel

@@ -15,7 +15,7 @@ r.config.decode_html_entities = True
 r.login(app.config['REDDIT_USERNAME'], app.config['REDDIT_PASSWORD'])
 
 
-def get_stream_from_url(url, only_new=False):
+def get_stream_from_url(url, submission_id, only_new=False):
     db_stream = None
 
     ytid = youtube_video_id(url)
@@ -26,9 +26,9 @@ def get_stream_from_url(url, only_new=False):
 
     tc = twitch_channel(url)
     if tc is not None:
-        db_stream = TwitchStream.query.filter_by(channel=tc).first()
+        db_stream = TwitchStream.query.filter_by(channel=tc, submission_id=submission_id).first()
         if db_stream is None:
-            return TwitchStream(tc)
+            return TwitchStream(tc, submission_id)
 
     return None if only_new else db_stream
 
@@ -46,7 +46,7 @@ def get_new_streams():
     for s in submissions:
         selfposts_urls = extract_links_from_selftexts(s.selftext_html) if s.selftext_html else []
         for url in selfposts_urls + [s.url]:
-            stream = get_stream_from_url(url, only_new=True)
+            stream = get_stream_from_url(url, s.id, only_new=True)
 
             if stream:
                 stream._update_status()
@@ -66,7 +66,7 @@ def update_flairs():
         for s in submissions:
             selfposts_urls = extract_links_from_selftexts(s.selftext_html) if s.selftext_html else []
             for url in selfposts_urls + [s.url]:
-                stream = get_stream_from_url(url)
+                stream = get_stream_from_url(url, s.id)
                 if stream:
                     flair_choices = s.get_flair_choices()['choices']
                     current_flair_text = s.get_flair_choices()[u'current'][u'flair_text']
