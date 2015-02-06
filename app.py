@@ -11,7 +11,7 @@ from flask.ext.migrate import Migrate, MigrateCommand
 import os
 import requests
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from utils import requests_get_with_retries
 
 
@@ -140,7 +140,7 @@ class TwitchStream(Stream):
             self.last_time_live = datetime.utcnow() 
         else:
             if self.status == 'live':
-                if datetime.utcnow() - self.last_time_live > datetime.timedelta(hours=1):
+                if datetime.utcnow() - self.last_time_live > timedelta(hours=1):
                     self.status = 'completed'
 
     def normal_url(self):
@@ -210,7 +210,7 @@ def index():
         return redirect(url_for('.index'))
 
     random_stream = YoutubeStream.query.filter(YoutubeStream.status != 'upcoming').order_by(db.func.random()).first()
-    upcoming_streams = Stream.query.filter_by(status='upcoming').order_by(Stream.scheduled_start_time.asc())
+    upcoming_streams = Stream.query.filter_by(status='upcoming').order_by(Stream.scheduled_start_time.asc()).all()
     return render_template('index.html', form=form, live_streams=live_streams, random_stream=random_stream, upcoming_streams=upcoming_streams)
 
 

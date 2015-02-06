@@ -32,7 +32,7 @@
           <hr>
         {% endif %}
 
-        {% if upcoming_streams is not none %}
+        {% if upcoming_streams != [] %}
           <h4> Upcoming streams </h4><br>
           {% for stream in upcoming_streams %}
             <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
