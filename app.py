@@ -11,7 +11,7 @@ from flask.ext.migrate import Migrate, MigrateCommand
 import os
 import requests
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from utils import requests_get_with_retries
 
 
@@ -140,7 +140,7 @@ class TwitchStream(Stream):
             self.last_time_live = datetime.utcnow() 
         else:
             if self.status == 'live':
-                if datetime.utcnow() - self.last_time_live > datetime.timedelta(hours=1):
+                if datetime.utcnow() - self.last_time_live > timedelta(hours=1):
                     self.status = 'completed'
 
     def normal_url(self):
