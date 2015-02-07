@@ -67,6 +67,8 @@ def update_flairs():
     try:
         submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
         for s in submissions:
+            if s.id == '2v1bnt':
+                continue
             for url in get_submission_urls(s):
                 stream = get_stream_from_url(url, s.id)
                 if stream:
