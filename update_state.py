@@ -1,18 +1,20 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
 import praw
+import os
 from bs4 import BeautifulSoup
 from sqlalchemy import or_
-
-from app import db, Stream, YoutubeStream, TwitchStream, app
-from utils import youtube_video_id, twitch_channel
 import traceback
 import datetime
+
+from app import db, Stream, YoutubeStream, TwitchStream, app
+from utils import youtube_video_id, twitch_channel, requests_get_with_retries
 
 
 reddit_user_agent = "/r/WatchPeopleCode app"
 r = praw.Reddit(user_agent=reddit_user_agent)
 r.config.decode_html_entities = True
 r.login(app.config['REDDIT_USERNAME'], app.config['REDDIT_PASSWORD'])
+youtube_api_key = os.environ['ytokkey']
 
 
 def get_stream_from_url(url, submission_id, only_new=False):
@@ -22,7 +24,12 @@ def get_stream_from_url(url, submission_id, only_new=False):
     if ytid is not None:
         db_stream = YoutubeStream.query.filter_by(ytid=ytid).first()
         if db_stream is None:
-            return YoutubeStream(ytid)
+            r = requests_get_with_retries(
+                "https://www.googleapis.com/youtube/v3/videos?id={}&part=liveStreamingDetails&key={}".format(ytid, youtube_api_key), retries_num=15)
+            item = r.json()['items']
+            if item:
+                if 'liveStreamingDetails' in item:
+                    return YoutubeStream(ytid)
 
     tc = twitch_channel(url)
     if tc is not None:
