@@ -81,7 +81,7 @@ class YoutubeStream(Stream):
 
     def _update_status(self):
         r = requests_get_with_retries(
-            "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet&key={}".format(self.ytid, youtube_api_key), retries_num=15)
+            "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(self.ytid, youtube_api_key), retries_num=15)
         r.raise_for_status()
 
         if not r.json()['items']:
@@ -89,14 +89,14 @@ class YoutubeStream(Stream):
             return
 
         for item in r.json()['items']:
-            if item['kind'] == 'youtube#video':
-                self.title = item['snippet']['title']
-                if item['snippet']['liveBroadcastContent'] == 'live':
-                    self.status = 'live'
-                elif item['snippet']['liveBroadcastContent'] == 'upcoming':
-                    self.status = 'upcoming'
-                else:
-                    self.status = 'completed'
+            self.title = item['snippet']['title']
+            self.scheduled_start_time = item['liveStreamingDetails']['scheduledStartTime']
+            if item['snippet']['liveBroadcastContent'] == 'live':
+                self.status = 'live'
+            elif item['snippet']['liveBroadcastContent'] == 'upcoming':
+                self.status = 'upcoming'
+            else:
+                self.status = 'completed'
 
     def normal_url(self):
         return "http://www.youtube.com/watch?v={}".format(self.ytid)
@@ -140,7 +140,7 @@ class TwitchStream(Stream):
         if stream is not None:
             self.status = 'live'
             self.title = stream['channel']['status']
-            self.last_time_live = datetime.utcnow() 
+            self.last_time_live = datetime.utcnow()
         else:
             if self.status == 'live':
                 if datetime.utcnow() - self.last_time_live > timedelta(hours=1):
