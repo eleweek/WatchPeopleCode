@@ -33,6 +33,7 @@ def get_stream_from_url(url, submission_id, only_new=False):
 
     tc = twitch_channel(url)
     if tc is not None:
+        db_stream = TwitchStream.query.filter_by(channel=tc, submission_id=submission_id).first()
         if db_stream is None:
             return TwitchStream(tc, submission_id)
 
