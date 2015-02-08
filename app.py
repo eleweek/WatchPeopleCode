@@ -71,7 +71,6 @@ class Stream(db.Model):
             return None
 
 
-
 class YoutubeStream(Stream):
     ytid = db.Column(db.String(11), unique=True)
 
@@ -226,10 +225,11 @@ def index():
     return render_template('index.html', form=form, live_streams=live_streams, random_stream=random_stream, upcoming_streams=upcoming_streams)
 
 
-@app.route('/past_streams')
-def past_streams():
-    streams = YoutubeStream.query.filter_by(status='completed').order_by(YoutubeStream.scheduled_start_time.desc().nullslast()).all()
-    return render_template('past_streams.html', streams=streams)
+@app.route('/past_streams', defaults={'page': 1})
+@app.route('/past_streams/page/<int:page>')
+def past_streams(page):
+    streams = YoutubeStream.query.filter_by(status='completed').order_by(YoutubeStream.scheduled_start_time.desc().nullslast()).paginate(page, per_page=5)
+    return render_template('past_streams.html', streams=streams, page=page)
 
 
 @app.route('/json')
@@ -266,6 +266,7 @@ def notify(stream):
         html = render_template('mails/notification.html', stream=stream)
         recipient_vars = {email: {} for email in stream.subscribers}
         send_message(recipient_vars, subject, text, html)
+
 
 if __name__ == '__main__':
     manager.run()

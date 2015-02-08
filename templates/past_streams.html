@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Watch people code: past streams{% endblock %}
+
+{% block content %}
+
+  {% macro render_pagination(pagination) %}
+    {% if pagination.pages > 1 %}
+      <ul class="pagination">
+      {%- for page in pagination.iter_pages() %}
+        {% if page %}
+          {% if page != pagination.page %}
+            <li><a href="{{ url_for(".past_streams", page=page) }}">{{ page }}</a></li>
+          {% else %}
+            <li class="active"><span>{{ page }}</span></li>
+          {% endif %}
+        {% else %}
+          <li  class="disabled"><span>…</span></li>
+        {% endif %}
+      {%- endfor %}
+      </ul>
+    {% endif %}
+  {% endmacro %}
+
+  <div class="container">
+      <div class="col-md-offset-2 col-md-8">
+        <p class="text-center"><a href={{url_for(".index")}}>Back to main page</a></p>
+        {{ render_pagination(streams) }}
+        <br>
+        {% for stream in streams.items %}
+          <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+          <br>
+          {{ stream.html_code() |safe }}
+          <hr>
+        {% endfor %}
+        {{ render_pagination(streams) }}
+      </div>
+  </div>
+{% endblock %}
