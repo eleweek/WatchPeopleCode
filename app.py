@@ -83,6 +83,11 @@ class YoutubeStream(Stream):
         r = requests_get_with_retries(
             "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet&key={}".format(self.ytid, youtube_api_key), retries_num=15)
         r.raise_for_status()
+
+        if not r.json()['items']:
+            self.status = 'completed'
+            return
+
         for item in r.json()['items']:
             if item['kind'] == 'youtube#video':
                 self.title = item['snippet']['title']
@@ -92,8 +97,6 @@ class YoutubeStream(Stream):
                     self.status = 'upcoming'
                 else:
                     self.status = 'completed'
-        else:  # e.g. if video is private
-            self.status = 'completed'  # TODO maybe "unavailable"?
 
     def normal_url(self):
         return "http://www.youtube.com/watch?v={}".format(self.ytid)
