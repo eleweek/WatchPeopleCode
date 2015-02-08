@@ -20,7 +20,7 @@
         {% if live_streams %}
             {% for stream in live_streams %}
               <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
-              {{ stream.html_code() |safe }}
+              {{ stream.html_code(autoplay=(loop.index == 1)) |safe }}
               <hr>
             {% endfor %}
         {% else %}

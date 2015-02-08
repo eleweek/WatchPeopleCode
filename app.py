@@ -101,12 +101,12 @@ class YoutubeStream(Stream):
     def normal_url(self):
         return "http://www.youtube.com/watch?v={}".format(self.ytid)
 
-    def html_code(self):
+    def html_code(self, autoplay=False):
         return """
                 <iframe width="640" height="390"
-                src="http://www.youtube.com/embed/{}">
+                src="http://www.youtube.com/embed/{}?rel=0&autoplay={}">
                 </iframe>
-              """.format(self.ytid)
+              """.format(self.ytid, int(autoplay))
 
     __mapper_args__ = {
         'polymorphic_identity': 'youtube_stream'
@@ -149,7 +149,7 @@ class TwitchStream(Stream):
     def normal_url(self):
         return "http://www.twitch.tv/" + self.channel
 
-    def html_code(self):
+    def html_code(self, autoplay=False):
         return """
                <object type="application/x-shockwave-flash"
                        height="390"
@@ -166,9 +166,9 @@ class TwitchStream(Stream):
                  <param  name="movie"
                          value="http://www.twitch.tv/widgets/live_embed_player.swf" />
                  <param  name="flashvars"
-                         value="hostname=www.twitch.tv&channel={}&auto_play=false" />
+                         value="hostname=www.twitch.tv&channel={}&auto_play={}" />
                </object>
-               """.format(self.channel, self.channel)
+               """.format(self.channel, self.channel, "true" if autoplay else "false")
 
     __mapper_args__ = {
         'polymorphic_identity': 'twitch_stream'
