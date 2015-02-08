@@ -36,7 +36,6 @@ def get_stream_from_url(url, submission_id, only_new=False):
         db_stream = TwitchStream.query.filter_by(channel=tc, submission_id=submission_id).first()
         if db_stream is None:
             return TwitchStream(tc, submission_id)
-
     return None if only_new else db_stream
 
 
@@ -46,7 +45,7 @@ def extract_links_from_selftexts(selftext_html):
 
 
 def get_submission_urls(submission):
-    return [submission.url] + extract_links_from_selftexts(submission.selftext_html) if submission.selftext_html else []
+    return [submission.url] + (extract_links_from_selftexts(submission.selftext_html) if submission.selftext_html else [])
 
 
 def get_new_streams():
