@@ -217,6 +217,12 @@ def index():
     return render_template('index.html', form=form, live_streams=live_streams, random_stream=random_stream, upcoming_streams=upcoming_streams)
 
 
+@app.route('/past_streams')
+def past_streams():
+    streams = YoutubeStream.query.filter_by(status='completed').order_by(YoutubeStream.scheduled_start_time.desc().nullslast()).all()
+    return render_template('past_streams.html', streams=streams)
+
+
 @app.route('/json')
 def stream_json():
     try:

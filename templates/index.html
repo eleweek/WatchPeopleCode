@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block html_attribs %} lang="en"{% endblock html_attribs %}
-
 {% block styles %}
   {{super()}}
   <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}">
@@ -17,7 +15,7 @@
         <h2 class="text-center"> Error getting live streams. :( Maybe try refreshing the page? </h2>
     {% endif %}
     <p class="text-center"> The app automatically gets live stream from /r/WatchPeopleCode subreddit, so if you want to start live streaming, submit a link to your youtube stream or twitch channel to <a href="http://www.reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode </a></p>
-    {# <p class="text-center"><a href="https://docs.google.com/spreadsheets/d/1ANp6WewbBsFKuIPy0lybki8UldhXSd29LjcjS2PNCjU/">Big list of past streams</a></p> #}
+    <p class="text-center"><a href={{url_for(".past_streams")}}>Big list of past streams</a></p>
       <div class="col-md-8">
         {% if live_streams %}
             {% for stream in live_streams %}
