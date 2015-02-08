@@ -98,7 +98,8 @@ class YoutubeStream(Stream):
 
         for item in r.json()['items']:
             self.title = item['snippet']['title']
-            self.scheduled_start_time = item['liveStreamingDetails']['scheduledStartTime']
+            if 'liveStreamingDetails' in item:
+                self.scheduled_start_time = item['liveStreamingDetails']['scheduledStartTime']
             if item['snippet']['liveBroadcastContent'] == 'live':
                 self.status = 'live'
             elif item['snippet']['liveBroadcastContent'] == 'upcoming':
