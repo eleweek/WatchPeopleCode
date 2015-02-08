@@ -134,7 +134,7 @@ class TwitchStream(Stream):
         self.status = 'upcoming'
 
     def __eq__(self, other):
-        return type(self) == type(other) and self.channel == other.channel
+        return type(self) == type(other) and self.channel == other.channel and self.submission_id == other.submission_id
 
     def __hash__(self):
         return hash(self.channel)
