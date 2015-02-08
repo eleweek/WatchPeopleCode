@@ -13,6 +13,7 @@ import requests
 import json
 from datetime import datetime, timedelta
 from utils import requests_get_with_retries
+import humanize
 
 
 app = Flask(__name__)
@@ -62,6 +63,13 @@ class Stream(db.Model):
         'polymorphic_on': type,
         'polymorphic_identity': 'stream'
     }
+
+    def format_start_time(self):
+        if self.scheduled_start_time:
+            return humanize.naturaltime(datetime.utcnow() - self.scheduled_start_time) + ", " + datetime.strftime(self.scheduled_start_time, "%Y-%m-%d %H:%M UTC")
+        else:
+            return None
+
 
 
 class YoutubeStream(Stream):

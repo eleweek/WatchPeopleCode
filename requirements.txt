@@ -16,6 +16,7 @@ argparse==1.2.1
 beautifulsoup4==4.3.2
 futures==2.2.0
 gunicorn==19.1.1
+humanize==0.5.1
 itsdangerous==0.24
 praw==2.1.20
 psycopg2==2.5.4
