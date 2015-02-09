@@ -268,8 +268,8 @@ def send_message(recipient_vars, subject, text, html):
 
 def notify():
     # this is stub, fix before use
-    live = Stream.query.filter_by(status='live')
-    upcoming = Stream.query.filter_by(status='upcoming')
+    live = Stream.query.filter_by(status='live').order_by(Stream.scheduled_start_time).all()
+    upcoming = Stream.query.filter_by(status='upcoming').order_by(Stream.scheduled_start_time).all()
     subject = "WatchPeopleCode: today's streams"
     text = render_template('mails/stream_notification.txt', live_streams=live, upcoming_streams=upcoming)
     html = render_template('mails/stream_notification.html', live_streams=live, upcoming_streams=upcoming)
