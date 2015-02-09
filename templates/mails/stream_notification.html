@@ -4,8 +4,8 @@
 
   <body>
     {% for stream in streams %}
-      {% if stream.scheduled_start_time %}<p><b>{{stream.format_start_time()}}</b></p> {% endif %}
-      <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+      <p>{% if stream.scheduled_start_time %}<b>{{stream.format_start_time()}}</b>{% endif %}
+      <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a></p>
     {% endfor %}
   </body>
 </html>
