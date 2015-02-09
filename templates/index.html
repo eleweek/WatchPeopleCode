@@ -20,12 +20,14 @@
         {% if live_streams %}
             {% for stream in live_streams %}
               <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+              <br>
               {{ stream.html_code(autoplay=(loop.index == 1)) |safe }}
               <hr>
             {% endfor %}
         {% else %}
           <h4> How about watching a random recorded stream? </h4>
           <a href={{ random_stream.normal_url() }}> {{ random_stream.title if random_stream.title else random_stream.normal_url() }}</a>
+          <br>
           {{ random_stream.html_code() | safe }}
           <hr>
         {% endif %}
@@ -35,6 +37,7 @@
           {% for stream in upcoming_streams %}
             {% if stream.scheduled_start_time %}<p><b>{{stream.format_start_time()}}</b></p> {% endif %}
             <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+            <br>
             {{ stream.html_code() | safe }}
             <hr>
           {% endfor %}
