@@ -1,5 +1,6 @@
 {# FIX THIS TEXT #}
-Today upcoming streams
+
+Hey, thank you for subscribing on WatchPeopleCode.com. We thought you might be interested in upcoming streams? Let us know how often you would like to receive these notifications. We don't have fancy email address yet, so just send your email messages to: avp-13@yandex.ru
 
 {% if live_streams %}
   Live right now:
