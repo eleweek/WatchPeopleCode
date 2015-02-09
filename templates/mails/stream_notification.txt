@@ -11,7 +11,7 @@ Today upcoming streams
 {% if upcoming_streams %}
   Upcoming today:
   {% for stream in upcoming_streams %}
-    {% if stream.scheduled_start_time %} {{stream.format_start_time()}} {% endif %}
+    {% if stream.scheduled_start_time %} {{stream.format_start_time(countdown=False)}} {% endif %}
     {% if stream.title %} {{ stream.title }}: {% endif %} {{ stream.normal_url() }}
   {% endfor %}
 {% endif %}

@@ -15,7 +15,7 @@
     {% if upcoming_streams %}
       <p><strong>Upcoming today:</strong><br>
         {% for stream in upcoming_streams %}
-          {% if stream.scheduled_start_time %}<b>{{stream.format_start_time()}}</b><br>{% endif %}
+          {% if stream.scheduled_start_time %}<b>{{stream.format_start_time(countdown=False)}}</b><br>{% endif %}
           <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
           <br><br>
         {% endfor %}

@@ -64,9 +64,14 @@ class Stream(db.Model):
         'polymorphic_identity': 'stream'
     }
 
-    def format_start_time(self):
+    def format_start_time(self, countdown=True):
         if self.scheduled_start_time:
-            return humanize.naturaltime(datetime.utcnow() - self.scheduled_start_time) + ", " + datetime.strftime(self.scheduled_start_time, "%Y-%m-%d %H:%M UTC")
+            if countdown:
+                return humanize.naturaltime(
+                    datetime.utcnow() - self.scheduled_start_time) + ", " + datetime.strftime(self.scheduled_start_time, "%Y-%m-%d %H:%M UTC")
+            else:
+                datetime.strftime(self.scheduled_start_time, "%Y-%m-%d %H:%M UTC")
+
         else:
             return None
 
