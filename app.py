@@ -32,7 +32,7 @@ manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
 
-@app.before_first_request
+@app.before_request
 def add_ga_tracking_code():
     g.ga_tracking_code = os.environ['GA_TRACKING_CODE']
 
