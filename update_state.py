@@ -86,24 +86,29 @@ def update_flairs():
                                             None: None}
 
                     flair_text = status_to_flair_text[stream.status]
+                    flair_css_text = status_to_flair_text[stream.status]
                     is_twitch_stream = ('channel' in dir(stream))  # TODO: better way
                     if is_twitch_stream:
                         created_dt = datetime.datetime.utcfromtimestamp(s.created_utc)
                         now = datetime.datetime.utcnow()
+                        if stream.status == 'completed':
+                            print "LOL"
+                            flair_text = u'Finished'
+                            flair_css_text = u'Finished'
                         if now - created_dt > datetime.timedelta(hours=12):
-                            flair_text = current_flair_text if current_flair_text == "Finished" else None
+                            flair_text = current_flair_text if current_flair_text == u"Finished" else None
 
                     if flair_text is not None:
                         for fc in flair_choices:
-                            if fc[u"flair_text"] == flair_text:
-                                s.set_flair(fc[u"flair_text"], fc[u'flair_css_class'])
+                            if fc[u"flair_text"] == flair_css_text:
+                                s.set_flair(flair_text, fc[u'flair_css_class'])
                     else:
                         s.set_flair('')
     except:
         traceback.print_exc()
 
 
-@sched.scheduled_job('interval', seconds=20)
+@sched.scheduled_job('interval', seconds=10)
 def update_state():
     for ls in Stream.query.filter(or_(Stream.status != 'completed', Stream.status == None)):
         try:
