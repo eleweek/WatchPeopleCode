@@ -138,7 +138,7 @@ class TwitchStream(Stream):
         return hash(self.channel)
 
     def __repr__(self):
-        return '<TwitchStream %d %r %r>' % (self.id, self.channel, self.submission_id)
+        return '<TwitchStream {} {} {}>'.format(self.id, self.channel, self.submission_id)
 
     def _update_status(self):
         r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
