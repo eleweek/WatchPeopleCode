@@ -152,6 +152,14 @@ class TwitchStream(Stream):
             if self.status == 'live':
                 if datetime.utcnow() - self.last_time_live > timedelta(hours=1):
                     self.status = 'completed'
+            # if stream is upcoming we should go to api for the title
+            else:
+                r = requests_get_with_retries("https://api.twitch.tv/kraken/channels/{}".format(self.channel))
+                r.raise_for_status()
+                stream = r.json()
+                if stream is not None:
+                    if stream['status'] is not None:
+                        self.title = stream['status']
 
     def normal_url(self):
         return "http://www.twitch.tv/" + self.channel
