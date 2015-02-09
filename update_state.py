@@ -28,7 +28,7 @@ def get_stream_from_url(url, submission_id, only_new=False):
                 "https://www.googleapis.com/youtube/v3/videos?id={}&part=liveStreamingDetails&key={}".format(ytid, youtube_api_key), retries_num=15)
             item = r.json()['items']
             if item:
-                if 'liveStreamingDetails' in item:
+                if 'liveStreamingDetails' in item[0]:
                     return YoutubeStream(ytid)
 
     tc = twitch_channel(url)
@@ -92,7 +92,6 @@ def update_flairs():
                         created_dt = datetime.datetime.utcfromtimestamp(s.created_utc)
                         now = datetime.datetime.utcnow()
                         if stream.status == 'completed':
-                            print "LOL"
                             flair_text = u'Finished'
                             flair_css_text = u'Finished'
                         if now - created_dt > datetime.timedelta(hours=12):
