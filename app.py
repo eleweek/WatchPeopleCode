@@ -255,13 +255,12 @@ def send_message(recipient_vars, subject, text, html):
 
 
 def notify(streams):
-    for subscribers in Subscriber.query:
-        # this is stub, fix before use
-        subject = "WatchPeopleCode: Today upcoming streams"
-        text = render_template('mails/stream_notification.txt', streams=streams)
-        html = render_template('mails/stream_notification.html', streams=streams)
-        recipient_vars = {subscriber.email: {} for subscriber in Subscriber.query}
-        send_message(recipient_vars, subject, text, html)
+    # this is stub, fix before use
+    subject = "WatchPeopleCode: Today upcoming streams"
+    text = render_template('mails/stream_notification.txt', streams=streams)
+    html = render_template('mails/stream_notification.html', streams=streams)
+    recipient_vars = {subscriber.email: {} for subscriber in Subscriber.query}
+    send_message(recipient_vars, subject, text, html)
 
 
 if __name__ == '__main__':
