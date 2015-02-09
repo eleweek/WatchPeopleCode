@@ -123,7 +123,6 @@ class YoutubeStream(Stream):
 
 class TwitchStream(Stream):
     channel = db.Column(db.String(25))
-    channel = db.Column(db.String(25))
     last_time_live = db.Column(db.DateTime())
     submission_id = db.Column(db.String())
 
