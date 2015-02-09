@@ -241,9 +241,6 @@ def stream_json():
 
 
 def send_message(recipient_vars, subject, text, html):
-    print app.config['MAILGUN_API_URL']
-    print app.config['MAILGUN_API_KEY']
-    print app.config['MAILGUN_TEST_OPTION']
     return requests.post(
         app.config['MAILGUN_API_URL'],
         auth=("api", app.config['MAILGUN_API_KEY']),
@@ -257,13 +254,13 @@ def send_message(recipient_vars, subject, text, html):
               })
 
 
-def notify(stream):
-    for subscribers in stream.subscribers:
+def notify(streams):
+    for subscribers in Subscriber.query:
         # this is stub, fix before use
-        subject = "WatchPeopleCode: A stream start soon"
-        text = render_template('mails/notification.txt', stream=stream)
-        html = render_template('mails/notification.html', stream=stream)
-        recipient_vars = {email: {} for email in stream.subscribers}
+        subject = "WatchPeopleCode: Today upcoming streams"
+        text = render_template('mails/stream_notification.txt', streams=streams)
+        html = render_template('mails/stream_notification.html', streams=streams)
+        recipient_vars = {subscriber.email: {} for subscriber in Subscriber.query}
         send_message(recipient_vars, subject, text, html)
 
 

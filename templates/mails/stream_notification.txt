@@ -1,0 +1,7 @@
+{# FIX THIS TEXT #}
+Today upcoming streams.
+
+{% for stream in streams %}
+  {% if stream.scheduled_start_time %} {{stream.format_start_time()}} {% endif %}
+  {% if stream.title %} {{ stream.title }}: {% endif %} {{ stream.normal_url() }}
+{% endfor %}
