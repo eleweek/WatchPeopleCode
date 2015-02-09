@@ -262,11 +262,13 @@ def send_message(recipient_vars, subject, text, html):
               })
 
 
-def notify(streams):
+def notify():
     # this is stub, fix before use
-    subject = "WatchPeopleCode: Today upcoming streams"
-    text = render_template('mails/stream_notification.txt', streams=streams)
-    html = render_template('mails/stream_notification.html', streams=streams)
+    live = Stream.query.filter_by(status='live')
+    upcoming = Stream.query.filter_by(status='upcoming')
+    subject = "WatchPeopleCode: today's streams"
+    text = render_template('mails/stream_notification.txt', live_streams=live, upcoming_streams=upcoming)
+    html = render_template('mails/stream_notification.html', live_streams=live, upcoming_streams=upcoming)
     recipient_vars = {subscriber.email: {} for subscriber in Subscriber.query}
     send_message(recipient_vars, subject, text, html)
 
