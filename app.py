@@ -65,15 +65,14 @@ class Stream(db.Model):
     }
 
     def format_start_time(self, countdown=True):
-        if self.scheduled_start_time:
-            if countdown:
-                return humanize.naturaltime(
-                    datetime.utcnow() - self.scheduled_start_time) + ", " + datetime.strftime(self.scheduled_start_time, "%Y-%m-%d %H:%M UTC")
-            else:
-                datetime.strftime(self.scheduled_start_time, "%Y-%m-%d %H:%M UTC")
-
-        else:
+        if not self.scheduled_start_time:
             return None
+
+        if countdown:
+            return humanize.naturaltime(
+                datetime.utcnow() - self.scheduled_start_time) + ", " + datetime.strftime(self.scheduled_start_time, "%Y-%m-%d %H:%M UTC")
+        else:
+            return datetime.strftime(self.scheduled_start_time, "%Y-%m-%d %H:%M UTC")
 
 
 class YoutubeStream(Stream):
