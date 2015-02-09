@@ -31,10 +31,9 @@ def twitch_channel(url):
     path_elements = query.path.strip('/').split('/')
     if len(path_elements) == 1:
         channel = path_elements[0] if query.hostname == 'twitch.tv' or query.hostname == 'www.twitch.tv' else None
+        return channel if channel else None
     else:
         return None
-
-    return channel if channel else None
 
 
 def requests_get_with_retries(url, retries_num=5):
