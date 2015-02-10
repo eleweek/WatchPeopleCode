@@ -10,6 +10,7 @@ from app import db, Stream, YoutubeStream, TwitchStream, app
 from utils import youtube_video_id, twitch_channel, requests_get_with_retries
 
 
+print app.config['SQLALCHEMY_DATABASE_URI']
 reddit_user_agent = "/r/WatchPeopleCode app"
 r = praw.Reddit(user_agent=reddit_user_agent)
 r.config.decode_html_entities = True
