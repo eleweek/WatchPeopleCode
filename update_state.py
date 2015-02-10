@@ -10,11 +10,11 @@ from app import db, Stream, YoutubeStream, TwitchStream, app
 from utils import youtube_video_id, twitch_channel, requests_get_with_retries
 
 
-print app.config['SQLALCHEMY_DATABASE_URI']
 reddit_user_agent = "/r/WatchPeopleCode app"
 r = praw.Reddit(user_agent=reddit_user_agent)
 r.config.decode_html_entities = True
-r.login(app.config['REDDIT_USERNAME'], app.config['REDDIT_PASSWORD'])
+if app.config['REDDIT_PASSWORD']:
+    r.login(app.config['REDDIT_USERNAME'], app.config['REDDIT_PASSWORD'])
 youtube_api_key = os.environ['ytokkey']
 
 
@@ -71,6 +71,9 @@ sched = BlockingScheduler()
 
 @sched.scheduled_job('interval', seconds=50)
 def update_flairs():
+    if not app.config['REDDIT_PASSWORD']:
+        return
+
     try:
         submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
         for s in submissions:
