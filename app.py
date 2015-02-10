@@ -55,7 +55,7 @@ class Stream(db.Model):
     type = db.Column(db.String(50))
     scheduled_start_time = db.Column(db.DateTime())
     status = db.Column(db.Enum('upcoming', 'live', 'completed', name='stream_status'))
-    title = db.Column(db.String(100))
+    title = db.Column(db.String(200))
     subscribers = db.relationship('Subscriber', secondary=subscription, backref=db.backref('streams', lazy='dynamic'))
     # reddit_thread = db.Column(db.String(255))
 
