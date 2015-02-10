@@ -154,7 +154,7 @@ class TwitchStream(Stream):
             self.last_time_live = datetime.utcnow()
         else:
             if self.status == 'live':
-                if datetime.utcnow() - self.last_time_live > timedelta(hours=1):
+                if datetime.utcnow() - self.last_time_live > timedelta(minutes=12):
                     self.status = 'completed'
             # if stream is upcoming we should go to api for the title
             else:
