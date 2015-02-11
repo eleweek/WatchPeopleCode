@@ -68,7 +68,6 @@ def get_new_streams():
     for s in submissions:
         for url in get_submission_urls(s):
             stream = get_stream_from_url(url, s.id, only_new=True)
-
             if stream:
                 reddit_username = get_reddit_username(s, url)
                 if reddit_username is not None:
@@ -138,14 +137,14 @@ def update_state():
             ls._update_status()
         except Exception as e:
             db.session.rollback()
-            print e
+            traceback.print_exc()
             raise
 
     try:
         get_new_streams()
     except Exception as e:
         db.session.rollback()
-        print e
+        traceback.print_exc(e)
         raise
 
     db.session.commit()
