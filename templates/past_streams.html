@@ -3,6 +3,7 @@
 {% block title %}Watch people code: past streams{% endblock %}
 
 {% block content %}
+  {{super()}}
 
   {% macro render_pagination(pagination) %}
     {% if pagination.pages > 1 %}
