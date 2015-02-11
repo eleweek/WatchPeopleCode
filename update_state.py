@@ -6,7 +6,7 @@ from sqlalchemy import or_
 import traceback
 import datetime
 
-from app import db, Stream, YoutubeStream, TwitchStream, app
+from app import db, Stream, YoutubeStream, TwitchStream, Streamer, app
 from utils import youtube_video_id, twitch_channel, requests_get_with_retries
 
 
@@ -37,6 +37,7 @@ def get_stream_from_url(url, submission_id, only_new=False):
         db_stream = TwitchStream.query.filter_by(channel=tc, submission_id=submission_id).first()
         if db_stream is None:
             return TwitchStream(tc, submission_id)
+
     return None if only_new else db_stream
 
 
@@ -49,6 +50,16 @@ def get_submission_urls(submission):
     return [submission.url] + (extract_links_from_selftexts(submission.selftext_html) if submission.selftext_html else [])
 
 
+def get_reddit_username(submission, url):
+    if submission.title.find('Live Coding Sunday') == -1 or submission.selftext.find('description') == -1:
+        return submission.author.name
+    else:
+        after_url = submission.selftext[submission.selftext.find(url) + len(url):]
+        start = after_url.find('/u/') + 3
+        finish = start + after_url[start:].find(' ')
+        return after_url[start:finish]
+
+
 def get_new_streams():
     submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
     new_streams = set()
@@ -59,7 +70,15 @@ def get_new_streams():
             stream = get_stream_from_url(url, s.id, only_new=True)
 
             if stream:
+                reddit_username = get_reddit_username(s, url)
+                streamer = Streamer.query.filter_by(reddit_username=reddit_username).first()
+                if streamer is None:
+                    streamer = Streamer(reddit_username)
+                    db.session.add(streamer)
+
+                stream.streamer = streamer
                 stream._update_status()
+
                 db.session.add(stream)
                 new_streams.add(stream)
 

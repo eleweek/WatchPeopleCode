@@ -57,6 +57,8 @@ class Stream(db.Model):
     status = db.Column(db.Enum('upcoming', 'live', 'completed', name='stream_status'))
     title = db.Column(db.String(200))
     subscribers = db.relationship('Subscriber', secondary=subscription, backref=db.backref('streams', lazy='dynamic'))
+    streamer_id = db.Column('streamer_id', db.Integer(), db.ForeignKey('streamer.id'))
+    streamer = db.relationship('Streamer', backref=db.backref('streams', lazy='dynamic'))
     # reddit_thread = db.Column(db.String(255))
 
     __mapper_args__ = {
@@ -109,6 +111,10 @@ class YoutubeStream(Stream):
                 self.status = 'upcoming'
             else:
                 self.status = 'completed'
+
+            # add channel to streamer table if it's needed
+            if self.streamer.youtube_channel is None:
+                self.streamer.youtube_channel = item['snippet']['channelId']
 
     def normal_url(self):
         return "http://www.youtube.com/watch?v={}".format(self.ytid)
@@ -165,6 +171,10 @@ class TwitchStream(Stream):
                     if stream['status'] is not None:
                         self.title = stream['status']
 
+        # add channel to streamer table if it's needed
+        if self.streamer.twitch_channel is None:
+            self.streamer.twitch_channel = self.channel
+
     def normal_url(self):
         return "http://www.twitch.tv/" + self.channel
 
@@ -205,6 +215,19 @@ class Subscriber(db.Model):
 
     def __repr__(self):
         return '<Subscriber %d %r>' % (self.id, self.email)
+
+
+class Streamer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    reddit_username = db.column_property(db.Column(db.String(20), unique=True), comparator_factory=CaseInsensitiveComparator)
+    twitch_channel = db.column_property(db.Column(db.String(25), unique=True), comparator_factory=CaseInsensitiveComparator)
+    youtube_channel = db.column_property(db.Column(db.String(24), unique=True), comparator_factory=CaseInsensitiveComparator)
+
+    def __init__(self, reddit_username):
+        self.reddit_username = reddit_username
+
+    def __repr__(self):
+        return '<Streamer %d %r>' % (self.id, self.reddit_username)
 
 
 def validate_email_unique(form, field):
