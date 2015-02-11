@@ -113,8 +113,9 @@ class YoutubeStream(Stream):
                 self.status = 'completed'
 
             # add channel to streamer table if it's needed
-            if self.streamer.youtube_channel is None:
-                self.streamer.youtube_channel = item['snippet']['channelId']
+            if self.streamer is not None:
+                if self.streamer.youtube_channel is None:
+                    self.streamer.youtube_channel = item['snippet']['channelId']
 
     def normal_url(self):
         return "http://www.youtube.com/watch?v={}".format(self.ytid)
@@ -172,8 +173,9 @@ class TwitchStream(Stream):
                         self.title = stream['status']
 
         # add channel to streamer table if it's needed
-        if self.streamer.twitch_channel is None:
-            self.streamer.twitch_channel = self.channel
+        if self.streamer is not None:
+            if self.streamer.twitch_channel is None:
+                self.streamer.twitch_channel = self.channel
 
     def normal_url(self):
         return "http://www.twitch.tv/" + self.channel
