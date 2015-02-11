@@ -1,0 +1,4 @@
+.alert {
+    position: relative;
+    z-index: 10;
+}
