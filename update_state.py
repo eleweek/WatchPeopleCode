@@ -6,7 +6,7 @@ from sqlalchemy import or_
 import traceback
 import datetime
 
-from app import db, Stream, YoutubeStream, TwitchStream, Streamer, app
+from app import db, Stream, YoutubeStream, TwitchStream, Streamer, Submission, app
 from utils import youtube_video_id, twitch_channel, requests_get_with_retries
 
 
@@ -79,9 +79,11 @@ def get_new_streams():
         for url in get_submission_urls(s):
             stream = get_stream_from_url(url, s.id, only_new=True)
             if stream:
+                stream.submissions.append(get_or_create(Submission, submission_id=s.id))
                 reddit_username = get_reddit_username(s, url)
                 if reddit_username is not None:
                     stream.streamer = get_or_create(Streamer, reddit_username=reddit_username)
+
                 stream._update_status()
 
                 db.session.add(stream)

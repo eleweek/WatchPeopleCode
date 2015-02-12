@@ -1,5 +1,5 @@
-from update_state import r, get_submission_urls, get_stream_from_url, get_reddit_username
-from app import Streamer, db
+from update_state import r, get_submission_urls, get_stream_from_url, get_reddit_username, get_or_create
+from app import Streamer, Submission, db
 
 
 def add_streamers():
@@ -20,5 +20,10 @@ def add_streamers():
                 db.session.commit()
 
 
-if __name__ == '__main__':
-    add_streamers()
+def add_submissions():
+    submissions = r.get_subreddit('watchpeoplecode').get_new(limit=None)
+    for s in submissions:
+        for url in get_submission_urls(s):
+            stream = get_stream_from_url(url, s.id)
+            if stream:
+                stream.submission = get_or_create(Submission, submission_id=s.id)

@@ -50,6 +50,15 @@ subscription = db.Table('subscription',
                         db.Column('subscriber_id', db.Integer(), db.ForeignKey('subscriber.id')))
 
 
+stream_sub = db.Table('stream_sub',
+                      db.Column('stream_id', db.Integer(), db.ForeignKey('stream.id')),
+                      db.Column('submission_id', db.String(6), db.ForeignKey('submission.submission_id')))
+
+
+class Submission(db.Model):
+    submission_id = db.Column(db.String(6), primary_key=True)
+
+
 class Stream(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(50))
@@ -57,6 +66,7 @@ class Stream(db.Model):
     status = db.Column(db.Enum('upcoming', 'live', 'completed', name='stream_status'))
     title = db.Column(db.String(200))
     subscribers = db.relationship('Subscriber', secondary=subscription, backref=db.backref('streams', lazy='dynamic'))
+    submissions = db.relationship('Submission', secondary=stream_sub, backref=db.backref('streams', lazy='dynamic'))
     streamer_id = db.Column('streamer_id', db.Integer(), db.ForeignKey('streamer.id'))
     streamer = db.relationship('Streamer', backref=db.backref('streams', lazy='dynamic'))
     # reddit_thread = db.Column(db.String(255))
@@ -82,6 +92,7 @@ class YoutubeStream(Stream):
 
     def __init__(self, id):
         self.ytid = id
+        self.submissions = []
 
     def __eq__(self, other):
         return type(self) == type(other) and self.ytid == other.ytid
@@ -141,6 +152,7 @@ class TwitchStream(Stream):
         self.channel = channel
         self.submission_id = submission_id
         self.status = 'upcoming'
+        self.submissions = []
 
     def __eq__(self, other):
         return type(self) == type(other) and self.channel == other.channel and self.submission_id == other.submission_id
