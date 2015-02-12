@@ -60,6 +60,16 @@ def get_reddit_username(submission, url):
         return after_url[start:finish]
 
 
+def get_or_create(model, **kwargs):
+    instance = model.query.filter_by(**kwargs).first()
+    if instance:
+        return instance
+    else:
+        instance = model(**kwargs)
+        db.session.add(instance)
+        db.session.commit()
+
+
 def get_new_streams():
     submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
     new_streams = set()
@@ -71,12 +81,7 @@ def get_new_streams():
             if stream:
                 reddit_username = get_reddit_username(s, url)
                 if reddit_username is not None:
-                    streamer = Streamer.query.filter_by(reddit_username=reddit_username).first()
-                    if streamer is None:
-                        streamer = Streamer(reddit_username)
-                        db.session.add(streamer)
-                    stream.streamer = streamer
-
+                    stream.streamer = get_or_create(Streamer, reddit_username=reddit_username)
                 stream._update_status()
 
                 db.session.add(stream)
