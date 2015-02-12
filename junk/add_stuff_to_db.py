@@ -9,14 +9,11 @@ def add_streamers():
             stream = get_stream_from_url(url, s.id)
             if stream and stream.streamer is None:
                 reddit_username = get_reddit_username(s, url)
-                streamer = Streamer.query.filter_by(reddit_username=reddit_username).first()
-                if streamer is None:
-                    streamer = Streamer(reddit_username)
+                if reddit_username:
+                    stream.streamer = get_or_create(Streamer, reddit_username=reddit_username)
+                    stream._update_status()
 
-                stream.streamer = streamer
-                stream._update_status()
-
-                db.session.add_all([stream, streamer])
+                db.session.add(stream)
                 db.session.commit()
 
 
