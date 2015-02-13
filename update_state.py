@@ -70,13 +70,13 @@ def get_new_streams():
             stream = get_stream_from_url(url, s.id, only_new=True)
 
             if stream:
-                reddit_username = get_reddit_username(s, url)
+                '''reddit_username = get_reddit_username(s, url)
                 if reddit_username is not None:
                     streamer = Streamer.query.filter_by(reddit_username=reddit_username).first()
                     if streamer is None:
                         streamer = Streamer(reddit_username)
                         db.session.add(streamer)
-                    stream.streamer = streamer
+                    stream.streamer = streamer'''
 
                 stream._update_status()
 
