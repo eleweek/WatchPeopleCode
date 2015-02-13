@@ -23,4 +23,6 @@ def add_submissions():
         for url in get_submission_urls(s):
             stream = get_stream_from_url(url, s.id)
             if stream:
-                stream.submission = get_or_create(Submission, submission_id=s.id)
+                stream.submissions.append(get_or_create(Submission, submission_id=s.id))
+
+    db.session.commit()
