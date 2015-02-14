@@ -283,8 +283,13 @@ def past_streams(page):
 
 @app.route('/json')
 def stream_json():
+    def make_dict(stream):
+        return {'username': stream.streamer.reddit_username if stream.streamer else None,
+                'title': stream.title, 'url': stream.normal_url()}
     try:
-        return jsonify(stream_urls=[st.normal_url() for st in Stream.query.filter_by(status='live')])
+        return jsonify(live=[make_dict(st) for st in Stream.query.filter_by(status='live')],
+                       upcoming=[make_dict(st) for st in Stream.query.filter_by(status='upcoming')],
+                       completed=[make_dict(st) for st in YoutubeStream.query.filter_by(status='completed')])
     except Exception as e:
         app.logger.exception(e)
         return jsonify(error=True)
