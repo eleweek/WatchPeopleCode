@@ -34,9 +34,11 @@ def get_stream_from_url(url, submission_id, only_new=False):
 
     tc = twitch_channel(url)
     if tc is not None:
-        db_stream = TwitchStream.query.filter_by(channel=tc, submission_id=submission_id).first()
+        db_stream = TwitchStream.query.filter_by(channel=tc).first()
         if db_stream is None:
-            return TwitchStream(tc, submission_id)
+            return TwitchStream(tc)
+        if submission_id not in db_stream.submissions:
+            return db_stream
 
     return None if only_new else db_stream
 
@@ -79,13 +81,12 @@ def get_new_streams():
         for url in get_submission_urls(s):
             stream = get_stream_from_url(url, s.id, only_new=True)
             if stream:
-                stream.submissions.append(get_or_create(Submission, submission_id=s.id))
+                submission = get_or_create(Submission, submission_id=s.id)
+                stream.submissions.append(submission)
+                db.session.commit()
                 reddit_username = get_reddit_username(s, url)
                 if reddit_username is not None:
-                    streamer = Streamer.query.filter_by(reddit_username=reddit_username).first()
-                    if streamer is None:
-                        streamer = Streamer(reddit_username)
-                        db.session.add(streamer)
+                    streamer = get_or_create(Streamer, reddit_username=reddit_username)
                     stream.streamer = streamer
                 
                 stream._update_status()

@@ -158,20 +158,19 @@ class TwitchStream(Stream):
     last_time_live = db.Column(db.DateTime())
     submission_id = db.Column(db.String())
 
-    def __init__(self, channel, submission_id):
+    def __init__(self, channel):
         self.channel = channel
-        self.submission_id = submission_id
         self.status = 'upcoming'
         self.submissions = []
 
     def __eq__(self, other):
-        return type(self) == type(other) and self.channel == other.channel and self.submission_id == other.submission_id
+        return type(self) == type(other) and self.channel == other.channel
 
     def __hash__(self):
         return hash(self.channel)
 
     def __repr__(self):
-        return '<TwitchStream {} {} {}>'.format(self.id, self.channel, self.submission_id)
+        return '<TwitchStream {} {}>'.format(self.id, self.channel)
 
     def _update_status(self):
         r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
