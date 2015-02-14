@@ -112,10 +112,17 @@ class YoutubeStream(Stream):
             else:
                 self.status = 'completed'
 
-            # add channel to streamer table if it's needed
+            # add channel to streamer table if it's needed and delete if there is collision
             if self.streamer is not None:
+                yc = item['snippet']['channelId']
                 if self.streamer.youtube_channel is None:
-                    self.streamer.youtube_channel = item['snippet']['channelId']
+                    if Streamer.query.filter_by(youtube_channel=yc).first():
+                        self.streamer = None
+                    else:
+                        self.streamer.youtube_channel = yc
+                else:
+                    if self.streamer.youtube_channel != yc:
+                        self.streamer = None
 
     def normal_url(self):
         return "http://www.youtube.com/watch?v={}".format(self.ytid)
@@ -172,10 +179,16 @@ class TwitchStream(Stream):
                     if stream['status'] is not None:
                         self.title = stream['status']
 
-        # add channel to streamer table if it's needed
+        # add channel to streamer table if it's needed and delete if there is collision
         if self.streamer is not None:
             if self.streamer.twitch_channel is None:
-                self.streamer.twitch_channel = self.channel
+                if Streamer.query.filter_by(twitch_channel=self.channel).first():
+                    self.streamer = None
+                else:
+                    self.streamer.twitch_channel = self.channel
+            else:
+                if self.streamer.twitch_channel != self.channel:
+                    self.streamer = None
 
     def normal_url(self):
         return "http://www.twitch.tv/" + self.channel
