@@ -64,11 +64,10 @@ def get_reddit_username(submission, url):
 
 def get_or_create(model, **kwargs):
     instance = model.query.filter_by(**kwargs).first()
-    if instance:
-        return instance
-    else:
+    if instance is None:
         instance = model(**kwargs)
         db.session.add(instance)
+    return instance
 
 
 def get_new_streams():
