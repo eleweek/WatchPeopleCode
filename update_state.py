@@ -69,7 +69,6 @@ def get_or_create(model, **kwargs):
     else:
         instance = model(**kwargs)
         db.session.add(instance)
-        db.session.commit()
 
 
 def get_new_streams():
@@ -81,13 +80,10 @@ def get_new_streams():
         for url in get_submission_urls(s):
             stream = get_stream_from_url(url, s.id, only_new=True)
             if stream:
-                submission = get_or_create(Submission, submission_id=s.id)
-                stream.submissions.append(submission)
-                db.session.commit()
+                stream.submissions.append(get_or_create(Submission, submission_id=s.id))
                 reddit_username = get_reddit_username(s, url)
                 if reddit_username is not None:
-                    streamer = get_or_create(Streamer, reddit_username=reddit_username)
-                    stream.streamer = streamer
+                    stream.streamer = get_or_create(Streamer, reddit_username=reddit_username)
                 
                 stream._update_status()
 

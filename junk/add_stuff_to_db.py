@@ -14,7 +14,7 @@ def add_streamers():
                     stream._update_status()
 
                 db.session.add(stream)
-                db.session.commit()
+    db.session.commit()
 
 
 def add_submissions():
@@ -23,9 +23,8 @@ def add_submissions():
         for url in get_submission_urls(s):
             stream = get_stream_from_url(url, s.id)
             if stream:
-                submission = get_or_create(Submission, submission_id=s.id)
-                stream.submissions.append(submission)
-                db.session.commit()
+                stream.submissions.append(get_or_create(Submission, submission_id=s.id))
+    db.session.commit()
 
 
 # move submission_id to submissions if needed
