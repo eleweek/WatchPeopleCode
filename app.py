@@ -251,7 +251,7 @@ class Streamer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     reddit_username = db.column_property(db.Column(db.String(20), unique=True), comparator_factory=CaseInsensitiveComparator)
     twitch_channel = db.column_property(db.Column(db.String(25), unique=True), comparator_factory=CaseInsensitiveComparator)
-    youtube_channel = db.column_property(db.Column(db.String(24), unique=True), comparator_factory=CaseInsensitiveComparator)
+    youtube_channel = db.column_property(db.Column(db.String(24), unique=True))
 
     def __init__(self, reddit_username):
         self.reddit_username = reddit_username
