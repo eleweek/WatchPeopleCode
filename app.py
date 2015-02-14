@@ -323,16 +323,19 @@ def send_message(recipient_vars, subject, text, html):
               })
 
 
-def notify():
+def generate_email_notifications():
     # this is stub, fix before use
     live = Stream.query.filter_by(status='live').order_by(Stream.scheduled_start_time).all()
     upcoming = Stream.query.filter_by(status='upcoming').order_by(Stream.scheduled_start_time).all()
-    subject = "WatchPeopleCode: today's streams"
     text = render_template('mails/stream_notification.txt', live_streams=live, upcoming_streams=upcoming)
     html = render_template('mails/stream_notification.html', live_streams=live, upcoming_streams=upcoming)
-    recipient_vars = {subscriber.email: {} for subscriber in Subscriber.query}
-    send_message(recipient_vars, subject, text, html)
+    return text, html
 
+
+def send_email_notifications(text, html, subject="WatchPeopleCode: weekly update"):
+    # FIXME: mailgun batches are limited to 1000
+    recipient_vars = {subscriber.email: {} for subscriber in Subscriber.query}
+    print send_message(recipient_vars, subject, text, html)
 
 if __name__ == '__main__':
     manager.run()
