@@ -18,7 +18,7 @@ if app.config['REDDIT_PASSWORD']:
 youtube_api_key = os.environ['ytokkey']
 
 
-def get_stream_from_url(url, submission_id, only_new=False):
+def get_stream_from_url(url, submission, only_new=False):
     db_stream = None
 
     ytid = youtube_video_id(url)
@@ -37,7 +37,7 @@ def get_stream_from_url(url, submission_id, only_new=False):
         db_stream = TwitchStream.query.filter_by(channel=tc).first()
         if db_stream is None:
             return TwitchStream(tc)
-        if submission_id not in db_stream.submissions:
+        if submission not in db_stream.submissions:
             return db_stream
 
     return None if only_new else db_stream
@@ -77,9 +77,9 @@ def get_new_streams():
     # TODO better way of caching api requests
     for s in submissions:
         for url in get_submission_urls(s):
-            stream = get_stream_from_url(url, s.id, only_new=True)
+            submission = get_or_create(Submission, submission_id=s.id)
+            stream = get_stream_from_url(url, submission, only_new=True)
             if stream:
-                submission = get_or_create(Submission, submission_id=s.id)
                 if submission not in stream.submissions:
                     stream.submissions.append(submission)
                 reddit_username = get_reddit_username(s, url)
@@ -108,7 +108,7 @@ def update_flairs():
             if s.id == '2v1bnt' or s.id == '2v70uo':  # ignore LCS threads TODO
                 continue
             for url in get_submission_urls(s):
-                stream = get_stream_from_url(url, s.id)
+                stream = get_stream_from_url(url, get_or_create(Submission, s.id))
                 if stream:
                     flair_choices = s.get_flair_choices()['choices']
                     current_flair_text = s.get_flair_choices()[u'current'][u'flair_text']
