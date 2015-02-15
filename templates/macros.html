@@ -9,3 +9,21 @@
     <hr>
   {% endfor %}
 {% endmacro %}
+
+{% macro render_pagination(pagination) %}
+  {% if pagination.pages > 1 %}
+    <ul class="pagination">
+    {%- for page in pagination.iter_pages() %}
+      {% if page %}
+        {% if page != pagination.page %}
+          <li><a href="{{ url_for(".past_streams", page=page) }}">{{ page }}</a></li>
+        {% else %}
+          <li class="active"><span>{{ page }}</span></li>
+        {% endif %}
+      {% else %}
+        <li  class="disabled"><span>…</span></li>
+      {% endif %}
+    {%- endfor %}
+    </ul>
+  {% endif %}
+{% endmacro %}
