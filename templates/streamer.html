@@ -7,6 +7,7 @@
   {{super()}}
   <div class="container">
     <div class="col-md-offset-2 col-md-8">
+      <p class="text-center"><a href={{url_for(".index")}}>Back to main page</a></p>
       Reddit username: <a href='http://www.reddit.com/user/{{ streamer.reddit_username }}'> {{ streamer.reddit_username }}</a>
       {% if streamer.youtube_channel %}
         <br>
