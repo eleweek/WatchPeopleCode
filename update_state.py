@@ -79,7 +79,9 @@ def get_new_streams():
         for url in get_submission_urls(s):
             stream = get_stream_from_url(url, s.id, only_new=True)
             if stream:
-                stream.submissions.append(get_or_create(Submission, submission_id=s.id))
+                submission = get_or_create(Submission, submission_id=s.id)
+                if submission not in stream.submissions:
+                    stream.submissions.append(submission)
                 reddit_username = get_reddit_username(s, url)
                 if reddit_username is not None:
                     stream.streamer = get_or_create(Streamer, reddit_username=reddit_username)

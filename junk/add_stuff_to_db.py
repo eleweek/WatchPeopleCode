@@ -23,7 +23,9 @@ def add_submissions():
         for url in get_submission_urls(s):
             stream = get_stream_from_url(url, s.id)
             if stream:
-                stream.submissions.append(get_or_create(Submission, submission_id=s.id))
+                submission = get_or_create(Submission, submission_id=s.id)
+                if submission not in stream.submissions:
+                    stream.submissions.append(submission)
     db.session.commit()
 
 
@@ -32,7 +34,9 @@ def move_submissions():
     q = TwitchStream.query
     for stream in q:
         if stream.submission_id:
-            stream.submissions.append(get_or_create(Submission, submission_id=stream.submission_id))
+            submission = get_or_create(Submission, submission_id=stream.submission_id)
+            if submission not in stream.submissions:
+                stream.submissions.append(submission)
     db.session.commit()
 
 
@@ -43,7 +47,7 @@ def delete_copies():
         copies = q.filter_by(channel=stream.channel).all()
         if len(copies) > 1:
             for copy in copies[1:]:
-                stream.submissions += copy.submissions
+                stream.submissions = list(set(stream.submissions + copy.submissions))
                 db.session.delete(copy)
 
     db.session.commit()
