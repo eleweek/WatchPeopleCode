@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros with context %}
+
+{% block title %}All streamers{% endblock %}
+
+{% block content %}
+  {{super()}}
+
+  <div class="container">
+    <div class="col-md-offset-2 col-md-8">
+      <p class="text-center"><a href={{url_for(".index")}}>Back to main page</a></p>
+      <h3><p class="text-center">All streamers list</p></h3>
+      {{ macros.render_pagination(streamers) }}
+      <br>
+      {% for streamer in streamers.items %}
+        <a href={{ url_for('.streamer_page', streamer_name=streamer.reddit_username) }}> {{ streamer.reddit_username }}</a>
+        <br>
+      {% endfor %}
+      {{ macros.render_pagination(streamers) }}
+    </div>
+  </div>
+{% endblock %}

@@ -321,6 +321,13 @@ def past_streams(page):
     return render_template('past_streams.html', streams=streams, page=page)
 
 
+@app.route('/streamers/', defaults={'page': 1})
+@app.route('/streamers/<int:page>')
+def streamers_list(page):
+    streamers = Streamer.query.paginate(page, per_page=50)
+    return render_template('streamers_list.html', streamers=streamers)
+
+
 @app.route('/streamer/<streamer_name>', defaults={'page': 1})
 @app.route('/streamer/<streamer_name>/<int:page>')
 def streamer_page(streamer_name, page):
