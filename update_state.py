@@ -18,7 +18,8 @@ if app.config['REDDIT_PASSWORD']:
 youtube_api_key = os.environ['ytokkey']
 
 
-def get_stream_from_url(url, submission, only_new=False):
+def get_stream_from_url(url, submission=None, only_new=False):
+    assert bool(submission) == bool(only_new)
     db_stream = None
 
     ytid = youtube_video_id(url)
@@ -37,7 +38,7 @@ def get_stream_from_url(url, submission, only_new=False):
         db_stream = TwitchStream.query.filter_by(channel=tc).first()
         if db_stream is None:
             return TwitchStream(tc)
-        if submission not in db_stream.submissions:
+        if submission and submission not in db_stream.submissions:
             return db_stream
 
     return None if only_new else db_stream
@@ -108,7 +109,7 @@ def update_flairs():
             if s.id == '2v1bnt' or s.id == '2v70uo':  # ignore LCS threads TODO
                 continue
             for url in get_submission_urls(s):
-                stream = get_stream_from_url(url, get_or_create(Submission, submission_id=s.id))
+                stream = get_stream_from_url(url, None)
                 if stream:
                     flair_choices = s.get_flair_choices()['choices']
                     current_flair_text = s.get_flair_choices()[u'current'][u'flair_text']
