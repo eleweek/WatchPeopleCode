@@ -108,7 +108,7 @@ def update_flairs():
             if s.id == '2v1bnt' or s.id == '2v70uo':  # ignore LCS threads TODO
                 continue
             for url in get_submission_urls(s):
-                stream = get_stream_from_url(url, get_or_create(Submission, s.id))
+                stream = get_stream_from_url(url, get_or_create(Submission, submission_id=s.id))
                 if stream:
                     flair_choices = s.get_flair_choices()['choices']
                     current_flair_text = s.get_flair_choices()[u'current'][u'flair_text']
