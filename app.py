@@ -172,6 +172,14 @@ class TwitchStream(Stream):
     def __repr__(self):
         return '<TwitchStream {} {}>'.format(self.id, self.channel)
 
+    def _update_title_from_channel(self):
+        r = requests_get_with_retries("https://api.twitch.tv/kraken/channels/{}".format(self.channel))
+        r.raise_for_status()
+        stream = r.json()
+        if stream is not None:
+            if stream['status'] is not None:
+                self.title = stream['status']
+
     def _update_status(self):
         r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
         r.raise_for_status()
@@ -182,16 +190,12 @@ class TwitchStream(Stream):
             self.last_time_live = datetime.utcnow()
         else:
             if self.status == 'live':
+                # this is workaround for situations like stream going offline shortly
                 if datetime.utcnow() - self.last_time_live > timedelta(minutes=12):
                     self.status = 'completed'
-            # if stream is upcoming we should go to api for the title
-            else:
-                r = requests_get_with_retries("https://api.twitch.tv/kraken/channels/{}".format(self.channel))
-                r.raise_for_status()
-                stream = r.json()
-                if stream is not None:
-                    if stream['status'] is not None:
-                        self.title = stream['status']
+
+            if self.status == 'upcoming':
+                self._update_title_from_channel()
 
         # add channel to streamer table if it's needed and delete if there is collision
         if self.streamer is not None:
