@@ -66,6 +66,7 @@ class Stream(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(50))
     scheduled_start_time = db.Column(db.DateTime())
+    actual_start_time = db.Column(db.DateTime())
     status = db.Column(db.Enum('upcoming', 'live', 'completed', name='stream_status'))
     title = db.Column(db.String(200))
     subscribers = db.relationship('Subscriber', secondary=subscription, backref=db.backref('streams', lazy='dynamic'))
@@ -121,6 +122,7 @@ class YoutubeStream(Stream):
                 self.scheduled_start_time = item['liveStreamingDetails']['scheduledStartTime']
             if item['snippet']['liveBroadcastContent'] == 'live':
                 self.status = 'live'
+                self.actual_start_time = item['liveStreamingDetails']['actualStartTime']
             elif item['snippet']['liveBroadcastContent'] == 'upcoming':
                 self.status = 'upcoming'
             else:
@@ -190,6 +192,8 @@ class TwitchStream(Stream):
             self.last_time_live = datetime.utcnow()
         else:
             if self.status == 'live':
+                if self.actual_start_time is None:
+                    self.actual_start_time = self.last_time_live
                 # this is workaround for situations like stream going offline shortly
                 if datetime.utcnow() - self.last_time_live > timedelta(minutes=12):
                     self.status = 'completed'
