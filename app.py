@@ -299,6 +299,13 @@ def past_streams(page):
     return render_template('past_streams.html', streams=streams, page=page)
 
 
+@app.route('/streamer/<streamer_name>', defaults={'page': 1})
+def streamer_page(streamer_name, page):
+    streamer = Streamer.query.filter_by(reddit_username=streamer_name).first()
+    streams = streamer.streams.paginate(page, per_page=5)
+    return render_template('streamer.html', streamer=streamer, streams=streams)
+
+
 @app.route('/json')
 def stream_json():
     def make_dict(stream):

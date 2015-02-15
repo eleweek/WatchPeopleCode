@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros with context %}
+
+{% block title %} Streamer {{ streamer.reddit_usernamer }} {% endblock %}
+
+{% block content %}
+  {{super()}}
+  <div class="container">
+    <div class="col-md-offset-2 col-md-8">
+      Reddit username: <a href='http://www.reddit.com/user/{{ streamer.reddit_username }}'> {{ streamer.reddit_username }}</a>
+      {% if streamer.youtube_channel %}
+        <br>
+        Youtube channel: <a href='http://www.youtube.com/channel/{{ streamer.youtube_channel }}'>{{ streamer.youtube_channel }}</a>
+      {% endif %}
+      {% if streamer.twitch_channel %}
+        <br>
+        Twitch: <a href='http://www.twitch.tv/{{ streamer.twitch_channel }}'>{{ streamer.twitch_channel }}</a>
+      {% endif %}
+      <br>
+      {{ macros.render_pagination(streams) }}
+      <br>
+      {% for stream in streams.items %}
+        <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+        <br>
+        {{ stream.html_code() |safe }}
+        <hr>
+      {% endfor %}
+      {{ macros.render_pagination(streams) }}
+    </div>
+  </div>
+{% endblock %}
