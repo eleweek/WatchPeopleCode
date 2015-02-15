@@ -220,7 +220,7 @@ class TwitchStream(Stream):
         if submission not in self.submissions:
             self.status = 'upcoming'
 
-        Stream.add_submission(submission)
+        Stream.add_submission(self, submission)
 
     def normal_url(self):
         return "http://www.twitch.tv/" + self.channel
