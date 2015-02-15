@@ -19,7 +19,7 @@
     {%- for page in pagination.iter_pages() %}
       {% if page %}
         {% if page != pagination.page %}
-          <li><a href="{{ url_for(".past_streams", page=page) }}">{{ page }}</a></li>
+          <li><a href="{{ url_for_other_page(page) }}">{{ page }}</a></li>
         {% else %}
           <li class="active"><span>{{ page }}</span></li>
         {% endif %}

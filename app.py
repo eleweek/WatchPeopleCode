@@ -45,6 +45,14 @@ def run():
 youtube_api_key = os.environ['ytokkey']
 
 
+def url_for_other_page(page):
+    args = request.view_args.copy()
+    args['page'] = page
+    return url_for(request.endpoint, **args)
+
+app.jinja_env.globals['url_for_other_page'] = url_for_other_page
+
+
 subscription = db.Table('subscription',
                         db.Column('stream_id', db.Integer(), db.ForeignKey('stream.id')),
                         db.Column('subscriber_id', db.Integer(), db.ForeignKey('subscriber.id')))
@@ -314,9 +322,10 @@ def past_streams(page):
 
 
 @app.route('/streamer/<streamer_name>', defaults={'page': 1})
+@app.route('/streamer/<streamer_name>/<int:page>')
 def streamer_page(streamer_name, page):
     streamer = Streamer.query.filter_by(reddit_username=streamer_name).first()
-    streams = streamer.streams.paginate(page, per_page=5)
+    streams = streamer.streams.order_by(Stream.scheduled_start_time.desc().nullslast()).paginate(page, per_page=5)
     return render_template('streamer.html', streamer=streamer, streams=streams)
 
 
