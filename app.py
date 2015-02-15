@@ -90,6 +90,10 @@ class Stream(db.Model):
         else:
             return datetime.strftime(self.scheduled_start_time, "%Y-%m-%d %H:%M UTC")
 
+    def add_submission(self, submission):
+        if submission not in self.submissions:
+            self.submissions.append(submission)
+
 
 class YoutubeStream(Stream):
     ytid = db.Column(db.String(11), unique=True)
@@ -211,6 +215,12 @@ class TwitchStream(Stream):
             else:
                 if self.streamer.twitch_channel != self.channel:
                     self.streamer = None
+
+    def add_submission(self, submission):
+        if submission not in self.submissions:
+            self.status = 'upcoming'
+
+        Stream.add_submission(submission)
 
     def normal_url(self):
         return "http://www.twitch.tv/" + self.channel
