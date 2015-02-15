@@ -1,0 +1,11 @@
+{% macro streams(streams, status) %}
+  {% for stream in streams %}
+    {% if status == 'upcoming'%}
+      {% if stream.scheduled_start_time %}<p><b>{{stream.format_start_time()}}</b></p> {% endif %}
+    {% endif %}
+    <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+    <br>
+    {{ stream.html_code(autoplay=(loop.index == 1) if status == 'live' else False ) |safe }}
+    <hr>
+  {% endfor %}
+{% endmacro %}

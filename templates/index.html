@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
+{% import "macros.html" as macros with context %}
 
 {% block styles %}
   {{super()}}
@@ -20,12 +21,7 @@
       {#<p class="text-center"><a href="http://webchat.freenode.net/?randomnick=1&channels=%23WatchPeopleCode&prompt=1">Join #WatchPeopleCode on irc.freenode.net</a></p>#}
       <div class="col-md-8">
         {% if live_streams %}
-            {% for stream in live_streams %}
-              <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
-              <br>
-              {{ stream.html_code(autoplay=(loop.index == 1)) |safe }}
-              <hr>
-            {% endfor %}
+          {{ macros.streams(live_streams, 'live') }}
         {% else %}
           <h4> How about watching a random recorded stream? </h4>
           <a href={{ random_stream.normal_url() }}> {{ random_stream.title if random_stream.title else random_stream.normal_url() }}</a>
@@ -36,13 +32,7 @@
 
         {% if upcoming_streams != [] %}
           <h4> Upcoming streams </h4><br>
-          {% for stream in upcoming_streams %}
-            {% if stream.scheduled_start_time %}<p><b>{{stream.format_start_time()}}</b></p> {% endif %}
-            <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
-            <br>
-            {{ stream.html_code() | safe }}
-            <hr>
-          {% endfor %}
+          {{ macros.streams(upcoming_streams, 'upcoming') }}
         {% endif %}
 
       </div>
