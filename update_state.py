@@ -54,7 +54,7 @@ def get_submission_urls(submission):
 
 
 def get_reddit_username(submission, url):
-    if submission.title.find('Live Coding Sunday') == -1 or submission.selftext.find('description') == -1:
+    if submission.author.name != 'godlikesme' or submission.selftext.find('description') == -1:
         return submission.author.name
     else:
         after_url = submission.selftext[submission.selftext.find(url) + len(url):]
