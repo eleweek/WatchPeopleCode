@@ -97,19 +97,26 @@ def get_new_streams():
 sched = BlockingScheduler()
 
 
-@sched.scheduled_job('interval', seconds=50)
+@sched.scheduled_job('interval', seconds=60)
 def update_flairs():
     if not app.config['REDDIT_PASSWORD']:
         return
 
     try:
-        submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
+        wpc_sub = r.get_subreddit('watchpeoplecode')
+        submissions = wpc_sub.get_new(limit=25)
         for s in submissions:
             if s.id == '2v1bnt' or s.id == '2v70uo':  # ignore LCS threads TODO
                 continue
             for url in get_submission_urls(s):
                 stream = get_stream_from_url(url, None)
                 if stream:
+                    # set user flair
+                    if not wpc_sub.get_flair(s.author)['flair_text']:
+                        print "Setting flair to ", s.author
+                        wpc_sub.set_flair(s.author, flair_text='Streamer', flair_css_class='text-white background-blue')
+
+                    # set link flairs
                     flair_choices = s.get_flair_choices()['choices']
                     current_flair_text = s.get_flair_choices()[u'current'][u'flair_text']
                     status_to_flair_text = {"live": u"Live",
