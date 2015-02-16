@@ -354,7 +354,7 @@ def past_streams(page):
 @app.route('/streamers/', defaults={'page': 1})
 @app.route('/streamers/<int:page>')
 def streamers_list(page):
-    streamers = Streamer.query.paginate(page, per_page=50)
+    streamers = Streamer.query.order_by(Streamer.reddit_username).paginate(page, per_page=50)
     return render_template('streamers_list.html', streamers=streamers)
 
 

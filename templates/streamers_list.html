@@ -11,11 +11,11 @@
       <p class="text-center"><a href={{url_for(".index")}}>Back to main page</a></p>
       <h3><p class="text-center">All streamers list</p></h3>
       {{ macros.render_pagination(streamers) }}
-      <br>
+      <ol start="{{(streamers.page - 1) * streamers.per_page + 1}}">
       {% for streamer in streamers.items %}
-        <a href={{ url_for('.streamer_page', streamer_name=streamer.reddit_username) }}> {{ streamer.reddit_username }}</a>
-        <br>
+        <li> <a href={{ url_for('.streamer_page', streamer_name=streamer.reddit_username) }}> {{ streamer.reddit_username }}</a> </li>
       {% endfor %}
+      </ol>
       {{ macros.render_pagination(streamers) }}
     </div>
   </div>
