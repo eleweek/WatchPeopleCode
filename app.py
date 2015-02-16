@@ -202,10 +202,10 @@ class TwitchStream(Stream):
             self.status = 'live'
             self.title = stream['channel']['status']
             self.last_time_live = datetime.utcnow()
+            if self.actual_start_time is None:
+                self.actual_start_time = self.last_time_live
         else:
             if self.status == 'live':
-                if self.actual_start_time is None:
-                    self.actual_start_time = self.last_time_live
                 # this is workaround for situations like stream going offline shortly
                 if datetime.utcnow() - self.last_time_live > timedelta(minutes=12):
                     self.status = 'completed'
