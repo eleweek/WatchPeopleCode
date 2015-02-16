@@ -148,6 +148,7 @@ class YoutubeStream(Stream):
                         self.streamer = None
                     else:
                         self.streamer.youtube_channel = yc
+                        self.streamer.youtube_name = item['snippet']['channelTitle']
                 else:
                     if self.streamer.youtube_channel != yc:
                         self.streamer = None
@@ -275,7 +276,8 @@ class Streamer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     reddit_username = db.column_property(db.Column(db.String(20), unique=True), comparator_factory=CaseInsensitiveComparator)
     twitch_channel = db.column_property(db.Column(db.String(25), unique=True), comparator_factory=CaseInsensitiveComparator)
-    youtube_channel = db.column_property(db.Column(db.String(24), unique=True))
+    youtube_channel = db.Column(db.String(24), unique=True)
+    youtube_name = db.Column(db.String(30))
 
     def __init__(self, reddit_username):
         self.reddit_username = reddit_username

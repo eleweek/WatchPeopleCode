@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% import "macros.html" as macros with context %}
 
-{% block title %} Streamer {{ streamer.reddit_usernamer }} {% endblock %}
+{% block title %} Streamer {{ streamer.reddit_username }} {% endblock %}
 
 {% block content %}
   {{super()}}
@@ -11,7 +11,7 @@
       Reddit username: <a href='http://www.reddit.com/user/{{ streamer.reddit_username }}'> {{ streamer.reddit_username }}</a>
       {% if streamer.youtube_channel %}
         <br>
-        Youtube channel: <a href='http://www.youtube.com/channel/{{ streamer.youtube_channel }}'>{{ streamer.youtube_channel }}</a>
+        Youtube channel: <a href='http://www.youtube.com/channel/{{ streamer.youtube_channel }}'>{{ streamer.youtube_name if streamer.youtube_name else streamer.youtube_channel }}</a>
       {% endif %}
       {% if streamer.twitch_channel %}
         <br>
