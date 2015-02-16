@@ -85,7 +85,7 @@ def get_new_streams():
                 reddit_username = get_reddit_username(s, url)
                 if reddit_username is not None:
                     stream.streamer = get_or_create(Streamer, reddit_username=reddit_username)
-                
+
                 stream._update_status()
 
                 db.session.add(stream)
