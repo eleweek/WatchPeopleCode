@@ -1,6 +1,5 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
 import praw
-import os
 from bs4 import BeautifulSoup
 from sqlalchemy import or_
 import traceback
@@ -15,7 +14,6 @@ r = praw.Reddit(user_agent=reddit_user_agent)
 r.config.decode_html_entities = True
 if app.config['REDDIT_PASSWORD']:
     r.login(app.config['REDDIT_USERNAME'], app.config['REDDIT_PASSWORD'])
-youtube_api_key = os.environ['ytokkey']
 
 
 def get_stream_from_url(url, submission=None, only_new=False):
@@ -27,7 +25,7 @@ def get_stream_from_url(url, submission=None, only_new=False):
         db_stream = YoutubeStream.query.filter_by(ytid=ytid).first()
         if db_stream is None:
             r = requests_get_with_retries(
-                "https://www.googleapis.com/youtube/v3/videos?id={}&part=liveStreamingDetails&key={}".format(ytid, youtube_api_key), retries_num=15)
+                "https://www.googleapis.com/youtube/v3/videos?id={}&part=liveStreamingDetails&key={}".format(ytid, app.config['YOUTUBE_KEY']), retries_num=15)
             item = r.json()['items']
             if item:
                 if 'liveStreamingDetails' in item[0]:

@@ -14,18 +14,46 @@ import json
 from datetime import datetime, timedelta
 from utils import requests_get_with_retries
 import humanize
+import logging
 
 
-app = Flask(__name__)
-app.secret_key = os.environ['SECRET_KEY']
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-app.config['MAILGUN_API_URL'] = os.environ['MAILGUN_API_URL']
-app.config['MAILGUN_API_KEY'] = os.environ['MAILGUN_API_KEY']
-app.config['MAILGUN_TEST_OPTION'] = True if os.environ['MAILGUN_TEST_OPTION'] == 'True' else False
-app.config['NOTIFICATION_EMAIL'] = os.environ['MAILGUN_SMTP_LOGIN']
-app.config['REDDIT_PASSWORD'] = os.environ['REDDIT_PASSWORD']
-app.config['REDDIT_USERNAME'] = os.environ['REDDIT_USERNAME']
-Bootstrap(app)
+def setup_logging(loggers_and_levels):
+    handler = logging.StreamHandler()
+
+    FORMAT = "%(asctime)s:%(levelname)s:%(name)s:%(message)s"
+    formatter = logging.Formatter(fmt=FORMAT)
+    handler.setFormatter(formatter)
+
+    for logger, level in loggers_and_levels:
+        logger.setLevel(level)
+        logger.addHandler(handler)
+
+
+def create_app():
+    app = Flask("WatchPeopleCode")
+    app.secret_key = os.environ['SECRET_KEY']
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+    app.config['MAILGUN_API_URL'] = os.environ['MAILGUN_API_URL']
+    app.config['MAILGUN_API_KEY'] = os.environ['MAILGUN_API_KEY']
+    app.config['MAILGUN_TEST_OPTION'] = True if os.environ['MAILGUN_TEST_OPTION'] == 'True' else False
+    app.config['NOTIFICATION_EMAIL'] = os.environ['MAILGUN_SMTP_LOGIN']
+    app.config['REDDIT_PASSWORD'] = os.environ['WPC_REDDIT_PASSWORD']
+    app.config['REDDIT_USERNAME'] = os.environ['WPC_REDDIT_USERNAME']
+    app.config['YOUTUBE_KEY'] = os.environ['WPC_YOUTUBE_KEY']
+    app.config['GA_TRACKING_CODE'] = os.environ['GA_TRACKING_CODE']
+
+    Bootstrap(app)
+    loggers_and_levels = [(app.logger, logging.INFO),
+                          (logging.getLogger('sqlalchemy'), logging.WARNING),
+                          (logging.getLogger('apscheduler.scheduler'), logging.INFO)]
+    setup_logging(loggers_and_levels)
+
+    app.logger.info("App created!")
+
+    return app
+
+app = create_app()
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 manager = Manager(app)
@@ -34,15 +62,12 @@ manager.add_command('db', MigrateCommand)
 
 @app.before_request
 def add_ga_tracking_code():
-    g.ga_tracking_code = os.environ['GA_TRACKING_CODE']
+    g.ga_tracking_code = app.config['GA_TRACKING_CODE']
 
 
 @manager.command
 def run():
     app.run(debug=True)
-
-
-youtube_api_key = os.environ['ytokkey']
 
 
 def url_for_other_page(page):
@@ -121,7 +146,11 @@ class YoutubeStream(Stream):
 
     def _update_status(self):
         r = requests_get_with_retries(
-            "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(self.ytid, youtube_api_key), retries_num=15)
+            "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(
+                self.ytid,
+                app.config['YOUTUBE_KEY'],
+                retries_num=15))
+
         r.raise_for_status()
 
         if not r.json()['items']:
