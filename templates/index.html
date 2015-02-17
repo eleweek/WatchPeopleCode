@@ -5,23 +5,25 @@
 {% block styles %}
   {{super()}}
   <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='base.css')}}">
 {% endblock %}
-
+ <div class="container">
+ <div class="toptext">
+  <p class="text-center"> The app automatically gets live stream from /r/WatchPeopleCode subreddit, so if you want to start live streaming, submit a link to your youtube stream or twitch channel to <a href="http://www.reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode </a></p>
+  </div>
+ <div id="live" >
 {% block content %}
   {{super()}}
-  <div class="container">
-    <h1 class="text-center"> Watch People Code </h1>
     {% if live_streams is not none %}
-        <h2 class="text-center"> Livestreams right now: {{live_streams|length}}</h2>
+<h2 class="text-center">Live Streams</h2>
+<div class="row">
+        <h2 class="text-center">Livestreams right now:{{live_streams|length}}</h2>
     {% else %}
         <h2 class="text-center"> Error getting live streams. :( Maybe try refreshing the page? </h2>
     {% endif %}
-    <p class="text-center"> The app automatically gets live stream from /r/WatchPeopleCode subreddit, so if you want to start live streaming, submit a link to your youtube stream or twitch channel to <a href="http://www.reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode </a></p>
-      <p class="text-center"><a href={{url_for(".past_streams")}}>Big list of past streams</a></p>
-      {#<p class="text-center"><a href="http://webchat.freenode.net/?randomnick=1&channels=%23WatchPeopleCode&prompt=1">Join #WatchPeopleCode on irc.freenode.net</a></p>#}
-      <div class="col-md-8">
+
         {% if live_streams %}
-          {{ macros.streams(live_streams, 'live') }}
+          {{ macros.streams(live_streams, 'live') }} </div>
         {% else %}
           <h4> How about watching a random recorded stream? </h4>
           <a href={{ random_stream.normal_url() }}> {{ random_stream.title if random_stream.title else random_stream.normal_url() }}</a>
@@ -31,31 +33,44 @@
         {% endif %}
 
         {% if upcoming_streams != [] %}
-          <h4> Upcoming streams </h4><br>
+    <h2 class="text-center">Upcoming streams</h2>
           {{ macros.streams(upcoming_streams, 'upcoming') }}
         {% endif %}
 
       </div>
-      <div class="col-md-4"> 
-        <form action="" method="POST" class="form form-subscribe" role="form">
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h1 class="panel-title">Get notifications about upcoming streams</h1>
-            </div>
-
-            <div class="panel-body">
-              <div class="form-group">
-                {{ form.hidden_tag() }}
-                {{ wtf.form_field(form.email, value="") }}
-                {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'primary'}) }}
-              </div>
-            </div>
-          </div>
-          <p><b> Get notifications in twitter </b></p>
-          <a href="https://twitter.com/WatchPeopleCode" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @WatchPeopleCode</a>
-          <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-        </form>
-    </div>
-  </div>
-
+	
 {% endblock %}
+
+ <div id="completed" style="display: none;">
+ <h2 class="text-center">Completed</h2>
+
+{% block content %}
+  {{super()}}
+        {{ macros.render_pagination(streams) }}
+        {% for stream in streams.items %}
+          {% if loop.index0 is even %}
+  <div class="row"> 
+  {%endif%}
+   <div class="col-lg-6">
+         <div class="full"> <a href={{ stream.normal_url() }}>{{ stream.title if stream.title else stream.normal_url() }}</a></div>
+          {{ stream.html_code() |safe }}
+          </div>
+           {% if loop.index0 is even %}
+      </div>
+     {%endif%}
+        {% endfor %}
+        {{ macros.render_pagination(streams) }}
+{% endblock %}
+</div>
+
+      </div>
+   <footer>
+   <div class="row">
+   <div class="col-lg-12" style="text-align: center;">
+   <small>&copy; 2015 WatchPeoplecode.com</small>
+   </div>
+   </div>
+   </footer>
+  
+  </body>
+</html>

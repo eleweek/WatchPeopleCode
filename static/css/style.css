@@ -49,6 +49,7 @@ margin-bottom: 0px !important;
 }
 h1.sitetitle {
 color: #fff;
+text-align: center;
 }
 
 .title{
@@ -109,7 +110,7 @@ color: #fff;
 .topform {
 margin-left: auto;
 margin-right: auto;
-width: 234px;
+width: 254px;
 margin-top:10px;
 }
 .topform p {
@@ -129,9 +130,7 @@ width: 333px;
 .nav-tabs>li a{
 min-width: 123px;	
 }
-.topform{
-	width: 254px;
-}
+
 h1{
 font-size: 34px !important;
 	

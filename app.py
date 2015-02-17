@@ -187,9 +187,11 @@ class YoutubeStream(Stream):
 
     def html_code(self, autoplay=False):
         return """
+            <div class="embed-responsive embed-responsive-16by9">
                 <iframe width="640" height="390"
                 src="http://www.youtube.com/embed/{}?rel=0&autoplay={}">
                 </iframe>
+                </div>
               """.format(self.ytid, int(autoplay))
 
     __mapper_args__ = {
@@ -264,6 +266,7 @@ class TwitchStream(Stream):
 
     def html_code(self, autoplay=False):
         return """
+            <div class="embed-responsive embed-responsive-16by9">
                <object type="application/x-shockwave-flash"
                        height="390"
                        width="640"
@@ -281,6 +284,7 @@ class TwitchStream(Stream):
                  <param  name="flashvars"
                          value="hostname=www.twitch.tv&channel={}&auto_play={}" />
                </object>
+               </div>
                """.format(self.channel, self.channel, "true" if autoplay else "false")
 
     __mapper_args__ = {

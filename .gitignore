@@ -60,3 +60,6 @@ target/
 
 # Enviroment
 .env
+
+# bower
+static/lib/
