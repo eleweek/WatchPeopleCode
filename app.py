@@ -145,13 +145,19 @@ class YoutubeStream(Stream):
         return '<YoutubeStream %d %r>' % (self.id, self.ytid)
 
     def _update_status(self):
-        r = requests_get_with_retries(
-            "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(
-                self.ytid,
-                app.config['YOUTUBE_KEY'],
-                retries_num=15))
+        app.logger.info("Updating status for {}".format(self))
+        try:
+            r = requests_get_with_retries(
+                "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(
+                    self.ytid,
+                    app.config['YOUTUBE_KEY'],
+                    retries_num=15))
 
-        r.raise_for_status()
+            r.raise_for_status()
+        except Exception as e:
+            app.logger.error("Error while updating {}".format(YoutubeStream))
+            app.logger.exception(e)
+            raise
 
         if not r.json()['items']:
             self.status = 'completed'
@@ -224,8 +230,15 @@ class TwitchStream(Stream):
                 self.title = stream['status']
 
     def _update_status(self):
-        r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
-        r.raise_for_status()
+        app.logger.info("Updating status for {}".format(self))
+        try:
+            r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
+            r.raise_for_status()
+        except Exception as e:
+            app.logger.error("Error while updating {}".format(self))
+            app.logger.exception(e)
+            raise
+
         stream = r.json()['stream']
         if stream is not None:
             self.status = 'live'

@@ -32,6 +32,7 @@ def get_stream_from_url(url, submission=None, only_new=False):
                     return YoutubeStream(ytid)
 
     tc = twitch_channel(url)
+    print tc, url
     if tc is not None:
         db_stream = TwitchStream.query.filter_by(channel=tc).first()
         if db_stream is None:
@@ -146,19 +147,21 @@ def update_flairs():
 
 @sched.scheduled_job('interval', seconds=10)
 def update_state():
+    app.logger.info("Updating old streams")
     for ls in Stream.query.filter(or_(Stream.status != 'completed', Stream.status == None)):
         try:
             ls._update_status()
         except Exception as e:
             db.session.rollback()
-            traceback.print_exc()
+            app.logger.exception(e)
             raise
 
+    app.logger.info("Updating new streams")
     try:
         get_new_streams()
     except Exception as e:
+        app.logger.exception(e)
         db.session.rollback()
-        traceback.print_exc(e)
         raise
 
     db.session.commit()

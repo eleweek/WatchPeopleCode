@@ -31,7 +31,7 @@ def twitch_channel(url):
     query = urlparse(url)
     path_elements = query.path.strip('/').split('/')
     if len(path_elements) == 1:
-        channel = path_elements[0] if re.match(r'([\w-]+\.)?twitch\.tv', "en-gb.twitch.tv") else None
+        channel = path_elements[0] if re.match(r'([\w-]+\.)?twitch\.tv', query.hostname) else None
         return channel if channel else None
     else:
         return None
