@@ -1,6 +1,8 @@
 {% macro streams(streams, status) %}
   {% for stream in streams %}
+  {% if loop.index0 is even %}
   <div class="row"> 
+  {%endif%}
    <div class="col-lg-6">
    
     {% endif %}
@@ -12,6 +14,9 @@
  {% if status == 'upcoming'%}
       {% if stream.scheduled_start_time %} <div class="full"><p><b>{{stream.format_start_time()}}</b></p></div> {% endif %}
     </div>
+     {% if loop.index0 is even %}
+      </div>
+     {%endif%}
   {% endfor %}
 {% endmacro %}
 
