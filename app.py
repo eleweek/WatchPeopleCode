@@ -175,18 +175,17 @@ class YoutubeStream(Stream):
             else:
                 self.status = 'completed'
 
-            # add channel to streamer table if it's needed and delete if there is collision
+            # add channel to streamer table if it's needed and fix if it's needed
             if self.streamer is not None:
                 yc = item['snippet']['channelId']
-                if self.streamer.youtube_channel is None:
-                    if Streamer.query.filter_by(youtube_channel=yc).first():
-                        self.streamer = None
-                    else:
-                        self.streamer.youtube_channel = yc
-                        self.streamer.youtube_name = item['snippet']['channelTitle']
+                streamer = Streamer.query.filter_by(youtube_channel=yc).first()
+                # if there is streamer with that channel
+                if streamer:
+                    self.streamer = streamer
+                # there is no streamer with that channel
                 else:
-                    if self.streamer.youtube_channel != yc:
-                        self.streamer = None
+                    self.streamer.youtube_channel = yc
+                    self.streamer.youtube_name = item['snippet']['channelTitle']
 
     def normal_url(self):
         return "http://www.youtube.com/watch?v={}".format(self.ytid)
@@ -255,16 +254,15 @@ class TwitchStream(Stream):
             if self.status == 'upcoming':
                 self._update_title_from_channel()
 
-        # add channel to streamer table if it's needed and delete if there is collision
+        # add channel to streamer table if it's needed and fix if it's needed
         if self.streamer is not None:
-            if self.streamer.twitch_channel is None:
-                if Streamer.query.filter_by(twitch_channel=self.channel).first():
-                    self.streamer = None
-                else:
-                    self.streamer.twitch_channel = self.channel
+            streamer = Streamer.query.filter_by(twitch_channel=self.channel).first()
+            # if there is streamer with that channel
+            if streamer:
+                self.streamer = streamer
+            # there is no streamer with that channel
             else:
-                if self.streamer.twitch_channel != self.channel:
-                    self.streamer = None
+                self.streamer.twitch_channel = self.channel
 
     def add_submission(self, submission):
         if submission not in self.submissions:

@@ -82,7 +82,7 @@ def get_new_streams():
             if stream:
                 stream.add_submission(submission)
                 reddit_username = get_reddit_username(s, url)
-                if reddit_username is not None:
+                if reddit_username is not None and stream.streamer is None:
                     stream.streamer = get_or_create(Streamer, reddit_username=reddit_username)
 
                 stream._update_status()
