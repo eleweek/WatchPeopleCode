@@ -16,14 +16,23 @@ from utils import requests_get_with_retries
 import humanize
 import logging
 
+from logentries import LogentriesHandler
 
-def setup_logging(loggers_and_levels):
-    handler = logging.StreamHandler()
+
+def setup_logging(loggers_and_levels, logentries_id=None):
+    log = logging.getLogger('logentries')
+    log.setLevel(logging.INFO)
+    if logentries_id:
+        logentries_handler = LogentriesHandler(logentries_id)
+        handler = logentries_handler
+    else:
+        handler = logging.StreamHandler()
 
     FORMAT = "%(asctime)s:%(levelname)s:%(name)s:%(message)s"
     formatter = logging.Formatter(fmt=FORMAT)
     handler.setFormatter(formatter)
 
+    log.addHandler(handler)
     for logger, level in loggers_and_levels:
         logger.setLevel(level)
         logger.addHandler(handler)
@@ -46,7 +55,7 @@ def create_app():
     loggers_and_levels = [(app.logger, logging.INFO),
                           (logging.getLogger('sqlalchemy'), logging.WARNING),
                           (logging.getLogger('apscheduler.scheduler'), logging.INFO)]
-    setup_logging(loggers_and_levels)
+    setup_logging(loggers_and_levels, logentries_id=os.environ.get('LOGENTRIES_ID', None))
 
     app.logger.info("App created!")
 

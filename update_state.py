@@ -2,7 +2,6 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 import praw
 from bs4 import BeautifulSoup
 from sqlalchemy import or_
-import traceback
 import datetime
 
 from app import db, Stream, YoutubeStream, TwitchStream, Streamer, Submission, app
@@ -32,7 +31,6 @@ def get_stream_from_url(url, submission=None, only_new=False):
                     return YoutubeStream(ytid)
 
     tc = twitch_channel(url)
-    print tc, url
     if tc is not None:
         db_stream = TwitchStream.query.filter_by(channel=tc).first()
         if db_stream is None:
@@ -112,7 +110,6 @@ def update_flairs():
                 if stream:
                     # set user flair
                     if not wpc_sub.get_flair(s.author)['flair_text']:
-                        print "Setting flair to ", s.author
                         wpc_sub.set_flair(s.author, flair_text='Streamer', flair_css_class='text-white background-blue')
 
                     # set link flairs
@@ -141,8 +138,8 @@ def update_flairs():
                                 s.set_flair(flair_text, fc[u'flair_css_class'])
                     else:
                         s.set_flair('')
-    except:
-        traceback.print_exc()
+    except Exception as e:
+        app.logger.exception(e)
 
 
 @sched.scheduled_job('interval', seconds=10)
