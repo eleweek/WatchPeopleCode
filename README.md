@@ -3,7 +3,8 @@ Helper app for /r/WatchPeopleCode subreddit
 
 Currently available at: http://watchpeoplecode.com
 
-# Working on the frontend
+# The following information is obsolete, install anything however you want. Modify templates to work on frontend in templates/
+## Working on the frontend
 If you are interested in working on the frontend, we recently moved to a bower dependency model. To start hacking install bower, and an optional static server through NPM (and if you don't have npm, consult your package manager or http://nodejs.org).
 
 ```npm install -g bower http-server``` (Depending on your OS you will have to run this as root, try without root first)
