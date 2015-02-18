@@ -7,6 +7,7 @@ from wtforms import StringField, SubmitField, validators
 from wtforms.validators import ValidationError
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
+from flask.ext.login import LoginManager, UserMixin, login_user, logout_user, login_required
 
 import os
 import requests
@@ -15,6 +16,7 @@ from datetime import datetime, timedelta
 from utils import requests_get_with_retries
 import humanize
 import logging
+import praw
 
 from logentries import LogentriesHandler
 
@@ -50,6 +52,8 @@ def create_app():
     app.config['REDDIT_USERNAME'] = os.environ['WPC_REDDIT_USERNAME']
     app.config['YOUTUBE_KEY'] = os.environ['WPC_YOUTUBE_KEY']
     app.config['GA_TRACKING_CODE'] = os.environ['GA_TRACKING_CODE']
+    app.config['REDDIT_API_ID'] = os.environ['WPC_APP_ID']
+    app.config['REDDIT_API_SECRET'] = os.environ['WPC_APP_SECRET']
 
     Bootstrap(app)
     loggers_and_levels = [(app.logger, logging.INFO),
@@ -67,6 +71,13 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
+reddit_user_agent = "/r/WatchPeopleCode app"
+login_manager = LoginManager(app)
+
+
+@login_manager.user_loader
+def load_user(reddit_username):
+        return Streamer.query.filter_by(reddit_username=reddit_username).first()
 
 
 @app.before_request
@@ -329,7 +340,7 @@ class Subscriber(db.Model):
         return '<Subscriber %d %r>' % (self.id, self.email)
 
 
-class Streamer(db.Model):
+class Streamer(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     reddit_username = db.column_property(db.Column(db.String(20), unique=True), comparator_factory=CaseInsensitiveComparator)
     twitch_channel = db.column_property(db.Column(db.String(25), unique=True), comparator_factory=CaseInsensitiveComparator)
@@ -341,6 +352,9 @@ class Streamer(db.Model):
 
     def __repr__(self):
         return '<Streamer %d %r>' % (self.id, self.reddit_username)
+
+    def get_id(self):
+        return self.reddit_username
 
 
 def validate_email_unique(form, field):
@@ -406,6 +420,41 @@ def stream_json():
     except Exception as e:
         app.logger.exception(e)
         return jsonify(error=True)
+
+
+@app.route('/auth')
+def authorize():
+    r = praw.Reddit(user_agent=reddit_user_agent)
+    r.set_oauth_app_info(app.config['REDDIT_API_ID'], app.config['REDDIT_API_SECRET'], 'http://localhost:5000/reddit_authorize_callback')
+    url = r.get_authorize_url('UniqueKey', 'identity', refreshable=True)
+    return redirect(url)
+
+
+@app.route('/reddit_authorize_callback')
+def reddit_authorize_callback():
+    r = praw.Reddit(user_agent=reddit_user_agent)
+    r.set_oauth_app_info(app.config['REDDIT_API_ID'], app.config['REDDIT_API_SECRET'], 'http://localhost:5000/reddit_authorize_callback')
+    code = request.args.get('code', '')
+    if code:
+        r.get_access_information(code)
+        name = r.get_me().name
+        if name:
+            user = get_or_create(Streamer, reddit_username=r.get_me().name)
+            db.session.commit()
+            login_user(user)
+            flash("Logged in successfully.", 'success')
+            return redirect(url_for(".streamer_page", streamer_name=user.reddit_username))
+
+    # fixme. write some message or what
+    flash("Not logged in", 'error')
+    return redirect(url_for(".index"))
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(".index")
 
 
 def send_message(recipient_vars, subject, text, html):
