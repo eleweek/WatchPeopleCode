@@ -3,7 +3,23 @@ Helper app for /r/WatchPeopleCode subreddit
 
 Currently available at: http://watchpeoplecode.com
 
-# The following information is obsolete, install anything however you want. Modify templates to work on frontend in templates/
+To run, create .env file with these contents
+
+```
+SECRET_KEY=secret
+DATABASE_URL=<your_url>
+MAILGUN_API_URL=
+MAILGUN_API_KEY=
+MAILGUN_TEST_OPTION=true
+MAILGUN_SMTP_LOGIN=
+WPC_REDDIT_PASSWORD=
+WPC_REDDIT_USERNAME=
+WPC_YOUTUBE_KEY=
+GA_TRACKING_CODE=
+```
+
+Then try `foreman run python app.py run`
+
 ## Working on the frontend
 If you are interested in working on the frontend, we recently moved to a bower dependency model. To start hacking install bower, and an optional static server through NPM (and if you don't have npm, consult your package manager or http://nodejs.org).
 
