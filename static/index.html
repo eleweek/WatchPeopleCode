@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="WPC">
 	<head>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -17,22 +17,6 @@
 		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	  <![endif]-->
 
-		<script type="text/javascript">
-		function switchtabs(number){
-			if (number == 1){
-				$('#live').show();
-				$('#completed').hide();
-				$('#tab1').attr("class", "active");
-				$('#tab2').attr("class", "")
-			}else{
-				$('#live').hide();
-				$('#completed').show();
-				$('#tab2').attr("class","active");
-				$('#tab1').attr("class","")
-			}
-		}
-		</script>
-		
 		<script type="text/javascript">
 		!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
 		</script>
@@ -86,7 +70,7 @@
 				</div>
 			</div>
 		</header>
-		<div class="container">
+		<div class="container" ng-controller="MainCtrl">
 			<div class="toptext">
 				<p class="text-center">
 					The app automatically gets live stream from /r/WatchPeopleCode subreddit, so if you want to start live streaming, submit a link to your youtube stream or twitch channel to <a href="http://www.reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode</a>
@@ -97,180 +81,34 @@
 					Live Streams
 				</h2>
 				<div class="row">
-					<div class="col-lg-6">
+					<div class="col-lg-6" ng-repeat="stream in streams">
 						<div class="full">
-							<a href="http://www.twitch.tv/gyfsukata">Let's Clone: Simple RTS System!</a> by <a href="/streamer/TouringTest">TouringTest</a>
+							<a ng-href="{{stream.url}}">{{stream.title}}</a> by <a href="/streamer/{{stream.username}}">{{stream.username}}</a>
 						</div>
 						<div class="embed-responsive embed-responsive-16by9">
-							<object class="embed-responsive-item" type="application/x-shockwave-flash" height="390" width="640" id="live_embed_player_flash" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=gyfsukata" bgcolor="#000000">
+							<object class="embed-responsive-item" type="application/x-shockwave-flash" height="390" width="640" id="live_embed_player_flash" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel={{stream.user}}" bgcolor="#000000">
 								<param name="allowFullScreen" value="true">
 								<param name="allowScriptAccess" value="always">
 								<param name="allowNetworking" value="all">
 								<param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf">
-								<param name="flashvars" value="hostname=www.twitch.tv&amp;channel=gyfsukata&amp;auto_play=true">
-							</object>
-						</div>
-					</div>
-					<div class="col-lg-6">
-						<div class="full">
-							<a href="http://www.twitch.tv/noobs2ninjas">Front End Design...Starting From Scratch</a> by <a href="/streamer/noobs2ninjas">noobs2ninjas</a>
-						</div>
-						<div class="embed-responsive embed-responsive-16by9">
-							<object class="embed-responsive-item" type="application/x-shockwave-flash" height="390" width="640" id="live_embed_player_flash2" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=noobs2ninjas" bgcolor="#000000">
-								<param name="allowFullScreen" value="true">
-								<param name="allowScriptAccess" value="always">
-								<param name="allowNetworking" value="all">
-								<param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf">
-								<param name="flashvars" value="hostname=www.twitch.tv&amp;channel=noobs2ninjas&amp;auto_play=false">
-							</object>
-						</div>
-					</div>
-				</div>
-				<h2 class="text-center">
-					Upcoming streams
-				</h2>
-				<div class="row">
-					<div class="col-lg-6">
-						<div class="full">
-							<a href="http://www.twitch.tv/freecodecamp">Relax Programming</a>
-						</div>
-						<div class="embed-responsive embed-responsive-16by9">
-							<object class="embed-responsive-item" type="application/x-shockwave-flash" height="390" width="640" id="live_embed_player_flash3" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=freecodecamp" bgcolor="#000000">
-								<param name="allowFullScreen" value="true">
-								<param name="allowScriptAccess" value="always">
-								<param name="allowNetworking" value="all">
-								<param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf">
-								<param name="flashvars" value="hostname=www.twitch.tv&amp;channel=freecodecamp&amp;auto_play=false">
-							</object>
-						</div>
-						<div class="full">
-							<p>
-								<b>16 hours from now, 2015-02-18 02:00 UTC</b>
-							</p>
-						</div>
-					</div>
-					<div class="col-lg-6">
-						<div class="full">
-							<a href="http://www.twitch.tv/freecodecamp">Relax Programming</a>
-						</div>
-						<div class="embed-responsive embed-responsive-16by9">
-							<object class="embed-responsive-item" type="application/x-shockwave-flash" height="390" width="640" id="live_embed_player_flash4" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=freecodecamp" bgcolor="#000000">
-								<param name="allowFullScreen" value="true">
-								<param name="allowScriptAccess" value="always">
-								<param name="allowNetworking" value="all">
-								<param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf">
-								<param name="flashvars" value="hostname=www.twitch.tv&amp;channel=freecodecamp&amp;auto_play=false">
-							</object>
-						</div>
-						<div class="full">
-							<p>
-								<b>16 hours from now, 2015-02-18 02:00 UTC</b>
-							</p>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div id="completed" style="display: none;">
-				<h2 class="text-center">
-					Completed
-				</h2>
-				<div class="row">
-					<div class="col-lg-6">
-						<div class="full">
-							<a href="http://www.twitch.tv/freecodecamp">Relax Programming</a>
-						</div>
-						<div class="embed-responsive embed-responsive-16by9">
-							<object class="embed-responsive-item" type="application/x-shockwave-flash" height="390" width="640" id="live_embed_player_flash5" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=freecodecamp" bgcolor="#000000">
-								<param name="allowFullScreen" value="true">
-								<param name="allowScriptAccess" value="always">
-								<param name="allowNetworking" value="all">
-								<param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf">
-								<param name="flashvars" value="hostname=www.twitch.tv&amp;channel=freecodecamp&amp;auto_play=false">
-							</object>
-						</div>
-					</div>
-					<div class="col-lg-6">
-						<div class="full">
-							<a href="http://www.twitch.tv/freecodecamp">Relax Programming</a>
-						</div>
-						<div class="embed-responsive embed-responsive-16by9">
-							<object class="embed-responsive-item" type="application/x-shockwave-flash" height="390" width="640" id="live_embed_player_flash6" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=freecodecamp" bgcolor="#000000">
-								<param name="allowFullScreen" value="true">
-								<param name="allowScriptAccess" value="always">
-								<param name="allowNetworking" value="all">
-								<param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf">
-								<param name="flashvars" value="hostname=www.twitch.tv&amp;channel=freecodecamp&amp;auto_play=false">
-							</object>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-lg-6">
-						<div class="full">
-							<a href="http://www.twitch.tv/freecodecamp">Relax Programming</a>
-						</div>
-						<div class="embed-responsive embed-responsive-16by9">
-							<object class="embed-responsive-item" type="application/x-shockwave-flash" height="390" width="640" id="live_embed_player_flash7" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=freecodecamp" bgcolor="#000000">
-								<param name="allowFullScreen" value="true">
-								<param name="allowScriptAccess" value="always">
-								<param name="allowNetworking" value="all">
-								<param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf">
-								<param name="flashvars" value="hostname=www.twitch.tv&amp;channel=freecodecamp&amp;auto_play=false">
-							</object>
-						</div>
-					</div>
-					<div class="col-lg-6">
-						<div class="full">
-							<a href="http://www.twitch.tv/freecodecamp">Relax Programming</a>
-						</div>
-						<div class="embed-responsive embed-responsive-16by9">
-							<object class="embed-responsive-item" type="application/x-shockwave-flash" height="390" width="640" id="live_embed_player_flash8" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=freecodecamp" bgcolor="#000000">
-								<param name="allowFullScreen" value="true">
-								<param name="allowScriptAccess" value="always">
-								<param name="allowNetworking" value="all">
-								<param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf">
-								<param name="flashvars" value="hostname=www.twitch.tv&amp;channel=freecodecamp&amp;auto_play=false">
-							</object>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-lg-6">
-						<div class="full">
-							<a href="http://www.twitch.tv/freecodecamp">Relax Programming</a>
-						</div>
-						<div class="embed-responsive embed-responsive-16by9">
-							<object class="embed-responsive-item" type="application/x-shockwave-flash" height="390" width="640" id="live_embed_player_flash9" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=freecodecamp" bgcolor="#000000">
-								<param name="allowFullScreen" value="true">
-								<param name="allowScriptAccess" value="always">
-								<param name="allowNetworking" value="all">
-								<param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf">
-								<param name="flashvars" value="hostname=www.twitch.tv&amp;channel=freecodecamp&amp;auto_play=false">
-							</object>
-						</div>
-					</div>
-					<div class="col-lg-6">
-						<div class="full">
-							<a href="http://www.twitch.tv/freecodecamp">Relax Programming</a>
-						</div>
-						<div class="embed-responsive embed-responsive-16by9">
-							<object class="embed-responsive-item" type="application/x-shockwave-flash" height="390" width="640" id="live_embed_player_flash10" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel=freecodecamp" bgcolor="#000000">
-								<param name="allowFullScreen" value="true">
-								<param name="allowScriptAccess" value="always">
-								<param name="allowNetworking" value="all">
-								<param name="movie" value="http://www.twitch.tv/widgets/live_embed_player.swf">
-								<param name="flashvars" value="hostname=www.twitch.tv&amp;channel=freecodecamp&amp;auto_play=false">
+								<param name="flashvars" value="hostname=www.twitch.tv&amp;channel={{stream.user}}&amp;auto_play=true">
 							</object>
 						</div>
 					</div>
 				</div>
 			</div>
+			
 			<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 			<script src="/lib/jquery/dist/jquery.js">
 			</script>
 			<!-- Include all compiled plugins (below), or include individual files as needed -->
 			<script src="/lib/bootstrap/dist/js/bootstrap.min.js" type="text/javascript">
 			</script>
+			
+			<script src="/lib/angular/angular.js" type="text/javascript">
+			</script>
+
+			<script src="/js/main.js" type="text/javascript"></script>
 		</div>
 		<footer>
 			<div class="row">
