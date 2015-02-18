@@ -1,4 +1,21 @@
-var app = angular.module('WPC', []);
+var app = angular.module('WPC', ['ngRoute']);
+
+app.config(['$routeProvider', 
+	function($routeProvider) {
+		$routeProvider.
+			when('/live', {
+				template: "<p>Hey guys</p>"
+			}).
+			when('upcoming', {
+				template: "<p>I'm upcmomnign</p>"
+			}).
+			when('completed', {
+				template: "<p>I'm completed</p>"
+			}).
+			otherwise({
+				redirectTo: '/live'
+			});
+	}])
 
 app.controller('MainCtrl', function($scope) {
 	$scope.streams = [
