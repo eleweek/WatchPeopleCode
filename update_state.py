@@ -87,8 +87,7 @@ def get_new_streams():
 
                 db.session.add(stream)
                 new_streams.add(stream)
-
-    db.session.commit()
+                db.session.commit()
 
 
 sched = BlockingScheduler()
@@ -148,6 +147,7 @@ def update_state():
     for ls in Stream.query.filter(or_(Stream.status != 'completed', Stream.status == None)):
         try:
             ls._update_status()
+            db.session.commit()
         except Exception as e:
             db.session.rollback()
             app.logger.exception(e)
