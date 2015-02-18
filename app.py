@@ -276,6 +276,7 @@ class TwitchStream(Stream):
     def add_submission(self, submission):
         if submission not in self.submissions:
             self.status = 'upcoming'
+            self.actual_start_time = None
 
         Stream.add_submission(self, submission)
 
