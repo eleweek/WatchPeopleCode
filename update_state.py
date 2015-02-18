@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from sqlalchemy import or_
 import datetime
 
-from app import db, Stream, YoutubeStream, TwitchStream, Streamer, Submission, app
+from app import db, Stream, YoutubeStream, TwitchStream, Streamer, Submission, app, get_or_create
 from utils import youtube_video_id, twitch_channel, requests_get_with_retries
 
 
@@ -58,14 +58,6 @@ def get_reddit_username(submission, url):
         start = after_url.find('/u/') + 3
         finish = start + after_url[start:].find(' ')
         return after_url[start:finish]
-
-
-def get_or_create(model, **kwargs):
-    instance = model.query.filter_by(**kwargs).first()
-    if instance is None:
-        instance = model(**kwargs)
-        db.session.add(instance)
-    return instance
 
 
 def get_new_streams():

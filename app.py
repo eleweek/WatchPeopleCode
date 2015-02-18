@@ -87,6 +87,14 @@ def url_for_other_page(page):
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 
 
+def get_or_create(model, **kwargs):
+    instance = model.query.filter_by(**kwargs).first()
+    if instance is None:
+        instance = model(**kwargs)
+        db.session.add(instance)
+    return instance
+
+
 subscription = db.Table('subscription',
                         db.Column('stream_id', db.Integer(), db.ForeignKey('stream.id')),
                         db.Column('subscriber_id', db.Integer(), db.ForeignKey('subscriber.id')))
