@@ -2,7 +2,6 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 import praw
 from bs4 import BeautifulSoup
 from sqlalchemy import or_
-import traceback
 import datetime
 
 from app import db, Stream, YoutubeStream, TwitchStream, Streamer, Submission, app
@@ -81,7 +80,7 @@ def get_new_streams():
             if stream:
                 stream.add_submission(submission)
                 reddit_username = get_reddit_username(s, url)
-                if reddit_username is not None:
+                if reddit_username is not None and stream.streamer is None:
                     stream.streamer = get_or_create(Streamer, reddit_username=reddit_username)
 
                 stream._update_status()
@@ -111,7 +110,6 @@ def update_flairs():
                 if stream:
                     # set user flair
                     if not wpc_sub.get_flair(s.author)['flair_text']:
-                        print "Setting flair to ", s.author
                         wpc_sub.set_flair(s.author, flair_text='Streamer', flair_css_class='text-white background-blue')
 
                     # set link flairs
@@ -140,25 +138,27 @@ def update_flairs():
                                 s.set_flair(flair_text, fc[u'flair_css_class'])
                     else:
                         s.set_flair('')
-    except:
-        traceback.print_exc()
+    except Exception as e:
+        app.logger.exception(e)
 
 
 @sched.scheduled_job('interval', seconds=10)
 def update_state():
+    app.logger.info("Updating old streams")
     for ls in Stream.query.filter(or_(Stream.status != 'completed', Stream.status == None)):
         try:
             ls._update_status()
         except Exception as e:
             db.session.rollback()
-            traceback.print_exc()
+            app.logger.exception(e)
             raise
 
+    app.logger.info("Updating new streams")
     try:
         get_new_streams()
     except Exception as e:
+        app.logger.exception(e)
         db.session.rollback()
-        traceback.print_exc(e)
         raise
 
     db.session.commit()

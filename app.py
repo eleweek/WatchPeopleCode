@@ -16,14 +16,23 @@ from utils import requests_get_with_retries
 import humanize
 import logging
 
+from logentries import LogentriesHandler
 
-def setup_logging(loggers_and_levels):
-    handler = logging.StreamHandler()
+
+def setup_logging(loggers_and_levels, logentries_id=None):
+    log = logging.getLogger('logentries')
+    log.setLevel(logging.INFO)
+    if logentries_id:
+        logentries_handler = LogentriesHandler(logentries_id)
+        handler = logentries_handler
+    else:
+        handler = logging.StreamHandler()
 
     FORMAT = "%(asctime)s:%(levelname)s:%(name)s:%(message)s"
     formatter = logging.Formatter(fmt=FORMAT)
     handler.setFormatter(formatter)
 
+    log.addHandler(handler)
     for logger, level in loggers_and_levels:
         logger.setLevel(level)
         logger.addHandler(handler)
@@ -46,7 +55,7 @@ def create_app():
     loggers_and_levels = [(app.logger, logging.INFO),
                           (logging.getLogger('sqlalchemy'), logging.WARNING),
                           (logging.getLogger('apscheduler.scheduler'), logging.INFO)]
-    setup_logging(loggers_and_levels)
+    setup_logging(loggers_and_levels, logentries_id=os.environ.get('LOGENTRIES_ID', None))
 
     app.logger.info("App created!")
 
@@ -145,13 +154,19 @@ class YoutubeStream(Stream):
         return '<YoutubeStream %d %r>' % (self.id, self.ytid)
 
     def _update_status(self):
-        r = requests_get_with_retries(
-            "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(
-                self.ytid,
-                app.config['YOUTUBE_KEY'],
-                retries_num=15))
+        app.logger.info("Updating status for {}".format(self))
+        try:
+            r = requests_get_with_retries(
+                "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(
+                    self.ytid,
+                    app.config['YOUTUBE_KEY'],
+                    retries_num=15))
 
-        r.raise_for_status()
+            r.raise_for_status()
+        except Exception as e:
+            app.logger.error("Error while updating {}".format(YoutubeStream))
+            app.logger.exception(e)
+            raise
 
         if not r.json()['items']:
             self.status = 'completed'
@@ -169,18 +184,17 @@ class YoutubeStream(Stream):
             else:
                 self.status = 'completed'
 
-            # add channel to streamer table if it's needed and delete if there is collision
+            # add channel to streamer table if it's needed and fix if it's needed
             if self.streamer is not None:
                 yc = item['snippet']['channelId']
-                if self.streamer.youtube_channel is None:
-                    if Streamer.query.filter_by(youtube_channel=yc).first():
-                        self.streamer = None
-                    else:
-                        self.streamer.youtube_channel = yc
-                        self.streamer.youtube_name = item['snippet']['channelTitle']
+                streamer = Streamer.query.filter_by(youtube_channel=yc).first()
+                # if there is streamer with that channel
+                if streamer:
+                    self.streamer = streamer
+                # there is no streamer with that channel
                 else:
-                    if self.streamer.youtube_channel != yc:
-                        self.streamer = None
+                    self.streamer.youtube_channel = yc
+                    self.streamer.youtube_name = item['snippet']['channelTitle']
 
     def normal_url(self):
         return "http://www.youtube.com/watch?v={}".format(self.ytid)
@@ -226,8 +240,15 @@ class TwitchStream(Stream):
                 self.title = stream['status']
 
     def _update_status(self):
-        r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
-        r.raise_for_status()
+        app.logger.info("Updating status for {}".format(self))
+        try:
+            r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
+            r.raise_for_status()
+        except Exception as e:
+            app.logger.error("Error while updating {}".format(self))
+            app.logger.exception(e)
+            raise
+
         stream = r.json()['stream']
         if stream is not None:
             self.status = 'live'
@@ -244,16 +265,15 @@ class TwitchStream(Stream):
             if self.status == 'upcoming':
                 self._update_title_from_channel()
 
-        # add channel to streamer table if it's needed and delete if there is collision
+        # add channel to streamer table if it's needed and fix if it's needed
         if self.streamer is not None:
-            if self.streamer.twitch_channel is None:
-                if Streamer.query.filter_by(twitch_channel=self.channel).first():
-                    self.streamer = None
-                else:
-                    self.streamer.twitch_channel = self.channel
+            streamer = Streamer.query.filter_by(twitch_channel=self.channel).first()
+            # if there is streamer with that channel
+            if streamer:
+                self.streamer = streamer
+            # there is no streamer with that channel
             else:
-                if self.streamer.twitch_channel != self.channel:
-                    self.streamer = None
+                self.streamer.twitch_channel = self.channel
 
     def add_submission(self, submission):
         if submission not in self.submissions:
