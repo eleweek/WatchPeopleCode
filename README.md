@@ -27,4 +27,6 @@ If you are interested in working on the frontend, we recently moved to a bower d
 
 Now, navigitate to the root directory of your WatchPeopleCode fork and execute ```bower install``` this downloads all of the needed dependencies and places them in static/lib.
 
+To run the test server, navigate to the static directory and execture ```http-server .``` and go to http://localhost:8080 in your web browser. Changes to the HTML/CSS/JS are refreshed automatically.
+
 If you need to install a new dependency please install it through bower with ```bower install angular``` where angular is the framework/library you want to install.
