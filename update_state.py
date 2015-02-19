@@ -66,20 +66,25 @@ def get_new_streams():
     # TODO : don't forget about http vs https
     # TODO better way of caching api requests
     for s in submissions:
-        for url in get_submission_urls(s):
-            submission = get_or_create(Submission, submission_id=s.id)
-            stream = get_stream_from_url(url, submission, only_new=True)
-            if stream:
-                stream.add_submission(submission)
-                reddit_username = get_reddit_username(s, url)
-                if reddit_username is not None and stream.streamer is None:
-                    stream.streamer = get_or_create(Streamer, reddit_username=reddit_username)
+        try:
+            for url in get_submission_urls(s):
+                submission = get_or_create(Submission, submission_id=s.id)
+                stream = get_stream_from_url(url, submission, only_new=True)
+                if stream:
+                    stream.add_submission(submission)
+                    reddit_username = get_reddit_username(s, url)
+                    if reddit_username is not None and stream.streamer is None:
+                        stream.streamer = get_or_create(Streamer, reddit_username=reddit_username)
 
-                stream._update_status()
+                    stream._update_status()
 
-                db.session.add(stream)
-                new_streams.add(stream)
-                db.session.commit()
+                    db.session.add(stream)
+                    new_streams.add(stream)
+                    db.session.commit()
+        except Exception as e:
+            app.logger.exception(e)
+            db.session.rollback()
+            raise
 
 
 sched = BlockingScheduler()
@@ -146,14 +151,8 @@ def update_state():
             raise
 
     app.logger.info("Updating new streams")
-    try:
-        get_new_streams()
-    except Exception as e:
-        app.logger.exception(e)
-        db.session.rollback()
-        raise
+    get_new_streams()
 
-    db.session.commit()
 
 if __name__ == '__main__':
     sched.start()
