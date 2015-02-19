@@ -84,10 +84,10 @@ function process(data, mode, $sce) {
 	out = []
 	for (var i = 0; i < streams.length; i++) {
 		stream = streams[i]
-		var l = getLocation(stream.url)
+		l = getLocation(stream.url)
 		stream.youtube = true
-
-		if (l.location == "twitch.tv") {
+		console.log(l)
+		if (l.hostname == "twitch.tv") {
 			stream.youtube = false
 			url = stream.url.split("/")
 			stream.user = url[url.length - 1]
