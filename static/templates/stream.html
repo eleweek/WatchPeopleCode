@@ -7,8 +7,10 @@
 			<div class="full">
 				<a ng-href="{{stream.url}}">{{stream.title}}</a> by <a ng-href="/streamer/{{stream.username}}">{{stream.username}}</a>
 			</div>
-			<iframe class="embed-responsive embed-responsive-16by9" width="640" height="390" ng-src="{{ stream.embed }}" ng-if="stream.youtube">
-			</iframe>
+			<div class="embed-responsive embed-responsive-16by9" ng-if="stream.youtube">
+                <iframe width="640" height="390" ng-src="{{stream.embed}}">
+                </iframe>
+            </div>
 			<div class="embed-responsive embed-responsive-16by9" ng-if="!stream.youtube">
 				<object class="embed-responsive-item" type="application/x-shockwave-flash" height="390" width="640" id="live_embed_player_flash" data="http://www.twitch.tv/widgets/live_embed_player.swf?channel={{stream.user}}" bgcolor="#000000">
 					<param name="allowFullScreen" value="true">

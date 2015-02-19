@@ -86,7 +86,7 @@ function process(data, mode, $sce) {
 		stream = streams[i]
 		l = getLocation(stream.url)
 		stream.youtube = true
-		console.log(l)
+
 		if (l.hostname == "twitch.tv") {
 			stream.youtube = false
 			url = stream.url.split("/")
@@ -94,7 +94,7 @@ function process(data, mode, $sce) {
 		}else {
 			url = stream.url.split("=")
 			stream.id = url[url.length - 1]
-			stream.embed = $sce.trustAsResourceUrl('http://www.youtube.com/embed/' + stream.id + '?html5=1&rel=0');
+			stream.embed = $sce.trustAsResourceUrl("http://www.youtube.com/embed/" + stream.id + "?rel=0&autoplay=0");
 		}
 
 		console.log(stream)
