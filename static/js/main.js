@@ -1,4 +1,4 @@
-var app = angular.module('WPC', ['ngRoute']);
+var app = angular.module('WPC', ['ngRoute', 'ngResource']);
 
 app.config(['$routeProvider', 
 	function($routeProvider) {
@@ -19,26 +19,26 @@ app.config(['$routeProvider',
 			});
 	}]);
 
-app.controller('LiveCtrl', function($scope, $http, $sce) {
-	// $http.get('http://www.watchpeoplecode.com/json').success(function(data) {
-	// 	$scope.streams = process(data, "live")
-
-	// 	console.log($scope.streams)
-	// });
-
+app.controller('LiveCtrl', function($scope, $http, $sce, WPCData) {
+    $http.defaults.useXDomain = true;
 	$scope.streams = process({"live": [{
-	      "title": "Streaming some AngularJS!", 
+	      "title": "Strming", 
 	      "url": "http://twitch.tv/paked", 
 	      "user": "paked",
 	      "username": "hcwool"
 	    }, 		{
-	      "title": "Streaming some AngularJS!", 
+	      "title": "AngularJS!", 
 	      "url": "http://twitch.tv/tyrantwarship",
 	      "user": "paked", 
 	      "username": "hcwool"
-	    }, 		
+	    },
 	    {
-	      "title": "Streaming some AngularJS!", 
+		"title": "Instruction Set Development - Part 5", 
+		"url": "http://www.youtube.com/watch?v=MCFA-6JPvPQ", 
+		"username": "ConformingCivilian"
+    	},  		
+	    {
+	      "title": "Some CSGO cause troll!", 
 	      "url": "http://twitch.tv/swagcs",
 	      "user": "swagcs", 
 	      "username": "hcwool"
@@ -47,13 +47,7 @@ app.controller('LiveCtrl', function($scope, $http, $sce) {
 
 });
 
-app.controller('CompletedCtrl', function($scope, $http, $sce) {
-	console.log("Hello")
-	// $http.get('http://www.watchpeoplecode.com/json').success(function(data) {
-	// 	$scope.streams = process(data, "completed")
-
-	// 	console.log($scope.streams)
-	// });
+app.controller('CompletedCtrl', function($scope, $http, $sce, $resource) {
 
 	$scope.streams = process({"completed": [
     {
@@ -76,8 +70,10 @@ app.controller('CompletedCtrl', function($scope, $http, $sce) {
       "url": "http://www.youtube.com/watch?v=stF4J3GI_-0", 
       "username": "davidwhitney"
     }]}, 'completed', $sce)
+	
 
 });
+
 
 function process(data, mode, $sce) {
 	streams = data[mode]
