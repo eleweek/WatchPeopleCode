@@ -84,7 +84,6 @@ def get_new_streams():
         except Exception as e:
             app.logger.exception(e)
             db.session.rollback()
-            raise
 
 
 sched = BlockingScheduler()
@@ -148,7 +147,6 @@ def update_state():
         except Exception as e:
             db.session.rollback()
             app.logger.exception(e)
-            raise
 
     app.logger.info("Updating new streams")
     get_new_streams()
