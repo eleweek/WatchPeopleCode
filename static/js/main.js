@@ -19,7 +19,7 @@ app.config(['$routeProvider',
 			});
 	}]);
 
-app.controller('LiveCtrl', function($scope, $http, $sce, WPCData) {
+app.controller('LiveCtrl', function($scope, $http, $sce) {
     $http.defaults.useXDomain = true;
 	$scope.streams = process({"live": [{
 	      "title": "Strming", 
@@ -47,7 +47,7 @@ app.controller('LiveCtrl', function($scope, $http, $sce, WPCData) {
 
 });
 
-app.controller('CompletedCtrl', function($scope, $http, $sce, $resource) {
+app.controller('CompletedCtrl', function($scope, $http, $sce) {
 
 	$scope.streams = process({"completed": [
     {
