@@ -8,7 +8,7 @@
     {% endif %}
     <div class="full"> <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a></div>
     {% if stream.streamer %}
-     | <a href={{ url_for('.streamer_page', streamer_name=stream.streamer.reddit_username) }}>{{ stream.streamer.reddit_username }}</a>
+     by <a href={{ url_for('.streamer_page', streamer_name=stream.streamer.reddit_username) }}>{{ stream.streamer.reddit_username }}</a>
     {% endif %} 
     {{ stream.html_code(autoplay=(loop.index == 1) if status == 'live' else False ) |safe }}
  {% if status == 'upcoming'%}

@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from sqlalchemy import or_
 import datetime
 
-from app import db, Stream, YoutubeStream, TwitchStream, Streamer, Submission, app
+from app import db, Stream, YoutubeStream, TwitchStream, Streamer, Submission, app, get_or_create
 from utils import youtube_video_id, twitch_channel, requests_get_with_retries
 
 
@@ -60,35 +60,30 @@ def get_reddit_username(submission, url):
         return after_url[start:finish]
 
 
-def get_or_create(model, **kwargs):
-    instance = model.query.filter_by(**kwargs).first()
-    if instance is None:
-        instance = model(**kwargs)
-        db.session.add(instance)
-    return instance
-
-
 def get_new_streams():
     submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
     new_streams = set()
     # TODO : don't forget about http vs https
     # TODO better way of caching api requests
     for s in submissions:
-        for url in get_submission_urls(s):
-            submission = get_or_create(Submission, submission_id=s.id)
-            stream = get_stream_from_url(url, submission, only_new=True)
-            if stream:
-                stream.add_submission(submission)
-                reddit_username = get_reddit_username(s, url)
-                if reddit_username is not None and stream.streamer is None:
-                    stream.streamer = get_or_create(Streamer, reddit_username=reddit_username)
+        try:
+            for url in get_submission_urls(s):
+                submission = get_or_create(Submission, submission_id=s.id)
+                stream = get_stream_from_url(url, submission, only_new=True)
+                if stream:
+                    stream.add_submission(submission)
+                    reddit_username = get_reddit_username(s, url)
+                    if reddit_username is not None and stream.streamer is None:
+                        stream.streamer = get_or_create(Streamer, reddit_username=reddit_username)
 
-                stream._update_status()
+                    stream._update_status()
 
-                db.session.add(stream)
-                new_streams.add(stream)
-
-    db.session.commit()
+                    db.session.add(stream)
+                    new_streams.add(stream)
+                    db.session.commit()
+        except Exception as e:
+            app.logger.exception(e)
+            db.session.rollback()
 
 
 sched = BlockingScheduler()
@@ -148,20 +143,14 @@ def update_state():
     for ls in Stream.query.filter(or_(Stream.status != 'completed', Stream.status == None)):
         try:
             ls._update_status()
+            db.session.commit()
         except Exception as e:
             db.session.rollback()
             app.logger.exception(e)
-            raise
 
     app.logger.info("Updating new streams")
-    try:
-        get_new_streams()
-    except Exception as e:
-        app.logger.exception(e)
-        db.session.rollback()
-        raise
+    get_new_streams()
 
-    db.session.commit()
 
 if __name__ == '__main__':
     sched.start()
