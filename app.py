@@ -3,11 +3,11 @@ from flask_bootstrap import Bootstrap
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.properties import ColumnProperty
 from flask_wtf import Form
-from wtforms import StringField, SubmitField, validators
+from wtforms import StringField, SubmitField, validators, TextAreaField
 from wtforms.validators import ValidationError
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
-from flask.ext.login import LoginManager, UserMixin, login_user, logout_user, login_required
+from flask.ext.login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 
 import os
 import requests
@@ -17,6 +17,8 @@ from utils import requests_get_with_retries
 import humanize
 import logging
 import praw
+import re
+from jinja2 import escape, evalcontextfilter, Markup
 
 from logentries import LogentriesHandler
 
@@ -347,6 +349,7 @@ class Streamer(db.Model, UserMixin):
     twitch_channel = db.column_property(db.Column(db.String(25), unique=True), comparator_factory=CaseInsensitiveComparator)
     youtube_channel = db.Column(db.String(24), unique=True)
     youtube_name = db.Column(db.String(30))
+    info = db.Column(db.Text())
 
     def __init__(self, reddit_username):
         self.reddit_username = reddit_username
@@ -367,6 +370,12 @@ def validate_email_unique(form, field):
 class SubscribeForm(Form):
     email = StringField("Email address", [validators.DataRequired(), validators.Email(), validate_email_unique])
     submit_button = SubmitField('Subscribe')
+
+
+class EditStreamerInfoForm(Form):
+    # fixme
+    info = TextAreaField("Info", [validators.Length(max=5000)])
+    submit_button = SubmitField('Submit')
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -401,12 +410,33 @@ def streamers_list(page):
     return render_template('streamers_list.html', streamers=streamers)
 
 
-@app.route('/streamer/<streamer_name>', defaults={'page': 1})
-@app.route('/streamer/<streamer_name>/<int:page>')
+@app.template_filter()
+@evalcontextfilter
+def nl2br(eval_ctx, value):
+    result = (u'%s' % escape(value)).replace('\n', '<br>')
+    if eval_ctx.autoescape:
+        result = Markup(result)
+    return result
+
+
+@app.route('/streamer/<streamer_name>', defaults={'page': 1}, methods=["GET", "POST"])
+@app.route('/streamer/<streamer_name>/<int:page>', methods=["GET", "POST"])
 def streamer_page(streamer_name, page):
     streamer = Streamer.query.filter_by(reddit_username=streamer_name).first()
     streams = streamer.streams.order_by(Stream.scheduled_start_time.desc().nullslast()).paginate(page, per_page=5)
-    return render_template('streamer.html', streamer=streamer, streams=streams)
+    form = EditStreamerInfoForm()
+
+    if current_user.is_authenticated() and current_user == streamer:
+        if form.validate_on_submit():
+            form.populate_obj(current_user)
+            db.session.commit()
+            # fixme
+            flash("Edited successfully", category='success')
+            return redirect(url_for('.streamer_page', streamer_name=streamer_name))
+        else:
+            form.info.data = current_user.info
+
+    return render_template('streamer.html', streamer=streamer, streams=streams, form=form)
 
 
 @app.route('/json')
@@ -423,39 +453,40 @@ def stream_json():
         return jsonify(error=True)
 
 
-@app.route('/auth')
-def authorize():
-    r = praw.Reddit(user_agent=reddit_user_agent)
-    r.set_oauth_app_info(app.config['REDDIT_API_ID'], app.config['REDDIT_API_SECRET'], 'http://localhost:5000/reddit_authorize_callback')
-    url = r.get_authorize_url('UniqueKey', 'identity', refreshable=True)
-    return redirect(url)
-
-
 @app.route('/reddit_authorize_callback')
 def reddit_authorize_callback():
     r = praw.Reddit(user_agent=reddit_user_agent)
-    r.set_oauth_app_info(app.config['REDDIT_API_ID'], app.config['REDDIT_API_SECRET'], 'http://localhost:5000/reddit_authorize_callback')
+    r.set_oauth_app_info(app.config['REDDIT_API_ID'], app.config['REDDIT_API_SECRET'], url_for('.reddit_authorize_callback', _external=True))
     code = request.args.get('code', '')
     if code:
         r.get_access_information(code)
         name = r.get_me().name
         if name:
-            user = get_or_create(Streamer, reddit_username=r.get_me().name)
+            user = get_or_create(Streamer, reddit_username=name)
             db.session.commit()
             login_user(user)
             flash("Logged in successfully.", 'success')
-            return redirect(url_for(".streamer_page", streamer_name=user.reddit_username))
+            return redirect(url_for(".streamer_page", streamer_name=name))
 
     # fixme. write some message or what
     flash("Not logged in", 'error')
     return redirect(url_for(".index"))
 
 
+@app.route('/auth')
+def authorize():
+    r = praw.Reddit(user_agent=reddit_user_agent)
+    r.set_oauth_app_info(app.config['REDDIT_API_ID'], app.config['REDDIT_API_SECRET'], url_for('.reddit_authorize_callback', _external=True))
+    url = r.get_authorize_url('UniqueKey', 'identity')
+    return redirect(url)
+
+
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
-    return redirect(".index")
+    flash("Logged out successfully.", 'info')
+    return redirect(url_for(".index"))
 
 
 def send_message(recipient_vars, subject, text, html):
