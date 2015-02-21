@@ -1,5 +1,5 @@
-from update_state import r, get_submission_urls, get_stream_from_url, get_reddit_username, get_or_create
-from app import Streamer, Submission, TwitchStream, db
+from update_state import r, get_submission_urls, get_stream_from_url, get_reddit_username
+from app import Streamer, Submission, TwitchStream, db, get_or_create
 
 
 def add_streamers():

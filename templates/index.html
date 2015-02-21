@@ -21,7 +21,11 @@
     {% else %}
         <h2 class="text-center"> Error getting live streams. :( Maybe try refreshing the page? </h2>
     {% endif %}
-
+    <p class="text-center"> The app automatically gets live stream from /r/WatchPeopleCode subreddit, so if you want to start live streaming, submit a link to your youtube stream or twitch channel to <a href="http://www.reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode </a></p>
+      <p class="text-center"><a href={{url_for(".past_streams")}}>Big list of past streams</a></p>
+      <p class="text-center"><b><a href="https://www.reddit.com/r/WatchPeopleCode/comments/2vzwly/announcement_24_hour_long_online_hackathon_on/">Join us at the online hackathon this Saturday!</b> </a></p>
+      {#<p class="text-center"><a href="http://webchat.freenode.net/?randomnick=1&channels=%23WatchPeopleCode&prompt=1">Join #WatchPeopleCode on irc.freenode.net</a></p>#}
+      <div class="col-md-8">
         {% if live_streams %}
           {{ macros.streams(live_streams, 'live') }} </div>
         {% else %}
