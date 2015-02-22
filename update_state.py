@@ -140,7 +140,7 @@ def update_flairs():
         app.logger.exception(e)
 
 
-@sched.scheduled_job('interval', seconds=10)
+@sched.scheduled_job('interval', seconds=30)
 def update_state():
     app.logger.info("Updating old streams")
     for ls in Stream.query.filter(or_(Stream.status != 'completed', Stream.status == None)):
