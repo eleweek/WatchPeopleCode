@@ -226,7 +226,7 @@ class YoutubeStream(Stream):
 
 
 class TwitchStream(Stream):
-    channel = db.Column(db.String(25))
+    channel = db.Column(db.String(25), unique=True)
     last_time_live = db.Column(db.DateTime())
 
     def __init__(self, channel):
