@@ -19,3 +19,6 @@ GA_TRACKING_CODE=
 ```
 
 Then try `foreman run python app.py run`
+
+
+To create database with proper tables, you can import `db` from app.py and run `db.create_all()`. Then set `alembic_version` in your db to the last revision, so you can use migrations in the future.
