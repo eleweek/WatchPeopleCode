@@ -17,7 +17,6 @@ from utils import requests_get_with_retries
 import humanize
 import logging
 import praw
-import re
 from jinja2 import escape, evalcontextfilter, Markup
 
 from logentries import LogentriesHandler
@@ -108,11 +107,6 @@ def get_or_create(model, **kwargs):
     return instance
 
 
-subscription = db.Table('subscription',
-                        db.Column('stream_id', db.Integer(), db.ForeignKey('stream.id')),
-                        db.Column('subscriber_id', db.Integer(), db.ForeignKey('subscriber.id')))
-
-
 stream_sub = db.Table('stream_sub',
                       db.Column('stream_id', db.Integer(), db.ForeignKey('stream.id')),
                       db.Column('submission_id', db.String(6), db.ForeignKey('submission.submission_id')))
@@ -132,7 +126,6 @@ class Stream(db.Model):
     actual_start_time = db.Column(db.DateTime())
     status = db.Column(db.Enum('upcoming', 'live', 'completed', name='stream_status'))
     title = db.Column(db.String(200))
-    subscribers = db.relationship('Subscriber', secondary=subscription, backref=db.backref('streams', lazy='dynamic'))
     submissions = db.relationship('Submission', secondary=stream_sub, backref=db.backref('streams', lazy='dynamic'))
     streamer_id = db.Column('streamer_id', db.Integer(), db.ForeignKey('streamer.id'))
     streamer = db.relationship('Streamer', backref=db.backref('streams', lazy='dynamic'))
