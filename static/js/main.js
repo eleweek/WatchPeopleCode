@@ -20,58 +20,28 @@ app.config(['$routeProvider',
 	}]);
 
 app.controller('LiveCtrl', function($scope, $http, $sce) {
+	$http.get('http://www.watchpeoplecode.com/json').
+		success(function(data) {
+			console.log(data)
+			$scope.streams = process(data, 'live', $sce)
+		}).
+		error(function() {
+			console.log("ERROR")
+			/* Act on the event */
+		});
     $http.defaults.useXDomain = true;
-	$scope.streams = process({"live": [{
-	      "title": "Strming", 
-	      "url": "http://twitch.tv/paked", 
-	      "user": "paked",
-	      "username": "hcwool"
-	    }, 		{
-	      "title": "AngularJS!", 
-	      "url": "http://twitch.tv/tyrantwarship",
-	      "user": "paked", 
-	      "username": "hcwool"
-	    },
-	    {
-		"title": "Instruction Set Development - Part 5", 
-		"url": "http://www.youtube.com/watch?v=MCFA-6JPvPQ", 
-		"username": "ConformingCivilian"
-    	},  		
-	    {
-	      "title": "Some CSGO cause troll!", 
-	      "url": "http://twitch.tv/swagcs",
-	      "user": "swagcs", 
-	      "username": "hcwool"
-	    }]}, 'live', $sce)
-
-
 });
 
 app.controller('CompletedCtrl', function($scope, $http, $sce) {
-
-	$scope.streams = process({"completed": [
-    {
-      "title": "Instruction Set Development - Part 5", 
-      "url": "http://www.youtube.com/watch?v=MCFA-6JPvPQ", 
-      "username": "ConformingCivilian"
-    }, 
-    {
-      "title": "Beginner Java: Lesson 2", 
-      "url": "http://www.youtube.com/watch?v=IT8snRacAcw", 
-      "username": "add7"
-    }, 
-    {
-      "title": "Building a Search Engine -- Season 2 episode 1", 
-      "url": "http://www.youtube.com/watch?v=L2DJhwANoUQ", 
-      "username": "godlikesme"
-    }, 
-    {
-      "title": "Cutting CODE! Ep 3 - Building a SASS to CSS compiler! (well, almost)", 
-      "url": "http://www.youtube.com/watch?v=stF4J3GI_-0", 
-      "username": "davidwhitney"
-    }]}, 'completed', $sce)
-	
-
+	$http.get('http://www.watchpeoplecode.com/json').
+		success(function(data) {
+			console.log(data)
+			$scope.streams = process(data, 'completed', $sce)
+		}).
+		error(function() {
+			console.log("ERROR")
+			/* Act on the event */
+		});
 });
 
 
