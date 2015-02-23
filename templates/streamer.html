@@ -9,33 +9,63 @@
   <div class="container">
     <div class="col-md-offset-2 col-md-8">
       <p class="text-center"><a href={{url_for(".index")}}>Back to main page</a></p>
-      <strong>Reddit username:</strong> <a href='http://www.reddit.com/user/{{ streamer.reddit_username }}'> {{ streamer.reddit_username }}</a>
-      {% if streamer.youtube_channel %}
-        <br>
-        <strong>Youtube channel:</strong> <a href='http://www.youtube.com/channel/{{ streamer.youtube_channel }}'>{{ streamer.youtube_name if streamer.youtube_name else streamer.youtube_channel }}</a>
-      {% endif %}
-      {% if streamer.twitch_channel %}
-        <br>
-        <strong>Twitch:</strong> <a href='http://www.twitch.tv/{{ streamer.twitch_channel }}'>{{ streamer.twitch_channel }}</a>
-      {% endif %}
-      <br>
-      {% if current_user == streamer %}
-          <div class="info-block">
+      <div class="info-block" {% if edit %} style="display:none;" {% endif %}>
+        <strong>Reddit username:</strong> <a href='http://www.reddit.com/user/{{ streamer.reddit_username }}'> {{ streamer.reddit_username }}</a>
+        {% if streamer == current_user %}
+          <br>
+          <strong>Youtube channel:</strong>
+          {% if streamer.youtube_channel %}
+            {% if streamer.youtube_channel | length < 24 %}
+              <a href='http://www.youtube.com/c/{{streamer.youtube_channel}}'>{{streamer.youtube_channel}}</a>
+            {% else %}
+              <a href='http://www.youtube.com/channel/{{ streamer.youtube_channel }}'>
+              {{ streamer.youtube_name if streamer.youtube_name else streamer.youtube_channel }}
+              </a>
+            {% endif %}
+          {% endif %}
+          <br>
+          <strong>Twitch:</strong> 
+          {% if streamer.twitch_channel %}
+            <a href='http://www.twitch.tv/{{ streamer.twitch_channel }}'>
+              {{ streamer.twitch_channel }}
+            </a>
+          {% endif %}
+          <br>
+          {% if streamer.info %}
             <strong>Info:</strong> {{ streamer.info | nl2br }}
+          {% endif %}
             <br>
             <br>
             <div class="text-left"><button type="button" class="btn btn-default edit-button">Edit info</button></div>
-          </div>
+        </div>
 
-            <form action="" method="POST" class="form form-edit-info" role="form" style="display:none;">
-              <div class="form-group">
-                {{ form.hidden_tag() }}
-                {{ wtf.form_field(form.info, rows=10) }}
-                {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'default'}) }}
-              </div>
-            </form>
-      {% elif streamer.info %}
-        Info: {{ streamer.info | nl2br }}
+        <form action="" method="POST" class="form form-edit-info" role="form" {% if not edit %} style="display:none;" {% endif %}>
+          <div class="form-group">
+            {{ form.hidden_tag() }}
+            {{ wtf.form_field(form.youtube_channel) }}
+            {{ wtf.form_field(form.twitch_channel) }}
+            {{ wtf.form_field(form.info, rows=10) }}
+            {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'default'}) }}
+          </div>
+        </form>
+      {% else %}
+        {% if streamer.youtube_channel %}
+          <br>
+          <strong>Youtube channel:</strong>
+          <a href='http://www.youtube.com/channel/{{ streamer.youtube_channel }}'>
+            {{ streamer.youtube_name if streamer.youtube_name else streamer.youtube_channel }}
+          </a>
+        {% endif %}
+        {% if streamer.twitch_channel %}
+          <br>
+          <strong>Twitch:</strong> 
+          <a href='http://www.twitch.tv/{{ streamer.twitch_channel }}'>
+            {{ streamer.twitch_channel }}
+          </a>
+        {% endif %}
+        {% if info %}
+          Info: {{ streamer.info | nl2br }}
+        {% endif %}
       {% endif %}
       <br>
       {{ macros.render_pagination(streams) }}
