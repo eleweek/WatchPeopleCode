@@ -19,8 +19,10 @@ import logging
 import praw
 import re
 from jinja2 import escape, evalcontextfilter, Markup
+from urlparse import urlparse
 
 from logentries import LogentriesHandler
+from crossdomain import crossdomain
 
 
 def setup_logging(loggers_and_levels, logentries_id=None):
@@ -108,11 +110,6 @@ def get_or_create(model, **kwargs):
     return instance
 
 
-subscription = db.Table('subscription',
-                        db.Column('stream_id', db.Integer(), db.ForeignKey('stream.id')),
-                        db.Column('subscriber_id', db.Integer(), db.ForeignKey('subscriber.id')))
-
-
 stream_sub = db.Table('stream_sub',
                       db.Column('stream_id', db.Integer(), db.ForeignKey('stream.id')),
                       db.Column('submission_id', db.String(6), db.ForeignKey('submission.submission_id')))
@@ -132,7 +129,6 @@ class Stream(db.Model):
     actual_start_time = db.Column(db.DateTime())
     status = db.Column(db.Enum('upcoming', 'live', 'completed', name='stream_status'))
     title = db.Column(db.String(200))
-    subscribers = db.relationship('Subscriber', secondary=subscription, backref=db.backref('streams', lazy='dynamic'))
     submissions = db.relationship('Submission', secondary=stream_sub, backref=db.backref('streams', lazy='dynamic'))
     streamer_id = db.Column('streamer_id', db.Integer(), db.ForeignKey('streamer.id'))
     streamer = db.relationship('Streamer', backref=db.backref('streams', lazy='dynamic'))
@@ -235,7 +231,7 @@ class YoutubeStream(Stream):
 
 
 class TwitchStream(Stream):
-    channel = db.Column(db.String(25))
+    channel = db.Column(db.String(25), unique=True)
     last_time_live = db.Column(db.DateTime())
 
     def __init__(self, channel):
@@ -364,6 +360,30 @@ class Streamer(db.Model, UserMixin):
     def get_id(self):
         return self.reddit_username
 
+    def populate(self, form):
+        self.info = form.info.data
+        self.twitch_channel = form.twitch_channel_extract()
+        yc = form.youtube_channel_extract()
+        # get yc name
+        if yc and yc != self.youtube_channel and len(yc) == 24:
+            try:
+                r = requests_get_with_retries(
+                    "https://www.googleapis.com/youtube/v3/channels?id={}&part=snippet&key={}".format(
+                        self.ytid,
+                        app.config['YOUTUBE_KEY'],
+                        retries_num=15))
+
+                r.raise_for_status()
+            except Exception as e:
+                app.logger.error("Error while updating {}".format(Streamer))
+                app.logger.exception(e)
+                raise
+
+            for item in r.json()['items']:
+                self.youtube_name = item['snippet']['title']
+
+        self.youtube_channel = yc
+
 
 def validate_email_unique(form, field):
     email = field.data
@@ -376,10 +396,59 @@ class SubscribeForm(Form):
     submit_button = SubmitField('Subscribe')
 
 
+def validate_yc(form, field):
+    if form.youtube_channel_extract() is None:
+        raise ValidationError("This field should be valid youtube channel.")
+
+
+def validate_tc(form, field):
+    if form.twitch_channel_extract() is None:
+        raise ValidationError('This field should be valid twitch channel.')
+
+
 class EditStreamerInfoForm(Form):
-    # fixme
+    youtube_channel = StringField("Youtube channel", [validators.Length(max=100), validate_yc])
+    twitch_channel = StringField("Twitch channel", [validators.Length(max=100), validate_tc])
     info = TextAreaField("Info", [validators.Length(max=5000)])
     submit_button = SubmitField('Submit')
+
+    def twitch_channel_extract(self):
+        """
+        Examples:
+        - ChannelName
+        - https://www.twitch.tv.channel_name
+        - something_wrong?!twitch.tv/channel_name
+        """
+        string = self.twitch_channel.data.strip()
+        position = string.find('twitch.tv')
+        if position != -1:
+            path = urlparse(string[position:]).path.split('/')
+            if len(path) < 2:
+                return None
+            string = path[1]
+
+        return string if len(string) <= 25 and re.match(r'\w*$', string) else None
+
+    def youtube_channel_extract(self):
+        """
+        Examples:
+        - ChannelName
+        - https://www.youtube.com/channel/UCJAVLOqT6Mgn_YD5lAxxkUA
+        - youtube.com/c/FancyCannelName
+        - something_wrong}[youtube.com/c/FancyCannelName
+        """
+        string = self.youtube_channel.data.strip()
+        position = string.find('youtube.com')
+        if position != -1:
+            path = urlparse(string[position:]).path.split('/')
+            if len(path) <3:
+                return None
+            if path[1] == 'c':
+                return path[2] if len(path[2]) <= 20 and re.match(r'\w*$', path[2]) else None
+            if path[1] == "channel":
+                string = path[2]
+
+        return string if len(string) <= 24 and re.match(r'\w*$', string) else None
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -431,19 +500,25 @@ def streamer_page(streamer_name, page):
     form = EditStreamerInfoForm()
 
     if current_user.is_authenticated() and current_user == streamer:
-        if form.validate_on_submit():
-            form.populate_obj(current_user)
-            db.session.commit()
-            # fixme
-            flash("Edited successfully", category='success')
-            return redirect(url_for('.streamer_page', streamer_name=streamer_name))
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                current_user.populate(form)
+                db.session.commit()
+                # fixme
+                flash("Edited successfully", category='success')
+                return redirect(url_for('.streamer_page', streamer_name=streamer_name))
+            else:
+                return render_template('streamer.html', streamer=streamer, streams=streams, form=form, edit=True)
         else:
+            form.youtube_channel.data = current_user.youtube_channel
+            form.twitch_channel.data = current_user.twitch_channel
             form.info.data = current_user.info
 
-    return render_template('streamer.html', streamer=streamer, streams=streams, form=form)
+    return render_template('streamer.html', streamer=streamer, streams=streams, form=form, edit=False)
 
 
 @app.route('/json')
+@crossdomain(origin='*', max_age=15)
 def stream_json():
     def make_dict(stream):
         return {'username': stream.streamer.reddit_username if stream.streamer else None,

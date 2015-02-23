@@ -20,6 +20,8 @@ GA_TRACKING_CODE=
 
 Then try `foreman run python app.py run`
 
+To create database with proper tables, you can import `db` from app.py and run `db.create_all()`. Then run `foreman run python app.py db heads` to see the last revision number and run `foreman run python app.py db stamp <last revision number>` to stamp your database, so you can use migrations in the future.
+
 ## Working on the frontend
 If you are interested in working on the frontend, we recently moved to a bower dependency model. To start hacking install bower, and an optional static server through NPM (and if you don't have npm, consult your package manager or http://nodejs.org).
 
