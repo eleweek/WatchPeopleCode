@@ -209,7 +209,7 @@ class YoutubeStream(Stream):
                 if streamer:
                     self.streamer = streamer
                 # there is no streamer with that channel
-                else:
+                elif not self.streamer.checked:
                     self.streamer.youtube_channel = yc
                     self.streamer.youtube_name = item['snippet']['channelTitle']
 
@@ -287,7 +287,7 @@ class TwitchStream(Stream):
             if streamer:
                 self.streamer = streamer
             # there is no streamer with that channel
-            else:
+            elif not self.streamer.checked:
                 self.streamer.twitch_channel = self.channel
 
     def add_submission(self, submission):
@@ -346,9 +346,11 @@ class Streamer(db.Model, UserMixin):
     youtube_channel = db.Column(db.String(24), unique=True)
     youtube_name = db.Column(db.String(30))
     info = db.Column(db.Text())
+    checked = db.Column(db.Boolean(), default=False)
 
-    def __init__(self, reddit_username):
+    def __init__(self, reddit_username, checked=False):
         self.reddit_username = reddit_username
+        self.checked = checked
 
     def __repr__(self):
         return '<Streamer %d %r>' % (self.id, self.reddit_username)
@@ -358,7 +360,13 @@ class Streamer(db.Model, UserMixin):
 
     def populate(self, form):
         self.info = form.info.data
-        self.twitch_channel = form.twitch_channel_extract()
+        tc = form.twitch_channel_extract()
+        streamer = Streamer.query.filter_by(twitch_channel=tc).first()
+        if streamer and streamer != current_user:
+            streamer.twitch_channel = None
+            self.streams = streamer.streams
+            streamer.streams = []
+        self.twitch_channel = tc if tc else None
         yc = form.youtube_channel_extract()
         # get yc name
         if yc and yc != self.youtube_channel and len(yc) == 24:
@@ -378,7 +386,12 @@ class Streamer(db.Model, UserMixin):
             for item in r.json()['items']:
                 self.youtube_name = item['snippet']['title']
 
-        self.youtube_channel = yc
+        streamer = Streamer.query.filter_by(youtube_channel=yc).first()
+        if streamer and streamer != current_user:
+            streamer.youtube_channel = None
+            self.streams = streamer.streams
+            streamer.streams = []
+        self.youtube_channel = yc if yc else None
 
 
 def validate_email_unique(form, field):
@@ -392,19 +405,9 @@ class SubscribeForm(Form):
     submit_button = SubmitField('Subscribe')
 
 
-def validate_yc(form, field):
-    if form.youtube_channel_extract() is None:
-        raise ValidationError("This field should be valid youtube channel.")
-
-
-def validate_tc(form, field):
-    if form.twitch_channel_extract() is None:
-        raise ValidationError('This field should be valid twitch channel.')
-
-
 class EditStreamerInfoForm(Form):
-    youtube_channel = StringField("Youtube channel", [validators.Length(max=100), validate_yc])
-    twitch_channel = StringField("Twitch channel", [validators.Length(max=100), validate_tc])
+    youtube_channel = StringField("Youtube channel", [validators.Length(max=100)])
+    twitch_channel = StringField("Twitch channel", [validators.Length(max=100)])
     info = TextAreaField("Info", [validators.Length(max=5000)])
     submit_button = SubmitField('Submit')
 
@@ -445,6 +448,24 @@ class EditStreamerInfoForm(Form):
                 string = path[2]
 
         return string if len(string) <= 24 and re.match(r'\w*$', string) else None
+
+    def validate_youtube_channel(form, field):
+        yc = form.youtube_channel_extract()
+        if yc is None:
+            raise ValidationError("This field should be valid youtube channel.")
+
+        streamer = Streamer.query.filter_by(youtube_channel=yc).first()
+        if streamer and streamer.checked and streamer != current_user:
+            raise ValidationError("There is another user with this channel. If it is your channel, please message about that to r/WatchPeoplecode moderators.")
+
+    def validate_twith_channel(form, field):
+        tc = form.twitch_channel_extract()
+        if tc is None:
+            raise ValidationError('This field should be valid twitch channel.')
+
+        streamer = Streamer.query.filter_by(twitch_channel=tc).first()
+        if streamer and streamer.checked and streamer != current_user:
+            raise ValidationError("There is another user with this channel. If it is your channel, please message about that to r/WatchPeoplecode moderators.")
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -538,6 +559,7 @@ def reddit_authorize_callback():
         name = r.get_me().name
         if name:
             user = get_or_create(Streamer, reddit_username=name)
+            user.checked = True
             db.session.commit()
             login_user(user)
             flash("Logged in successfully.", 'success')
