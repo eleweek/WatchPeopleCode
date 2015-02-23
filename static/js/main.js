@@ -20,6 +20,10 @@ app.config(['$routeProvider',
 	}]);
 
 app.controller('LiveCtrl', function($scope, $http, $sce) {
+	$scope.isActive = function(str) {
+		return str == 'live'
+	}
+
 	$http.get('http://www.watchpeoplecode.com/json').
 		success(function(data) {
 			console.log(data)
@@ -33,6 +37,9 @@ app.controller('LiveCtrl', function($scope, $http, $sce) {
 });
 
 app.controller('CompletedCtrl', function($scope, $http, $sce) {
+	$scope.isActive = function(str) {
+		return str == 'completed'
+	}
 	$http.get('http://www.watchpeoplecode.com/json').
 		success(function(data) {
 			console.log(data)

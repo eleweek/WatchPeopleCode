@@ -48,10 +48,10 @@
 						<a href="https://twitter.com/WatchPeopleCode" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @WatchPeopleCode</a>
 					</div>
 					<ul class="nav nav-tabs">
-						<li role="presentation" id="tab1" class="active">
+						<li role="presentation" ng-class="{active:isActive('live')}">
 							<a href="#/live">Live and Upcoming</a>
 						</li>
-						<li role="presentation" id="tab2" class="">
+						<li role="presentation" class="{active:isActive('completed')}">
 							<a href="#/completed">Completed</a>
 						</li>
 					</ul>
