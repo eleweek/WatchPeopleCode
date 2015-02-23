@@ -22,6 +22,7 @@ from jinja2 import escape, evalcontextfilter, Markup
 from urlparse import urlparse
 
 from logentries import LogentriesHandler
+from crossdomain import crossdomain
 
 
 def setup_logging(loggers_and_levels, logentries_id=None):
@@ -513,6 +514,7 @@ def streamer_page(streamer_name, page):
 
 
 @app.route('/json')
+@crossdomain(origin='*', max_age=15)
 def stream_json():
     def make_dict(stream):
         return {'username': stream.streamer.reddit_username if stream.streamer else None,
