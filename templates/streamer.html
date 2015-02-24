@@ -15,13 +15,9 @@
           <br>
           <strong>Youtube channel:</strong>
           {% if streamer.youtube_channel %}
-            {% if streamer.youtube_channel | length < 24 %}
-              <a href='http://www.youtube.com/c/{{streamer.youtube_channel}}'>{{streamer.youtube_channel}}</a>
-            {% else %}
-              <a href='http://www.youtube.com/channel/{{ streamer.youtube_channel }}'>
-              {{ streamer.youtube_name if streamer.youtube_name else streamer.youtube_channel }}
-              </a>
-            {% endif %}
+            <a href='http://www.youtube.com/channel/{{ streamer.youtube_channel }}'>
+            {{ streamer.youtube_name if streamer.youtube_name else streamer.youtube_channel }}
+            </a>
           {% endif %}
           <br>
           <strong>Twitch:</strong> 

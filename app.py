@@ -361,19 +361,49 @@ class Streamer(db.Model, UserMixin):
     def populate(self, form):
         self.info = form.info.data
         tc = form.twitch_channel_extract()
+
+        # delete inapropriate tstream
+        if tc != self.twitch_channel:
+            ts = self.streams.filter_by(type='twitch_stream').first()
+            if ts:
+                ts.streamer = None
+        
+        # rebind tstream
         streamer = Streamer.query.filter_by(twitch_channel=tc).first()
         if streamer and streamer != current_user:
             streamer.twitch_channel = None
-            self.streams = streamer.streams
-            streamer.streams = []
+            for ts in streamer.streams.filter_by(type='twitch_stream'):
+                ts.streamer = self
+
         self.twitch_channel = tc if tc else None
+
         yc = form.youtube_channel_extract()
+
+        # delete inapropriate ystreams
+        if yc != self.youtube_channel:
+            for ys in self.streams.filter_by(type='youtube_stream'):
+                ys.streamer = None
+
+        # rebind ystreams
+        streamer = Streamer.query.filter_by(youtube_channel=yc).first()
+        if streamer and streamer != current_user:
+            # to not make api-requests
+            yn = streamer.youtube_name
+            if yn is not None:
+                self.youtube_name = yn
+                self.youtube_channel = streamer.youtube_channel
+                streamer.youtube_name = None
+
+            streamer.youtube_channel = None
+            for ys in streamer.streams.filter_by(type='youtube_stream'):
+                ys.streamer = self
+
         # get yc name
-        if yc and yc != self.youtube_channel and len(yc) == 24:
+        if yc and (yc != self.youtube_channel or self.youtube_name is None):
             try:
                 r = requests_get_with_retries(
                     "https://www.googleapis.com/youtube/v3/channels?id={}&part=snippet&key={}".format(
-                        self.ytid,
+                        yc,
                         app.config['YOUTUBE_KEY'],
                         retries_num=15))
 
@@ -386,11 +416,6 @@ class Streamer(db.Model, UserMixin):
             for item in r.json()['items']:
                 self.youtube_name = item['snippet']['title']
 
-        streamer = Streamer.query.filter_by(youtube_channel=yc).first()
-        if streamer and streamer != current_user:
-            streamer.youtube_channel = None
-            self.streams = streamer.streams
-            streamer.streams = []
         self.youtube_channel = yc if yc else None
 
 
@@ -414,7 +439,7 @@ class EditStreamerInfoForm(Form):
     def twitch_channel_extract(self):
         """
         Examples:
-        - ChannelName
+        - channel_name
         - https://www.twitch.tv.channel_name
         - something_wrong?!twitch.tv/channel_name
         """
@@ -431,27 +456,25 @@ class EditStreamerInfoForm(Form):
     def youtube_channel_extract(self):
         """
         Examples:
-        - ChannelName
+        - UCJAVLOqT6Mgn_YD5lAxxkUA
         - https://www.youtube.com/channel/UCJAVLOqT6Mgn_YD5lAxxkUA
-        - youtube.com/c/FancyCannelName
-        - something_wrong}[youtube.com/c/FancyCannelName
+        - something_wrong}[youtube.com/channel/UCJAVLOqT6Mgn_YD5lAxxkUA
         """
         string = self.youtube_channel.data.strip()
         position = string.find('youtube.com')
         if position != -1:
             path = urlparse(string[position:]).path.split('/')
-            if len(path) <3:
+            if len(path) <3 or path[1] != "channel":
                 return None
-            if path[1] == 'c':
-                return path[2] if len(path[2]) <= 20 and re.match(r'\w*$', path[2]) else None
-            if path[1] == "channel":
+            else:
                 string = path[2]
 
-        return string if len(string) <= 24 and re.match(r'\w*$', string) else None
+        return string if len(string) == 24 and re.match(r'[\w-]*$', string) or string == '' else None
 
     def validate_youtube_channel(form, field):
         yc = form.youtube_channel_extract()
         if yc is None:
+            # fixme. add explanation here or hint to page
             raise ValidationError("This field should be valid youtube channel.")
 
         streamer = Streamer.query.filter_by(youtube_channel=yc).first()
