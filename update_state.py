@@ -3,6 +3,7 @@ import praw
 from bs4 import BeautifulSoup
 from sqlalchemy import or_
 import datetime
+import re
 
 from app import db, Stream, YoutubeStream, TwitchStream, Streamer, Submission, app, get_or_create
 from utils import youtube_video_id, twitch_channel, requests_get_with_retries
@@ -51,13 +52,15 @@ def get_submission_urls(submission):
 
 
 def get_reddit_username(submission, url):
-    if submission.author.name != 'godlikesme' or submission.selftext.find('description') == -1:
+    if submission.author.name != 'godlikesme' or submission.selftext_html.find('<table>') == -1:
         return submission.author.name
     else:
-        after_url = submission.selftext[submission.selftext.find(url) + len(url):]
-        start = after_url.find('/u/') + 3
-        finish = start + after_url[start:].find(' ')
-        return after_url[start:finish]
+        trs = BeautifulSoup(submission.selftext_html).table.find_all('tr')
+        for tr in trs:
+            if tr.find(href=url) is not None:
+                streamer_link = tr.find(href=re.compile('/u/'))
+                return streamer_link.get_text()[3:]
+        return None
 
 
 def get_new_streams():
