@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 {% import "macros.html" as macros with context %}
 
 {% block title %}Watch people code: past streams{% endblock %}
@@ -7,8 +8,30 @@
   {{super()}}
 
   <div class="container">
-      <div class="col-md-offset-2 col-md-8">
-        <p class="text-center"><a href={{url_for(".index")}}>Back to main page</a></p>
+      <p class="text-center"><a href={{url_for(".index")}}>Back to main page</a></p>
+      {% if tag %}
+        <p class="text-center"><a href={{url_for(".past_streams")}}>Back to all past streams</a></p>
+        <h3 class="text-center">Search results for tag "{{tag}}"</h3>
+      {% endif %}
+
+      <div class="col-md-3">
+        <br>
+        <form action="" method="POST" class="form form-basic" role="form">
+          {{ form.hidden_tag() }}
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h1 class="panel-title">Search streams</h1>
+            </div>
+
+            <div class="panel-body">
+              {{ wtf.form_field(form.tag) }}
+              {{ wtf.form_field(form.search_button) }}
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="col-md-9">
         {{ macros.render_pagination(streams) }}
         <br>
         {% for stream in streams.items %}
@@ -19,6 +42,8 @@
           <br>
           {{ stream.html_code() |safe }}
           <hr>
+        {% else %}
+          Sorry, we have no results for your request right now.
         {% endfor %}
         {{ macros.render_pagination(streams) }}
       </div>

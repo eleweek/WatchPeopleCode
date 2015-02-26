@@ -110,6 +110,11 @@ def get_or_create(model, **kwargs):
     return instance
 
 
+stream_tag = db.Table('stream_tag',
+                      db.Column('stream_id', db.Integer(), db.ForeignKey('stream.id')),
+                      db.Column('tag_name', db.String(256), db.ForeignKey('tag.name')))
+
+
 stream_sub = db.Table('stream_sub',
                       db.Column('stream_id', db.Integer(), db.ForeignKey('stream.id')),
                       db.Column('submission_id', db.String(6), db.ForeignKey('submission.submission_id')))
@@ -132,7 +137,7 @@ class Stream(db.Model):
     submissions = db.relationship('Submission', secondary=stream_sub, backref=db.backref('streams', lazy='dynamic'))
     streamer_id = db.Column('streamer_id', db.Integer(), db.ForeignKey('streamer.id'))
     streamer = db.relationship('Streamer', backref=db.backref('streams', lazy='dynamic'))
-    # reddit_thread = db.Column(db.String(255))
+    tags = db.relationship('Tag', secondary=stream_tag, backref=db.backref('streams', lazy='dynamic'))
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -367,7 +372,7 @@ class Streamer(db.Model, UserMixin):
             ts = self.streams.filter_by(type='twitch_stream').first()
             if ts:
                 ts.streamer = None
-        
+
         # rebind tstream
         streamer = Streamer.query.filter_by(twitch_channel=tc).first()
         if streamer and streamer != current_user:
@@ -417,6 +422,17 @@ class Streamer(db.Model, UserMixin):
                 self.youtube_name = item['snippet']['title']
 
         self.youtube_channel = yc if yc else None
+
+
+class Tag(db.Model):
+    __tablename__ = 'tag'
+    name = db.column_property(db.Column(db.String(256), primary_key=True), comparator_factory=CaseInsensitiveComparator)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return '<Tag {}>'.format(self.name)
 
 
 def validate_email_unique(form, field):
@@ -491,6 +507,16 @@ class EditStreamerInfoForm(Form):
             raise ValidationError("There is another user with this channel. If it is your channel, please message about that to r/WatchPeoplecode moderators.")
 
 
+class SearchForm(Form):
+    # fixme. fix texts.
+    tag = StringField("Tag", [validators.DataRequired(), validators.Length(max=256)])
+    search_button = SubmitField('Search')
+
+    def validate_tag(form, field):
+        if field.data.find(',') != -1:
+            raise ValidationError('Right now search works only for one tag. Sorry about that.')
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
@@ -509,11 +535,19 @@ def index():
     return render_template('index.html', form=form, live_streams=live_streams, random_stream=random_stream, upcoming_streams=upcoming_streams)
 
 
-@app.route('/past_streams', defaults={'page': 1})
-@app.route('/past_streams/page/<int:page>')
-def past_streams(page):
-    streams = YoutubeStream.query.filter_by(status='completed').order_by(YoutubeStream.scheduled_start_time.desc().nullslast()).paginate(page, per_page=5)
-    return render_template('past_streams.html', streams=streams, page=page)
+@app.route('/past_streams', defaults={'page': 1, 'tag': None}, methods=["GET", "POST"])
+@app.route('/past_streams/tag/<tag>', defaults={'page': 1}, methods=["GET", "POST"])
+@app.route('/past_streams/page/<int:page>', defaults={'tag': None}, methods=["GET", "POST"])
+@app.route('/past_streams/tag/<tag>/page/<int:page>', methods=["GET", "POST"])
+def past_streams(tag, page):
+    form = SearchForm()
+    if form.validate_on_submit():
+        return redirect(url_for('.past_streams', tag=form.tag.data))
+    streams = YoutubeStream.query.filter_by(status='completed')
+    if tag is not None:
+        streams = streams.filter(Stream.tags.any(name=tag))
+    streams = streams.order_by(YoutubeStream.scheduled_start_time.desc().nullslast()).paginate(page, per_page=5)
+    return render_template('past_streams.html', streams=streams, page=page, form=form, tag=tag)
 
 
 @app.route('/streamers/', defaults={'page': 1})
