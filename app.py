@@ -515,7 +515,7 @@ class EditStreamerInfoForm(Form):
 class SearchForm(Form):
     # fixme. fix texts.
     query = StringField("Query")
-    search_button = SubmitField('Search')
+    search_button = SubmitField('Search past streams')
 
     def validate_tag(form, field):
         if field.data.find(',') != -1:
