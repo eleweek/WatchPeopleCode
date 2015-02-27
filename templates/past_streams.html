@@ -9,27 +9,11 @@
 
   <div class="container">
       <p class="text-center"><a href={{url_for(".index")}}>Back to main page</a></p>
-      {% if tag %}
-        <p class="text-center"><a href={{url_for(".past_streams")}}>Back to all past streams</a></p>
-        <h3 class="text-center">Search results for tag "{{tag}}"</h3>
+      {% if query %}
+        <p class="text-center"><a href={{url_for(".past_streams")}}>All past streams</a></p>
+        <h3 class="text-center">Search results for query "{{query}}"</h3>
       {% endif %}
 
-      <div class="col-md-3">
-        <br>
-        <form action="" method="POST" class="form form-basic" role="form">
-          {{ form.hidden_tag() }}
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h1 class="panel-title">Search streams</h1>
-            </div>
-
-            <div class="panel-body">
-              {{ wtf.form_field(form.tag) }}
-              {{ wtf.form_field(form.search_button) }}
-            </div>
-          </div>
-        </form>
-      </div>
 
       <div class="col-md-9">
         {{ macros.render_pagination(streams) }}

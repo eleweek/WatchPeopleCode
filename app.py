@@ -89,6 +89,11 @@ def add_ga_tracking_code():
     g.ga_tracking_code = app.config['GA_TRACKING_CODE']
 
 
+@app.before_request
+def create_search_form():
+    g.search_form = SearchForm()
+
+
 @manager.command
 def run():
     app.run(debug=True)
@@ -491,7 +496,7 @@ class EditStreamerInfoForm(Form):
         yc = form.youtube_channel_extract()
         if yc is None:
             # fixme. add explanation here or hint to page
-            raise ValidationError("This field should be valid youtube channel.")
+            raise ValidationError("This field should contain valid youtube channel.")
 
         streamer = Streamer.query.filter_by(youtube_channel=yc).first()
         if streamer and streamer.checked and streamer != current_user:
@@ -509,7 +514,7 @@ class EditStreamerInfoForm(Form):
 
 class SearchForm(Form):
     # fixme. fix texts.
-    tag = StringField("Tag", [validators.DataRequired(), validators.Length(max=256)])
+    query = StringField("Query")
     search_button = SubmitField('Search')
 
     def validate_tag(form, field):
@@ -535,19 +540,28 @@ def index():
     return render_template('index.html', form=form, live_streams=live_streams, random_stream=random_stream, upcoming_streams=upcoming_streams)
 
 
-@app.route('/past_streams', defaults={'page': 1, 'tag': None}, methods=["GET", "POST"])
-@app.route('/past_streams/tag/<tag>', defaults={'page': 1}, methods=["GET", "POST"])
-@app.route('/past_streams/page/<int:page>', defaults={'tag': None}, methods=["GET", "POST"])
-@app.route('/past_streams/tag/<tag>/page/<int:page>', methods=["GET", "POST"])
-def past_streams(tag, page):
-    form = SearchForm()
-    if form.validate_on_submit():
-        return redirect(url_for('.past_streams', tag=form.tag.data))
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    if g.search_form.validate_on_submit():
+        return redirect(url_for("past_streams", query=g.search_form.query.data))
+    else:
+        # Should never happen, unless user requested /search manually
+        return redirect(url_for("past_streams"))
+
+
+@app.route('/past_streams', defaults={'page': 1, 'query': None}, methods=["GET", "POST"])
+@app.route('/past_streams/query/<query>', defaults={'page': 1}, methods=["GET", "POST"])
+@app.route('/past_streams/page/<int:page>', defaults={'query': None}, methods=["GET", "POST"])
+@app.route('/past_streams/query/<query>/page/<int:page>', methods=["GET", "POST"])
+def past_streams(query, page):
     streams = YoutubeStream.query.filter_by(status='completed')
-    if tag is not None:
-        streams = streams.filter(Stream.tags.any(name=tag))
+
+    if query:
+        terms = [t.strip() for t in query.split(" ")]
+        streams = streams.filter(YoutubeStream.title.match(" & ".join(terms)))
+
     streams = streams.order_by(YoutubeStream.scheduled_start_time.desc().nullslast()).paginate(page, per_page=5)
-    return render_template('past_streams.html', streams=streams, page=page, form=form, tag=tag)
+    return render_template('past_streams.html', streams=streams, page=page, query=query)
 
 
 @app.route('/streamers/', defaults={'page': 1})
@@ -578,8 +592,7 @@ def streamer_page(streamer_name, page):
             if form.validate_on_submit():
                 current_user.populate(form)
                 db.session.commit()
-                # fixme
-                flash("Edited successfully", category='success')
+                flash("Updated successfully", category='success')
                 return redirect(url_for('.streamer_page', streamer_name=streamer_name))
             else:
                 return render_template('streamer.html', streamer=streamer, streams=streams, form=form, edit=True)
@@ -638,7 +651,7 @@ def authorize():
 @login_required
 def logout():
     logout_user()
-    flash("Logged out successfully.", 'info')
+    flash("Logged out successfully", 'info')
     return redirect(url_for(".index"))
 
 
