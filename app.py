@@ -480,7 +480,7 @@ class EditStreamerInfoForm(Form):
         position = string.find('youtube.com')
         if position != -1:
             path = urlparse(string[position:]).path.split('/')
-            if len(path) <3 or path[1] != "channel":
+            if len(path) < 3 or path[1] != "channel":
                 return None
             else:
                 string = path[2]
@@ -619,11 +619,10 @@ def reddit_authorize_callback():
             user.checked = True
             db.session.commit()
             login_user(user)
-            flash("Logged in successfully.", 'success')
+            flash("Logged in successfully", 'success')
             return redirect(url_for(".streamer_page", streamer_name=name))
 
-    # fixme. write some message or what
-    flash("Not logged in", 'error')
+    flash("Error while trying to log in", 'error')
     return redirect(url_for(".index"))
 
 
