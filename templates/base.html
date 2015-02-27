@@ -39,7 +39,7 @@
         <ul class="nav navbar-nav">
           <form action="{{url_for('search')}}" method="POST" class="navbar-form" role="search">
             {{ g.search_form.hidden_tag() }}
-            <input class="form-control" id="query" name="query" required type="text" value="" placeholder="Search past streams">
+            <input class="form-control" id="query" name="query" required type="text" value="">
             {{ wtf.form_field(g.search_form.search_button) }}
           </form>
         </ul>
