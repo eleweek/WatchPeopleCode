@@ -19,7 +19,7 @@ import logging
 import praw
 import re
 from jinja2 import escape, evalcontextfilter, Markup
-from urlparse import urlparse
+from urlparse import urlparse, parse_qs
 
 from logentries import LogentriesHandler
 from crossdomain import crossdomain
@@ -607,9 +607,23 @@ def streamer_page(streamer_name, page):
 @app.route('/json')
 @crossdomain(origin='*', max_age=15)
 def stream_json():
+    def get_viewers(url):
+        if "twitch.tv" in url:
+            twitch_name = url.split("/")
+            if twitch_name[-1] == "":
+                twitch_name = twitch_name[-2]
+            else:
+                twitch_name = twitch_name[-1]
+            twitch_json = requests.get("https://api.twitch.tv/kraken/streams?channel=" + twitch_name).json()
+            return twitch_json["streams"][0]["viewers"]
+        elif "youtube.com" in url:
+            url_data = urlparse(url)
+            video_id = parse_qs(url_data.query)["v"][0]
+            return requests.get("https://www.youtube.com/live_stats?v=" + video_id).text
+
     def make_dict(stream):
         return {'username': stream.streamer.reddit_username if stream.streamer else None,
-                'title': stream.title, 'url': stream.normal_url()}
+                'title': stream.title, 'url': stream.normal_url(), 'viewers': get_viewers(stream.normal_url())}
     try:
         return jsonify(live=[make_dict(st) for st in Stream.query.filter_by(status='live')],
                        upcoming=[make_dict(st) for st in Stream.query.filter_by(status='upcoming')],
