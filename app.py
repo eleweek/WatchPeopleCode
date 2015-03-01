@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, g
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, g, send_from_directory
 from flask_bootstrap import Bootstrap
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.properties import ColumnProperty
@@ -653,6 +653,11 @@ def logout():
     logout_user()
     flash("Logged out successfully", 'info')
     return redirect(url_for(".index"))
+
+
+@app.route("/podcast_feed.xml")
+def podcast_feed():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'podcast_feed.xml', mimetype='application/rss+xml')
 
 
 def send_message(recipient_vars, subject, text, html):
