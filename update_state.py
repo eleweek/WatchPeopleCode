@@ -9,7 +9,7 @@ from app import db, Stream, YoutubeStream, TwitchStream, Streamer, Submission, a
 from utils import youtube_video_id, twitch_channel, requests_get_with_retries
 
 
-reddit_user_agent = "/r/WatchPeopleCode app"
+reddit_user_agent = "/r/WatchPeopleCode flairs&streams bot (main contact: /u/godlikesme)"
 r = praw.Reddit(user_agent=reddit_user_agent)
 r.config.decode_html_entities = True
 if app.config['REDDIT_PASSWORD']:

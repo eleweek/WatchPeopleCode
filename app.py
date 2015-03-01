@@ -58,6 +58,7 @@ def create_app():
     app.config['GA_TRACKING_CODE'] = os.environ['GA_TRACKING_CODE']
     app.config['REDDIT_API_ID'] = os.environ['WPC_APP_ID']
     app.config['REDDIT_API_SECRET'] = os.environ['WPC_APP_SECRET']
+    app.config['REDDIT_WEB_APP_USER_AGENT'] = "/r/WatchPeopleCode web app(main contact: /u/godlikesme)"
 
     Bootstrap(app)
     loggers_and_levels = [(app.logger, logging.INFO),
@@ -75,7 +76,6 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
-reddit_user_agent = "/r/WatchPeopleCode app"
 login_manager = LoginManager(app)
 
 
@@ -621,7 +621,7 @@ def stream_json():
 
 @app.route('/reddit_authorize_callback')
 def reddit_authorize_callback():
-    r = praw.Reddit(user_agent=reddit_user_agent)
+    r = praw.Reddit(user_agent=app.config["REDDIT_WEB_APP_USER_AGENT"])
     r.set_oauth_app_info(app.config['REDDIT_API_ID'], app.config['REDDIT_API_SECRET'], url_for('.reddit_authorize_callback', _external=True))
     code = request.args.get('code', '')
     if code:
@@ -641,7 +641,7 @@ def reddit_authorize_callback():
 
 @app.route('/auth')
 def authorize():
-    r = praw.Reddit(user_agent=reddit_user_agent)
+    r = praw.Reddit(user_agent=app.config["REDDIT_WEB_APP_USER_AGENT"])
     r.set_oauth_app_info(app.config['REDDIT_API_ID'], app.config['REDDIT_API_SECRET'], url_for('.reddit_authorize_callback', _external=True))
     url = r.get_authorize_url('UniqueKey', 'identity')
     return redirect(url)
