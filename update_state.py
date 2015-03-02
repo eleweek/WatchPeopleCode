@@ -52,7 +52,7 @@ def get_submission_urls(submission):
 
 
 def get_reddit_username(submission, url):
-    if submission.author.name != 'godlikesme' or submission.selftext_html.find('<table>') == -1:
+    if submission.author.name != 'godlikesme' or not submission.selftext_html or submission.selftext_html.find('<table>') == -1:
         return submission.author.name
     else:
         trs = BeautifulSoup(submission.selftext_html).table.find_all('tr')
