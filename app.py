@@ -533,7 +533,7 @@ class MozillaStreamHack(object):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
-    live_streams.append(MozillaStreamHack())
+    live_streams.insert(0, MozillaStreamHack())
 
     form = SubscribeForm()
     if request.method == "POST" and form.validate_on_submit():
