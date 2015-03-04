@@ -619,7 +619,7 @@ def stream_json():
         elif "youtube.com" in url:
             url_data = urlparse(url)
             video_id = parse_qs(url_data.query)["v"][0]
-            return requests.get("https://www.youtube.com/live_stats?v=" + video_id).text
+            return int(requests.get("https://www.youtube.com/live_stats?v=" + video_id).text)
 
     def make_dict(stream):
         return {'username': stream.streamer.reddit_username if stream.streamer else None,
