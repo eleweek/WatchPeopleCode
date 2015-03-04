@@ -522,18 +522,9 @@ class SearchForm(Form):
             raise ValidationError('Right now search works only for one tag. Sorry about that.')
 
 
-class MozillaStreamHack(object):
-    def html_code(self, autoplay=None):
-        return '''<iframe src="https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-4/video/" width="640" height="380" frameborder="0" allowfullscreen></iframe>'''
-
-    def normal_url(self):
-        return "https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-4/"
-    
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
     live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
-    live_streams.append(MozillaStreamHack())
 
     form = SubscribeForm()
     if request.method == "POST" and form.validate_on_submit():
