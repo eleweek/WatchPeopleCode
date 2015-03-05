@@ -495,7 +495,7 @@ class EditStreamerInfoForm(Form):
     def validate_youtube_channel(form, field):
         yc = form.youtube_channel_extract()
         if yc is None:
-            # fixme. add explanation here or hint to page
+            # FIXME: add explanation here or hint to page
             raise ValidationError("This field should contain valid youtube channel.")
 
         streamer = Streamer.query.filter_by(youtube_channel=yc).first()
@@ -513,13 +513,8 @@ class EditStreamerInfoForm(Form):
 
 
 class SearchForm(Form):
-    # fixme. fix texts.
     query = StringField("Query")
     search_button = SubmitField('Search past streams')
-
-    def validate_tag(form, field):
-        if field.data.find(',') != -1:
-            raise ValidationError('Right now search works only for one tag. Sorry about that.')
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -675,7 +670,7 @@ def send_message(recipient_vars, subject, text, html):
 
 
 def generate_email_notifications():
-    # this is stub, fix before use
+    # fix before use
     live = Stream.query.filter_by(status='live').order_by(Stream.scheduled_start_time).all()
     upcoming = Stream.query.filter_by(status='upcoming').order_by(Stream.scheduled_start_time).all()
     text = render_template('mails/stream_notification.txt', live_streams=live, upcoming_streams=upcoming)
