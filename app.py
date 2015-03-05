@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, g, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, g, send_from_directory, session
 from flask_bootstrap import Bootstrap
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.properties import ColumnProperty
@@ -20,6 +20,7 @@ import praw
 import re
 from jinja2 import escape, evalcontextfilter, Markup
 from urlparse import urlparse
+from uuid import uuid4
 
 from logentries import LogentriesHandler
 from crossdomain import crossdomain
@@ -618,17 +619,18 @@ def stream_json():
 def reddit_authorize_callback():
     r = praw.Reddit(user_agent=app.config["REDDIT_WEB_APP_USER_AGENT"])
     r.set_oauth_app_info(app.config['REDDIT_API_ID'], app.config['REDDIT_API_SECRET'], url_for('.reddit_authorize_callback', _external=True))
-    code = request.args.get('code', '')
-    if code:
-        r.get_access_information(code)
-        name = r.get_me().name
-        if name:
-            user = get_or_create(Streamer, reddit_username=name)
-            user.checked = True
-            db.session.commit()
-            login_user(user)
-            flash("Logged in successfully", 'success')
-            return redirect(url_for(".streamer_page", streamer_name=name))
+    if str(session['unique_key']) == request.args.get('state', ''):
+        code = request.args.get('code', '')
+        if code:
+            r.get_access_information(code)
+            name = r.get_me().name
+            if name:
+                user = get_or_create(Streamer, reddit_username=name)
+                user.checked = True
+                db.session.commit()
+                login_user(user)
+                flash("Logged in successfully", 'success')
+                return redirect(url_for(".streamer_page", streamer_name=name))
 
     flash("Error while trying to log in", 'error')
     return redirect(url_for(".index"))
@@ -638,7 +640,8 @@ def reddit_authorize_callback():
 def authorize():
     r = praw.Reddit(user_agent=app.config["REDDIT_WEB_APP_USER_AGENT"])
     r.set_oauth_app_info(app.config['REDDIT_API_ID'], app.config['REDDIT_API_SECRET'], url_for('.reddit_authorize_callback', _external=True))
-    url = r.get_authorize_url('UniqueKey', 'identity')
+    session['unique_key'] = uuid4()
+    url = r.get_authorize_url(session['unique_key'], 'identity')
     return redirect(url)
 
 
