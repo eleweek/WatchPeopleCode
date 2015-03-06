@@ -57,4 +57,5 @@ app = create_app()
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
-import wpc.views
+
+import wpc.views  # NOQA
