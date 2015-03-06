@@ -4,14 +4,14 @@ app.config(['$routeProvider',
 	function($routeProvider) {
 		$routeProvider.
 			when('/live', {
-				templateUrl: "/templates/stream.html",
+				templateUrl: "/static/templates/stream.html",
 				controller: "LiveCtrl"
 			}).
 			when('/upcoming', {
-				templateUrl: "/templates/stream.html"
+				templateUrl: "/static/templates/stream.html"
 			}).
 			when('/completed', {
-				templateUrl: "/templates/stream.html",
+				templateUrl: "/static/templates/stream.html",
 				controller: "CompletedCtrl"
 			}).
 			otherwise({
@@ -43,7 +43,7 @@ app.controller('CompletedCtrl', function($scope, $http, $sce) {
 	$http.get('http://www.watchpeoplecode.com/json').
 		success(function(data) {
 			console.log(data)
-			$scope.streams = process(data, 'completed', $sce)
+			$scope.streams = process(data, 'completed', $sce, max)
 		}).
 		error(function() {
 			console.log("ERROR")
