@@ -1,12 +1,14 @@
+from wpc import db, app
+from wpc.models import Stream, YoutubeStream, TwitchStream, Streamer, Submission, get_or_create
+from wpc.utils import youtube_video_id, twitch_channel, requests_get_with_retries
+
+
 from apscheduler.schedulers.blocking import BlockingScheduler
 import praw
 from bs4 import BeautifulSoup
 from sqlalchemy import or_
 import datetime
 import re
-
-from app import db, Stream, YoutubeStream, TwitchStream, Streamer, Submission, app, get_or_create
-from utils import youtube_video_id, twitch_channel, requests_get_with_retries
 
 
 reddit_user_agent = "/r/WatchPeopleCode flairs&streams bot (main contact: /u/godlikesme)"

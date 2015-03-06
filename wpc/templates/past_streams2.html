@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros with context %}
+
+{% block title %}Watch people code: past streams{% endblock %}
+
+{% block content %}
+  {{super()}}
+
+  <div class="container">
+      <div class="col-md-offset-2 col-md-8">
+        <p class="text-center"><a href={{url_for(".index")}}>Back to main page</a></p>
+
+        <form action="" method="POST" class="form form-basic" role="form">
+          {{ form.hidden_tag() }}
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h1 class="panel-title">Search streams</h1>
+            </div>
+
+            <div class="panel-body">
+              {{ wtf.form_field(form.tags) }}<hr>
+              {{ wtf.form_field(form.operator) }}<hr>
+              {{ wtf.form_field(form.search_button, button_map={'search_button': 'primary'}) }}
+            </div>
+          </div>
+        </form>
+
+        {{ macros.render_pagination(streams) }}
+        <br>
+        {% for stream in streams.items %}
+          <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+        {% if stream.streamer %}
+         by <a href={{ url_for('.streamer_page', streamer_name=stream.streamer.reddit_username) }}>{{ stream.streamer.reddit_username }}</a>
+        {% endif %} 
+          <br>
+          {{ stream.html_code() |safe }}
+          <hr>
+        {% endfor %}
+        {{ macros.render_pagination(streams) }}
+      </div>
+  </div>
+{% endblock %}
