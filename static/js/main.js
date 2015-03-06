@@ -43,7 +43,7 @@ app.controller('CompletedCtrl', function($scope, $http, $sce) {
 	$http.get('http://www.watchpeoplecode.com/json').
 		success(function(data) {
 			console.log(data)
-			$scope.streams = process(data, 'completed', $sce, max)
+			$scope.streams = process(data, 'completed', $sce)
 		}).
 		error(function() {
 			console.log("ERROR")
