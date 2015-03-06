@@ -1,15 +1,22 @@
 {% macro streams(streams, status) %}
   {% for stream in streams %}
-    {% if status == 'upcoming'%}
-      {% if stream.scheduled_start_time %}<p><b>{{stream.format_start_time()}}</b></p> {% endif %}
+  {% if loop.index0 is even %}
+  <div class="row"> 
+  {%endif%}
+   <div class="col-lg-6">
+   
     {% endif %}
-    <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+    <div class="full"> <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a></div>
     {% if stream.streamer %}
      by <a href={{ url_for('.streamer_page', streamer_name=stream.streamer.reddit_username) }}>{{ stream.streamer.reddit_username }}</a>
     {% endif %} 
-    <br>
     {{ stream.html_code(autoplay=(loop.index == 1) if status == 'live' else False ) |safe }}
-    <hr>
+ {% if status == 'upcoming'%}
+      {% if stream.scheduled_start_time %} <div class="full"><p><b>{{stream.format_start_time()}}</b></p></div> {% endif %}
+    </div>
+     {% if loop.index0 is even %}
+      </div>
+     {%endif%}
   {% endfor %}
 {% endmacro %}
 
