@@ -41,6 +41,7 @@ class Stream(db.Model):
     streamer_id = db.Column('streamer_id', db.Integer(), db.ForeignKey('streamer.id'))
     streamer = db.relationship('Streamer', backref=db.backref('streams', lazy='dynamic'))
     tags = db.relationship('Tag', secondary=stream_tag, backref=db.backref('streams', lazy='dynamic'))
+    current_viewers = db.Column(db.Integer)
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -101,6 +102,7 @@ class YoutubeStream(Stream):
             self.title = item['snippet']['title']
             if 'liveStreamingDetails' in item:
                 self.scheduled_start_time = item['liveStreamingDetails']['scheduledStartTime']
+                self.current_viewers = item['liveStreamingDetails']['concurrentViewers']
             if item['snippet']['liveBroadcastContent'] == 'live':
                 self.status = 'live'
                 self.actual_start_time = item['liveStreamingDetails']['actualStartTime']
@@ -184,6 +186,7 @@ class TwitchStream(Stream):
         if stream is not None:
             self.status = 'live'
             self.title = stream['channel']['status']
+            self.current_viewers = stream['channel']
             self.last_time_live = datetime.utcnow()
             if self.actual_start_time is None:
                 self.actual_start_time = self.last_time_live
