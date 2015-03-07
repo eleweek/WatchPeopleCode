@@ -47,13 +47,13 @@ class Stream(db.Model):
         'polymorphic_identity': 'stream'
     }
 
-    def format_start_time(self, countdown=True):
-        if not self.scheduled_start_time:
+    def format_start_time(self, countdown=True, start_time=True):
+        if not self.scheduled_start_time or (not countdown and not start_time):
             return None
 
         if countdown:
-            return humanize.naturaltime(
-                datetime.utcnow() - self.scheduled_start_time) + ", " + datetime.strftime(self.scheduled_start_time, "%Y-%m-%d %H:%M UTC")
+            return humanize.naturaltime(datetime.utcnow() - self.scheduled_start_time) +\
+                ((", " + datetime.strftime(self.scheduled_start_time, "%Y-%m-%d %H:%M UTC")) if start_time else "")
         else:
             return datetime.strftime(self.scheduled_start_time, "%Y-%m-%d %H:%M UTC")
 
@@ -120,6 +120,14 @@ class YoutubeStream(Stream):
                 elif not self.streamer.checked:
                     self.streamer.youtube_channel = yc
                     self.streamer.youtube_name = item['snippet']['channelTitle']
+
+    def _get_flair(self):
+        status_to_flair = {"live": (u"Live", u"one"),
+                           "completed": (u"Recording Available", u"four"),
+                           "upcoming": (self.format_start_time(start_time=False), u"two"),
+                           None: (None, None)}
+
+        return status_to_flair[self.status]
 
     def normal_url(self):
         return "http://www.youtube.com/watch?v={}".format(self.ytid)
@@ -197,6 +205,15 @@ class TwitchStream(Stream):
             # there is no streamer with that channel
             elif not self.streamer.checked:
                 self.streamer.twitch_channel = self.channel
+
+    def _get_flair(self):
+        fst = self.format_start_time(start_time=False)
+        status_to_flair = {"live": (u"Live", u"one"),
+                           "completed": (u"Finished", u"three"),
+                           "upcoming": (fst if fst else u"Upcoming", u"two"),
+                           None: (None, None)}
+
+        return status_to_flair[self.status]
 
     def add_submission(self, submission):
         if submission not in self.submissions:

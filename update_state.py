@@ -113,31 +113,20 @@ def update_flairs():
                         wpc_sub.set_flair(s.author, flair_text='Streamer', flair_css_class='text-white background-blue')
 
                     # set link flairs
-                    flair_choices = s.get_flair_choices()['choices']
-                    current_flair_text = s.get_flair_choices()[u'current'][u'flair_text']
-                    status_to_flair_text = {"live": u"Live",
-                                            "completed": u"Recording Available",  # TODO, careful, only for youtube
-                                            "upcoming": u"Upcoming",
-                                            None: None}
 
-                    flair_text = status_to_flair_text[stream.status]
-                    flair_css_text = status_to_flair_text[stream.status]
+                    allow_flair_change = True
+
                     is_twitch_stream = ('channel' in dir(stream))  # TODO: better way
                     if is_twitch_stream:
                         created_dt = datetime.datetime.utcfromtimestamp(s.created_utc)
                         now = datetime.datetime.utcnow()
-                        if stream.status == 'completed':
-                            flair_text = u'Finished'
-                            flair_css_text = u'Finished'
                         if now - created_dt > datetime.timedelta(hours=12):
-                            flair_text = current_flair_text if current_flair_text == u"Finished" else None
+                            allow_flair_change = False
 
-                    if flair_text is not None:
-                        for fc in flair_choices:
-                            if fc[u"flair_text"] == flair_css_text:
-                                s.set_flair(flair_text, fc[u'flair_css_class'])
-                    else:
-                        s.set_flair('')
+                    if allow_flair_change:
+                        flair_text, flair_css = stream._get_flair()
+                        if flair_text and flair_css:
+                            s.set_flair(flair_text, flair_css)
     except Exception as e:
         app.logger.exception(e)
 
