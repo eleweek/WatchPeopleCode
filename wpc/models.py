@@ -102,7 +102,8 @@ class YoutubeStream(Stream):
             self.title = item['snippet']['title']
             if 'liveStreamingDetails' in item:
                 self.scheduled_start_time = item['liveStreamingDetails']['scheduledStartTime']
-                self.current_viewers = item['liveStreamingDetails']['concurrentViewers']
+                if 'concurrentViewers' in item['liveStreamingDetails']:
+                    self.current_viewers = item['liveStreamingDetails']['concurrentViewers']
             if item['snippet']['liveBroadcastContent'] == 'live':
                 self.status = 'live'
                 self.actual_start_time = item['liveStreamingDetails']['actualStartTime']
@@ -186,7 +187,7 @@ class TwitchStream(Stream):
         if stream is not None:
             self.status = 'live'
             self.title = stream['channel']['status']
-            self.current_viewers = stream['channel']
+            self.current_viewers = stream['viewers']
             self.last_time_live = datetime.utcnow()
             if self.actual_start_time is None:
                 self.actual_start_time = self.last_time_live
