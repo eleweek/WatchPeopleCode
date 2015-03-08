@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %} Video {% endblock %}
+
+{% block content %}
+  {{super()}}
+  <div class="container">
+    <div id="video">Loading the player...</div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
+  <script type="text/javascript">
+      jwplayer("video").setup({
+          file: 'rtmp://104.236.11.162/live/flv:test',
+          rtmp: {
+              bufferlength: 0.2
+          }
+      });
+  </script>
+{% endblock %}

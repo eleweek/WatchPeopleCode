@@ -168,3 +168,8 @@ def logout():
 @app.route("/podcast_feed.xml")
 def podcast_feed():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'podcast_feed.xml', mimetype='application/rss+xml')
+
+
+@app.route("/streams")
+def streams():
+    return render_template("streams.html")
