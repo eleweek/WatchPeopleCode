@@ -125,9 +125,10 @@ class YoutubeStream(Stream):
                     self.streamer.youtube_name = item['snippet']['channelTitle']
 
     def _get_flair(self):
+        fst = self.format_start_time(start_time=False)
         status_to_flair = {"live": (u"Live", u"one"),
                            "completed": (u"Recording Available", u"four"),
-                           "upcoming": (self.format_start_time(start_time=False), u"two"),
+                           "upcoming": (fst if fst else u"Upcoming", u"two"),
                            None: (None, None)}
 
         return status_to_flair[self.status]
@@ -222,6 +223,7 @@ class TwitchStream(Stream):
     def add_submission(self, submission):
         if submission not in self.submissions:
             self.status = 'upcoming'
+            self.scheduled_start_time = None
             self.actual_start_time = None
 
         Stream.add_submission(self, submission)
