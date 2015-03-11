@@ -31,6 +31,9 @@ def generate_email_notifications():
 
 
 def send_email_notifications(text, html, subject="WatchPeopleCode: weekly update"):
-    # FIXME: mailgun batches are limited to 1000
-    recipient_vars = {subscriber.email: {} for subscriber in Subscriber.query}
-    print send_message(recipient_vars, subject, text, html)
+    num_subscribers = Subscriber.query.count()
+    batch_size = 1000  # mailgun limit
+    num_batches = (num_subscribers + batch_size - 1) / batch_size
+    for b in xrange(num_batches):
+        recipient_vars = {subscriber.email: {} for subscriber in Subscriber.query.order_by(Subscriber.id).offset(b * batch_size).limit(batch_size)}
+        print b, send_message(recipient_vars, subject, text, html)
