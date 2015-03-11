@@ -1,5 +1,5 @@
 from wpc import db, app
-from wpc.models import YoutubeStream, Stream, Streamer, Subscriber, get_or_create
+from wpc.models import YoutubeStream, Stream, Streamer, Subscriber, get_or_create, MozillaStreamHack
 from wpc.forms import SubscribeForm, EditStreamerInfoForm, SearchForm
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, send_from_directory, session
@@ -33,6 +33,7 @@ app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 @app.route('/', methods=['GET', 'POST'])
 def index():
     live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
+    live_streams.insert(0, MozillaStreamHack())
 
     form = SubscribeForm()
     if request.method == "POST" and form.validate_on_submit():
