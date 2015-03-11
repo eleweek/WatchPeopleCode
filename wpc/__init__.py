@@ -29,18 +29,22 @@ def setup_logging(loggers_and_levels, logentries_id=None):
 
 def create_app():
     app = Flask(__name__)
+    # Set crucial variables
     app.secret_key = os.environ['SECRET_KEY']
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-    app.config['MAILGUN_API_URL'] = os.environ['MAILGUN_API_URL']
-    app.config['MAILGUN_API_KEY'] = os.environ['MAILGUN_API_KEY']
-    app.config['MAILGUN_TEST_OPTION'] = True if os.environ['MAILGUN_TEST_OPTION'] == 'True' else False
-    app.config['NOTIFICATION_EMAIL'] = os.environ['MAILGUN_SMTP_LOGIN']
-    app.config['REDDIT_PASSWORD'] = os.environ['WPC_REDDIT_PASSWORD']
-    app.config['REDDIT_USERNAME'] = os.environ['WPC_REDDIT_USERNAME']
-    app.config['YOUTUBE_KEY'] = os.environ['WPC_YOUTUBE_KEY']
-    app.config['GA_TRACKING_CODE'] = os.environ['GA_TRACKING_CODE']
-    app.config['REDDIT_API_ID'] = os.environ['WPC_APP_ID']
-    app.config['REDDIT_API_SECRET'] = os.environ['WPC_APP_SECRET']
+
+    #Set non crucial variables
+    app.config['MAILGUN_API_URL'] = os.environ.get('MAILGUN_API_URL', '')
+    app.config['MAILGUN_API_KEY'] = os.environ.get('MAILGUN_API_KEY', '')
+    app.config['MAILGUN_TEST_OPTION'] = True if os.environ.get('MAILGUN_TEST_OPTION', 'True') == 'True' else False
+    app.config['NOTIFICATION_EMAIL'] = os.environ.get('MAILGUN_SMTP_LOGIN', '')
+    app.config['REDDIT_PASSWORD'] = os.environ.get('WPC_REDDIT_PASSWORD', '')
+    app.config['REDDIT_USERNAME'] = os.environ.get('WPC_REDDIT_USERNAME', '')
+    app.config['YOUTUBE_KEY'] = os.environ.get('WPC_YOUTUBE_KEY', '')
+    app.config['GA_TRACKING_CODE'] = os.environ.get('GA_TRACKING_CODE', '')
+    app.config['REDDIT_API_ID'] = os.environ.get('WPC_APP_ID', '')
+    app.config['REDDIT_API_SECRET'] = os.environ.get('WPC_APP_SECRET', '')
+    
     app.config['REDDIT_WEB_APP_USER_AGENT'] = "/r/WatchPeopleCode web app(main contact: /u/godlikesme)"
 
     Bootstrap(app)
