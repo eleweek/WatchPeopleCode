@@ -120,7 +120,7 @@ def streamer_page(streamer_name, page):
 def stream_json():
     def make_dict(stream):
         return {'username': stream.streamer.reddit_username if stream.streamer else None,
-                'title': stream.title, 'url': stream.normal_url()}
+                'title': stream.title, 'url': stream.normal_url(), 'viewers': stream.current_viewers}
     try:
         return jsonify(live=[make_dict(st) for st in Stream.query.filter_by(status='live')],
                        upcoming=[make_dict(st) for st in Stream.query.filter_by(status='upcoming')],
