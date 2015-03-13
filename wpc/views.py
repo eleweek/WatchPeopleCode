@@ -3,14 +3,14 @@ from wpc.models import YoutubeStream, Stream, Streamer, Subscriber, get_or_creat
 from wpc.models import MozillaStreamHack  # NOQA
 from wpc.forms import SubscribeForm, EditStreamerInfoForm, SearchForm
 
-from flask import render_template, request, redirect, url_for, flash, jsonify, g, send_from_directory, session
+from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session
 from flask.ext.login import login_user, logout_user, login_required, current_user
 from jinja2 import escape, evalcontextfilter, Markup
 
 from uuid import uuid4
 import praw
 from crossdomain import crossdomain
-import os
+from feedgen.feed import FeedGenerator
 
 
 @app.before_request
@@ -170,4 +170,21 @@ def logout():
 
 @app.route("/podcast_feed.xml")
 def podcast_feed():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'podcast_feed.xml', mimetype='application/rss+xml')
+    fg = FeedGenerator()
+    fg.load_extension('podcast')
+    fg.podcast.itunes_category('Technology', 'Podcasting')
+    fg.author({'name': 'Nathan Kellert', 'email': 'nathankellert@gmail.com'})
+    fg.link(href='http://watchpeoplecode.com/podcast_feed.xml', rel='self')
+    fg.title('WatchPeopleCode')
+    fg.description('WatchPeopleCode(WPC) is a weekly peek into the lives of developers and the WatchPeopleCode community. Our goal is to keep our listeners entertained by giving them new and interesting insights into our industry as well as awesome things happening within our own community. Here, you can expect hear about some of the latest news, tools, and opportunities for developers in nearly every aread of our industry. Most importantly, we hope to have some fun and a few laughs in ways only other nerds know how.')  # NOQA
+
+    for epfile, eptitle in [('ep1.mp3', 'Episode 1'), ('ep2.mp3', 'Episode 2'), ('ep3.mp3', 'Episode 3')]:
+        epurl = "https://s3.amazonaws.com/wpcpodcast/{}".format(epfile)
+        fe = fg.add_entry()
+        fe.id(epurl)
+        fe.title(eptitle)
+        fe.enclosure(epurl, 0, 'audio/mpeg')
+
+    return Response(response=fg.rss_str(pretty=True),
+                    status=200,
+                    mimetype='application/rss+xml')

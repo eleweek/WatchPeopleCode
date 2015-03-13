@@ -33,7 +33,7 @@ def create_app():
     app.secret_key = os.environ['SECRET_KEY']
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
-    #Set non crucial variables
+    # Set non crucial variables
     app.config['MAILGUN_API_URL'] = os.environ.get('MAILGUN_API_URL', '')
     app.config['MAILGUN_API_KEY'] = os.environ.get('MAILGUN_API_KEY', '')
     app.config['MAILGUN_TEST_OPTION'] = True if os.environ.get('MAILGUN_TEST_OPTION', 'True') == 'True' else False
@@ -44,7 +44,7 @@ def create_app():
     app.config['GA_TRACKING_CODE'] = os.environ.get('GA_TRACKING_CODE', '')
     app.config['REDDIT_API_ID'] = os.environ.get('WPC_APP_ID', '')
     app.config['REDDIT_API_SECRET'] = os.environ.get('WPC_APP_SECRET', '')
-    
+
     app.config['REDDIT_WEB_APP_USER_AGENT'] = "/r/WatchPeopleCode web app(main contact: /u/godlikesme)"
 
     Bootstrap(app)
