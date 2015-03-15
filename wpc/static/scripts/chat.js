@@ -89,7 +89,7 @@
         });
         
         var format_message = function(message) {
-            return "<b>" + message.sender + "</b>: " + message.text;
+            return '<b style="color: blue">' + message.sender + '</b>: ' + message.text;
         }
         
         chatAPI.onJoin = function(joined, my_username) {
@@ -98,7 +98,7 @@
                 $(".compose-message-form").show();
                 $(".messages").append(
                     jQuery("<li>").html(
-                        "<b><i>You've been connected. Send some messages! </i></b>"
+                        "<i>You've been connected.</i>"
                     )
                 );
                 $(".form-group").children().removeAttr("disabled");
@@ -117,7 +117,7 @@
         chatAPI.onDisconnect = function(){
             $(".messages").append(
                 jQuery("<li>").html(
-                    "<b><i>You've been disconnected.</i></b>"
+                    "<i>You've been disconnected.</i>"
                 )
             );
         };

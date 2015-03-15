@@ -2,6 +2,11 @@
 
 {% block title %} Video {% endblock %}
 
+{% block styles %}
+  {{super()}}
+  <link rel="stylesheet" href="{{url_for('static', filename='chat.css')}}">
+{% endblock %}
+
 {% block content %}
   {{super()}}
   <div class="container">
@@ -20,7 +25,7 @@
 
           <div class="panel-body">
             <ul class="messages"></ul>
-            <form class="compose-message-form" style="display:none;">
+            <form class="compose-message-form">
               <div class="form-group">
                 <textarea class="form-control" name="message"></textarea>
                 <br>

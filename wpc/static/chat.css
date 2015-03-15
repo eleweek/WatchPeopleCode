@@ -1,0 +1,8 @@
+.messages {
+  list-style-type: none;
+  padding: 5px;
+}
+
+.compose-message-form {
+  display: none;
+}
