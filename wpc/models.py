@@ -42,7 +42,7 @@ class Stream(db.Model):
     streamer = db.relationship('Streamer', backref=db.backref('streams', lazy='dynamic'))
     tags = db.relationship('Tag', secondary=stream_tag, backref=db.backref('streams', lazy='dynamic'))
     current_viewers = db.Column(db.Integer)
-
+    confstream = db.Column(db.Boolean(), default=False)
     __mapper_args__ = {
         'polymorphic_on': type,
         'polymorphic_identity': 'stream'

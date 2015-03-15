@@ -51,6 +51,23 @@ def index():
     return render_template('index.html', form=form, live_streams=live_streams, random_stream=random_stream, upcoming_streams=upcoming_streams)
 
 
+# TODO it is copypasted from index(), but whatever, this is one time change
+@app.route('/onlineconf', methods=['GET', 'POST'])
+def onlineconf():
+    streams = Stream.query.filter_by(confstream=True).filter(Stream.status != 'completed').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
+
+    form = SubscribeForm()
+    if request.method == "POST" and form.validate_on_submit():
+        subscriber = Subscriber()
+        form.populate_obj(subscriber)
+        db.session.add(subscriber)
+        db.session.commit()
+        flash("you've subscribed successfully", "success")
+        return redirect(url_for('.index'))
+
+    return render_template('onlineconf.html', form=form, streams=streams)
+
+
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if g.search_form.validate_on_submit():
