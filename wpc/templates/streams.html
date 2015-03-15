@@ -5,11 +5,42 @@
 {% block content %}
   {{super()}}
   <div class="container">
-    <div id="video">Loading the player...</div>
+
+    <div class="row">
+      <div class="col-md-8">
+        <div id="video">Loading the player...</div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="panel panel-default panel-chat">
+
+          <div class="panel-heading">
+            <h3 class="panel-title">Chat</h3>
+          </div>
+
+          <div class="panel-body">
+            <ul class="messages"></ul>
+            <form class="compose-message-form" style="display:none;">
+              <div class="form-group">
+                <textarea class="form-control" name="message"></textarea>
+                <br>
+                <button class="btn btn-info" type="submit">Send </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
 {% endblock %}
 
 {% block scripts %}
+  <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+  <script src="{{ url_for('static', filename='scripts/socket.io.min.js') }}"></script>
+  <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+  <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
+
   <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
   <script type="text/javascript">
       jwplayer("video").setup({

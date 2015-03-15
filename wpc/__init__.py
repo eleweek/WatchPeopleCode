@@ -2,6 +2,7 @@ from flask_bootstrap import Bootstrap
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask import Flask
 from flask.ext.login import LoginManager
+from flask.ext.socketio import SocketIO
 
 import logging
 import os
@@ -57,4 +58,5 @@ app = create_app()
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
+socketio = SocketIO(app)
 import wpc.views

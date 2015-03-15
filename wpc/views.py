@@ -1,10 +1,11 @@
-from wpc import db, app
+from wpc import db, app, socketio
 from wpc.models import YoutubeStream, Stream, Streamer, Subscriber, get_or_create
 from wpc.forms import SubscribeForm, EditStreamerInfoForm, SearchForm
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, send_from_directory, session
 from flask.ext.login import login_user, logout_user, login_required, current_user
 from jinja2 import escape, evalcontextfilter, Markup
+from flask.ext.socketio import emit
 
 from uuid import uuid4
 import praw
@@ -85,6 +86,11 @@ def nl2br(eval_ctx, value):
     result = (u'%s' % escape(value)).replace('\n', '<br>')
     if eval_ctx.autoescape:
         result = Markup(result)
+    return result
+
+
+def nl2br_py(value):
+    result = (u'%s' % escape(value)).replace('\n', '<br>')
     return result
 
 
@@ -173,3 +179,26 @@ def podcast_feed():
 @app.route("/streams")
 def streams():
     return render_template("streams.html")
+
+
+messages = list()
+
+
+@socketio.on('connect', namespace='/chat')
+def chat_connect():
+    print('New connection')
+    if current_user.is_authenticated():
+        emit('join', True, current_user.reddit_username)
+
+
+@socketio.on('disconnect', namespace='/chat')
+def chat_disconnect():
+    pass
+
+
+@socketio.on('message', namespace='/chat')
+def chat_message(message_text):
+    message = {"sender": current_user.reddit_username,
+               "text": nl2br_py(message_text)}
+    emit("message", message, broadcast=True)
+    return True
