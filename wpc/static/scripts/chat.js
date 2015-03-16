@@ -89,7 +89,11 @@
         });
         
         var format_message = function(message) {
-            return '<b style="color: blue">' + message.sender + '</b>: ' + message.text;
+            if (message.sender === myUsername) { 
+                return '<b style="color: orangered">' + message.sender + '</b>: ' + message.text;
+            } else {
+                return '<b style="color: blue">' + message.sender + '</b>: ' + message.text;
+            }
         }
         
         chatAPI.onJoin = function(joined, my_username) {
