@@ -11,6 +11,8 @@ from uuid import uuid4
 import praw
 from crossdomain import crossdomain
 from feedgen.feed import FeedGenerator
+from datetime import datetime
+import pytz
 
 
 @app.before_request
@@ -187,25 +189,29 @@ def logout():
 
 @app.route("/podcast_feed.xml")
 def podcast_feed():
+    logo_url = url_for("static", filename="wpclogo_big.png", _external=True)
+
     fg = FeedGenerator()
     fg.load_extension('podcast')
     fg.podcast.itunes_category('Technology', 'Podcasting')
-    fg.podcast.itunes_image(url_for("static", filename="wpclogo_big.png", _external=True))
+    fg.podcast.itunes_image(logo_url)
     fg.author({'name': 'Nathan Kellert', 'email': 'nathankellert@gmail.com'})
     fg.link(href='http://watchpeoplecode.com/podcast_feed.xml', rel='self')
     fg.title('WatchPeopleCode')
     fg.description('WatchPeopleCode(WPC) is a weekly peek into the lives of developers and the WatchPeopleCode community. Our goal is to keep our listeners entertained by giving them new and interesting insights into our industry as well as awesome things happening within our own community. Here, you can expect hear about some of the latest news, tools, and opportunities for developers in nearly every aread of our industry. Most importantly, we hope to have some fun and a few laughs in ways only other nerds know how.')  # NOQA
 
-    episodes = [('ep1.mp3', 'Episode 1', 'Learn all about the WPC hosts, and where we came from in Episode 1!'),
-                ('ep2.mp3', 'Episode 2', 'This week we cover your news, topics and questions in episode 2!'),
-                ('ep3.mp3', 'Episode 3', "On todays podcast we talk to WatchPeopleCode's founder Alex Putilin. Hear about how the reddit search engine thousands watched him write. Also, hear the inside scoop of how WatchPeopleCode got started!")]  # NOQA
+    episodes = [('ep1.mp3', 'Episode 1', datetime(2015, 02, 21, 23), 'Learn all about the WPC hosts, and where we came from in Episode 1!'),
+                ('ep2.mp3', 'Episode 2', datetime(2015, 02, 28, 23), 'This week we cover your news, topics and questions in episode 2!'),
+                ('ep3.mp3', 'Episode 3', datetime(2015, 03, 07, 23), "On todays podcast we talk to WatchPeopleCode's founder Alex Putilin. Hear about how the reddit search engine thousands watched him write. Also, hear the inside scoop of how WatchPeopleCode got started!")]  # NOQA
 
-    for epfile, eptitle, epdescription in episodes[::-1]:
+    for epfile, eptitle, epdate, epdescription in episodes[::-1]:
         epurl = "https://s3.amazonaws.com/wpcpodcast/{}".format(epfile)
         fe = fg.add_entry()
         fe.id(epurl)
         fe.title(eptitle)
         fe.description(epdescription)
+        fe.podcast.itunes_image(logo_url)
+        fe.pubdate(epdate.replace(tzinfo=pytz.UTC))
         fe.enclosure(epurl, 0, 'audio/mpeg')
 
     return Response(response=fg.rss_str(pretty=True),
