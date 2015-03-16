@@ -190,7 +190,7 @@ def podcast_feed():
     fg = FeedGenerator()
     fg.load_extension('podcast')
     fg.podcast.itunes_category('Technology', 'Podcasting')
-    fg.podcast.itunes_image(url_for("static", filename="wpclogo_big.png"))
+    fg.podcast.itunes_image(url_for("static", filename="wpclogo_big.png", _external=True))
     fg.author({'name': 'Nathan Kellert', 'email': 'nathankellert@gmail.com'})
     fg.link(href='http://watchpeoplecode.com/podcast_feed.xml', rel='self')
     fg.title('WatchPeopleCode')
