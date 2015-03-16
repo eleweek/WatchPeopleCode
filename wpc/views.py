@@ -200,7 +200,7 @@ def podcast_feed():
                 ('ep2.mp3', 'Episode 2', 'This week we cover your news, topics and questions in episode 2!'),
                 ('ep3.mp3', 'Episode 3', "On todays podcast we talk to WatchPeopleCode's founder Alex Putilin. Hear about how the reddit search engine thousands watched him write. Also, hear the inside scoop of how WatchPeopleCode got started!")]  # NOQA
 
-    for epfile, eptitle, epdescription in episodes:
+    for epfile, eptitle, epdescription in episodes[::-1]:
         epurl = "https://s3.amazonaws.com/wpcpodcast/{}".format(epfile)
         fe = fg.add_entry()
         fe.id(epurl)
