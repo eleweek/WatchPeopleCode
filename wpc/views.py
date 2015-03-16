@@ -11,6 +11,7 @@ from uuid import uuid4
 import praw
 from crossdomain import crossdomain
 import os
+import random
 
 
 @app.before_request
@@ -181,24 +182,38 @@ def streams():
     return render_template("streams.html")
 
 
-messages = list()
+users = list()
+first_words = ['True', 'False', 'For', 'While', 'If', 'Else', 'Elif', 'Undefined', 'Do',
+               'Exit', 'Continue', 'Super', 'Break', 'Try', 'Catch', 'Class', 'Object',
+               'Def', 'Var', 'Pass', 'Return']
+second_words = ['C', 'C++', 'Lisp', 'Python', 'Java', 'JavaScript', 'Pascal', 'Objective-C',
+                'C#', 'Perl', 'Ruby', 'Ada', 'Haskell', 'Octave', 'Basic', 'Fortran']
 
 
 @socketio.on('connect', namespace='/chat')
 def chat_connect():
     print('New connection')
+
     if current_user.is_authenticated():
-        emit('join', True, current_user.reddit_username)
+        session['username'] = current_user.reddit_username
+    elif 'username' not in session or session['username'] in users:
+        while True:
+            session['username'] = random.choice(first_words) + ' ' + random.choice(second_words)
+            if session['username'] not in users:
+                break
+
+    users.append(session['username'])
+    emit('join', True, session['username'])
 
 
 @socketio.on('disconnect', namespace='/chat')
 def chat_disconnect():
-    pass
+    users.remove(session['username'])
 
 
 @socketio.on('message', namespace='/chat')
 def chat_message(message_text):
-    message = {"sender": current_user.reddit_username,
+    message = {"sender": session['username'],
                "text": nl2br_py(message_text)}
     emit("message", message, broadcast=True)
     return True
