@@ -202,7 +202,8 @@ def podcast_feed():
 
     episodes = [('ep1.mp3', 'Episode 1', datetime(2015, 02, 21, 23), 'Learn all about the WPC hosts, and where we came from in Episode 1!'),
                 ('ep2.mp3', 'Episode 2', datetime(2015, 02, 28, 23), 'This week we cover your news, topics and questions in episode 2!'),
-                ('ep3.mp3', 'Episode 3', datetime(2015, 03, 07, 23), "On todays podcast we talk to WatchPeopleCode's founder Alex Putilin. Hear about how the reddit search engine thousands watched him write. Also, hear the inside scoop of how WatchPeopleCode got started!")]  # NOQA
+                ('ep3.mp3', 'Episode 3', datetime(2015, 03, 07, 23), "On todays podcast we talk to WatchPeopleCode's founder Alex Putilin. Hear about how the reddit search engine thousands watched him write. Also, hear the inside scoop of how WatchPeopleCode got started!"),  # NOQA
+                ('ep4.mp3', 'Episode 4', datetime(2015, 03, 14, 23), "This week we talk to FreeCodeCamps Quincy Larson(http://www.freecodecamp.com) about their project that combines teaching new developers how to code and completing projects for non-profits! Lets find out how this group of streamers code with a cause!")]  # NOQA
 
     for epfile, eptitle, epdate, epdescription in episodes[::-1]:
         epurl = "https://s3.amazonaws.com/wpcpodcast/{}".format(epfile)
