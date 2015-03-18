@@ -184,6 +184,7 @@ class TwitchStream(Stream):
             app.logger.exception(e)
             raise
 
+        app.logger.info("JSON for {} is {}".format(self, r.json()))
         stream = r.json()['stream']
         if stream is not None:
             self.status = 'live'
