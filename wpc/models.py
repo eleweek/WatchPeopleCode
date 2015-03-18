@@ -175,10 +175,6 @@ class TwitchStream(Stream):
                 self.title = stream['status']
 
     def _update_status(self):
-        if self.channel == 'limeoats':
-            app.logger.info("LIMEOATS HACK".format(self))
-            self.status = 'live'
-            return
         app.logger.info("Updating status for {}".format(self))
         try:
             r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
