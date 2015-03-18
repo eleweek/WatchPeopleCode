@@ -37,7 +37,7 @@ app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 def index():
     live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
     # Uncomment this when mozilla guys start livestreaming
-    live_streams.insert(0, MozillaStreamHack())
+    # live_streams.insert(0, MozillaStreamHack())
 
     form = SubscribeForm()
     if request.method == "POST" and form.validate_on_submit():
