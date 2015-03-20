@@ -17,10 +17,16 @@
         <h2 class="text-center"> Error getting live streams. :( Maybe try refreshing the page? </h2>
     {% endif %}
     <p class="text-center"> The app automatically gets live stream from /r/WatchPeopleCode subreddit, so if you want to start live streaming, submit a link to your youtube stream or twitch channel to <a href="http://www.reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode </a></p>
+<<<<<<< HEAD
     <p class="text-center"><a href={{url_for(".past_streams")}}>Big list of past streams</a></p>
     <p class="text-center"><a href="https://www.reddit.com/r/WatchPeopleCode/comments/2xl3iv/requests_thread_viewers_what_streams_do_you_want/">[Requests Thread] Viewers, what streams do you want to watch? </a></p>
     {#<p class="text-center"><a href="http://webchat.freenode.net/?randomnick=1&channels=%23WatchPeopleCode&prompt=1">Join #WatchPeopleCode on irc.freenode.net</a></p>#}
     <div class="row">
+=======
+      <p class="text-center"><a href={{url_for(".past_streams")}}>Big list of past streams</a></p>
+      <p class="text-center"><a href="https://www.reddit.com/r/WatchPeopleCode/comments/2y2oji/wpc_online_conference_on_15th_of_march_viewers/">WPC Online Conference on 15th of March. Viewers: what talks do you want to watch?</a></p>
+      {#<p class="text-center"><a href="http://webchat.freenode.net/?randomnick=1&channels=%23WatchPeopleCode&prompt=1">Join #WatchPeopleCode on irc.freenode.net</a></p>#}
+>>>>>>> master
       <div class="col-md-8">
         {% if live_streams %}
           {{ macros.streams(live_streams, 'live') }}

@@ -41,19 +41,20 @@ class Stream(db.Model):
     streamer_id = db.Column('streamer_id', db.Integer(), db.ForeignKey('streamer.id'))
     streamer = db.relationship('Streamer', backref=db.backref('streams', lazy='dynamic'))
     tags = db.relationship('Tag', secondary=stream_tag, backref=db.backref('streams', lazy='dynamic'))
+    current_viewers = db.Column(db.Integer)
 
     __mapper_args__ = {
         'polymorphic_on': type,
         'polymorphic_identity': 'stream'
     }
 
-    def format_start_time(self, countdown=True):
-        if not self.scheduled_start_time:
+    def format_start_time(self, countdown=True, start_time=True):
+        if not self.scheduled_start_time or (not countdown and not start_time):
             return None
 
         if countdown:
-            return humanize.naturaltime(
-                datetime.utcnow() - self.scheduled_start_time) + ", " + datetime.strftime(self.scheduled_start_time, "%Y-%m-%d %H:%M UTC")
+            return humanize.naturaltime(datetime.utcnow() - self.scheduled_start_time) +\
+                ((", " + datetime.strftime(self.scheduled_start_time, "%Y-%m-%d %H:%M UTC")) if start_time else "")
         else:
             return datetime.strftime(self.scheduled_start_time, "%Y-%m-%d %H:%M UTC")
 
@@ -101,6 +102,8 @@ class YoutubeStream(Stream):
             self.title = item['snippet']['title']
             if 'liveStreamingDetails' in item:
                 self.scheduled_start_time = item['liveStreamingDetails']['scheduledStartTime']
+                if 'concurrentViewers' in item['liveStreamingDetails']:
+                    self.current_viewers = item['liveStreamingDetails']['concurrentViewers']
             if item['snippet']['liveBroadcastContent'] == 'live':
                 self.status = 'live'
                 self.actual_start_time = item['liveStreamingDetails']['actualStartTime']
@@ -120,6 +123,14 @@ class YoutubeStream(Stream):
                 elif not self.streamer.checked:
                     self.streamer.youtube_channel = yc
                     self.streamer.youtube_name = item['snippet']['channelTitle']
+
+    def _get_flair(self):
+        status_to_flair = {"live": (u"Live", u"one"),
+                           "completed": (u"Recording Available", u"four"),
+                           "upcoming": (self.format_start_time(start_time=False), u"two"),
+                           None: (None, None)}
+
+        return status_to_flair[self.status]
 
     def normal_url(self):
         return "http://www.youtube.com/watch?v={}".format(self.ytid)
@@ -176,6 +187,7 @@ class TwitchStream(Stream):
         if stream is not None:
             self.status = 'live'
             self.title = stream['channel']['status']
+            self.current_viewers = stream['viewers']
             self.last_time_live = datetime.utcnow()
             if self.actual_start_time is None:
                 self.actual_start_time = self.last_time_live
@@ -197,6 +209,15 @@ class TwitchStream(Stream):
             # there is no streamer with that channel
             elif not self.streamer.checked:
                 self.streamer.twitch_channel = self.channel
+
+    def _get_flair(self):
+        fst = self.format_start_time(start_time=False)
+        status_to_flair = {"live": (u"Live", u"one"),
+                           "completed": (u"Finished", u"three"),
+                           "upcoming": (fst if fst else u"Upcoming", u"two"),
+                           None: (None, None)}
+
+        return status_to_flair[self.status]
 
     def add_submission(self, submission):
         if submission not in self.submissions:
