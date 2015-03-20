@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros with context %}
+
+{% block styles %}
+  {{super()}}
+  <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}">
+{% endblock %}
+
+{% block content %}
+  {{super()}}
+  <div class="container">
+    <h1 class="text-center"> Watch People Code: online conference is over! </h1>
+    <h2 class="text-center"> Recordings available: {{streams|length}}</h2>
+    <p class="text-center"> This is the page for the event in <a href="http://www.reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode </a>, an online conference. <a href="{{url_for('index')}}">Back to the main page</a></p>
+
+    <div class="col-md-8">
+      {% if streams %}
+        {{ macros.streams(streams, 'live') }}
+      {% endif %}
+      <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading">Conference Schedule</div>
+        <div class="panel-body">
+          <p>The conference schedule. Click on UTC times to convert them to your local timezone. <p>
+        </div>
+
+        <!-- Table -->
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Starting time</th>
+              <th>Streamer's username</th>
+              <th>Title and description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row"><a href="http://www.timebie.com/std/utc.php?q=12">12:20 UTC</a></th>
+              <td>beohoff</td>
+              <td><b>"Desktop applications workflow with Qt"</b> <br> Planning on going over some simple desktop architecture things, enough to get someone who is interested in doing GUI programming "over the hump" or the barrier to entry that makes it seem intimidating. We'll look in detail into doing a table view and a tree view, layouts, signals and slots, QDialogs, and wrap up with a "Where to go from here"</td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="http://www.timebie.com/std/utc.php?q=17">17:00 UTC</a></th>
+              <td>clashesyemilk</td>
+              <td><b>"Concurrency on iOS"</b> <br> I'm going to talk about multithreading/parallelism/Concurrency on iOS using Grand Central Dispatch and NSOperationQueue </td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="http://www.timebie.com/std/utc.php?q=18">18:00 UTC</a></th>
+              <td>godlikesme</td>
+              <td><b>"Building a Search Engine"</b> <br> I built a simple but functional search engine for just one subreddit, /r/learnprogramming . I plan this to be an ELI5 introduction into search engines </td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="http://www.timebie.com/std/utc.php?q=19">19:00 UTC</a></th>
+              <td>thomasballinger</td>
+              <td><b>"Terminal Whispering" - how to do more with the terminal than print text </b> <br> The terminal emulators you (may) use daily can do more than display text, if you know how to talk to them. I'll cover how terminals work and show how to use terminal colors and styles, write to arbitrary portions of the screen, handle signals from the terminal, determine the size of the terminal. Examples will be in Python, but the techniques should be useful whenever you're in a terminal environment.</td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="http://www.timebie.com/std/utc.php?q=21">21:00 UTC</a></th>
+              <td>noobs2ninjas</td>
+              <td><b>Frontend design </b><br> When the primary focus of a programmers day being about writing clean, robust code, it is often easy to forget the most important part of anything we build. Without the user even the most complicated, well-written code will never see the light of day. So, what is front-end design anyway? Where do design trends come from? How could a programmer possibly focus on the program itself yet still help design a great front end? All these questions answered and more in this talk! Tune in and find out!</td>
+            </tr>
+            <tr>
+              <th scope="row"><a href="http://www.timebie.com/std/utc.php?q=22">22:30 UTC</a></th>
+              <td>Jebes</td>
+              <td><b>"plan9's file system API and how it relates to a REST API" - how to do more with the terminal than print text </b> <br> File systems as API's and how you can implement them in your next web/desktop project. </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+      <div class="col-md-4"> 
+        <form action="" method="POST" class="form form-subscribe" role="form">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h1 class="panel-title">Get notifications about upcoming streams</h1>
+            </div>
+
+            <div class="panel-body">
+              <div class="form-group">
+                {{ form.hidden_tag() }}
+                {{ wtf.form_field(form.email, value="") }}
+                {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'primary'}) }}
+              </div>
+            </div>
+          </div>
+          <p><b> Get notifications in twitter </b></p>
+          <a href="https://twitter.com/WatchPeopleCode" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @WatchPeopleCode</a>
+          <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+        </form>
+    </div>
+  </div>
+
+{% endblock %}

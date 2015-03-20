@@ -137,6 +137,7 @@ def update_state():
     for ls in Stream.query.filter(or_(Stream.status != 'completed', Stream.status == None)):  # NOQA
         try:
             ls._update_status()
+            app.logger.info("Status of {} is {}".format(ls, ls.status))
             db.session.commit()
         except Exception as e:
             db.session.rollback()

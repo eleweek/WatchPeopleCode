@@ -42,7 +42,7 @@ class Stream(db.Model):
     streamer = db.relationship('Streamer', backref=db.backref('streams', lazy='dynamic'))
     tags = db.relationship('Tag', secondary=stream_tag, backref=db.backref('streams', lazy='dynamic'))
     current_viewers = db.Column(db.Integer)
-
+    confstream = db.Column(db.Boolean(), default=False)
     __mapper_args__ = {
         'polymorphic_on': type,
         'polymorphic_identity': 'stream'
@@ -125,9 +125,10 @@ class YoutubeStream(Stream):
                     self.streamer.youtube_name = item['snippet']['channelTitle']
 
     def _get_flair(self):
+        fst = self.format_start_time(start_time=False)
         status_to_flair = {"live": (u"Live", u"one"),
                            "completed": (u"Recording Available", u"four"),
-                           "upcoming": (self.format_start_time(start_time=False), u"two"),
+                           "upcoming": (fst if fst else u"Upcoming", u"two"),
                            None: (None, None)}
 
         return status_to_flair[self.status]
@@ -183,6 +184,7 @@ class TwitchStream(Stream):
             app.logger.exception(e)
             raise
 
+        app.logger.info("JSON for {} is {}".format(self, r.json()))
         stream = r.json()['stream']
         if stream is not None:
             self.status = 'live'
@@ -222,6 +224,7 @@ class TwitchStream(Stream):
     def add_submission(self, submission):
         if submission not in self.submissions:
             self.status = 'upcoming'
+            self.scheduled_start_time = None
             self.actual_start_time = None
 
         Stream.add_submission(self, submission)
@@ -253,6 +256,14 @@ class TwitchStream(Stream):
     __mapper_args__ = {
         'polymorphic_identity': 'twitch_stream'
     }
+
+
+class MozillaStreamHack(object):
+    def html_code(self, autoplay=None):
+        return '''<iframe src="https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-6/video/" width="640" height="380" frameborder="0" allowfullscreen></iframe>'''  # NOQA
+
+    def normal_url(self):
+        return "https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-6/"
 
 
 class CaseInsensitiveComparator(ColumnProperty.Comparator):
