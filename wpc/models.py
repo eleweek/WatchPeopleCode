@@ -376,3 +376,8 @@ def get_or_create(model, **kwargs):
         instance = model(**kwargs)
         db.session.add(instance)
     return instance
+
+
+class WPCStream(db.Model):
+    path = db.Column(db.String(30), primary_key=True)
+    is_live = db.Column(db.Boolean(), default=False)
