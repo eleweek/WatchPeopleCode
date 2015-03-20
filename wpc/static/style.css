@@ -52,6 +52,12 @@ color: #97C8F5;
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
 }
+
+#emailinputgroup {
+  width:100%;
+  float:left;
+}
+
 #questionname{
   border: 1px solid #CCCCCC;
   border-radius: 4px;
@@ -93,7 +99,7 @@ margin-left: 10px;
 }
 
 ul.nav.nav-tabs {
-width: 437px;
+width: 442;
 margin-left: auto;
 margin-right: auto;
 text-align: center;
