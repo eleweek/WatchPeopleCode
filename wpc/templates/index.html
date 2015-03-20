@@ -4,6 +4,7 @@
 {% block styles %}
   {{super()}}
   <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='chat.css')}}">
 {% endblock %}
 
 {% block content %}
@@ -11,51 +12,104 @@
   <div class="container">
     <h1 class="text-center"> Watch People Code </h1>
     {% if live_streams is not none %}
-        <h2 class="text-center"> Livestreams right now: {{live_streams|length}}</h2>
+        <h2 class="text-center"> Livestreams right now: {{ live_streams|length  + wpc_stream }}</h2>
     {% else %}
         <h2 class="text-center"> Error getting live streams. :( Maybe try refreshing the page? </h2>
     {% endif %}
     <p class="text-center"> The app automatically gets live stream from /r/WatchPeopleCode subreddit, so if you want to start live streaming, submit a link to your youtube stream or twitch channel to <a href="http://www.reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode </a></p>
-      <p class="text-center"><a href={{url_for(".past_streams")}}>Big list of past streams</a></p>
-      <p class="text-center"><a href="https://www.reddit.com/r/WatchPeopleCode/comments/2xl3iv/requests_thread_viewers_what_streams_do_you_want/">[Requests Thread] Viewers, what streams do you want to watch? </a></p>
-      {#<p class="text-center"><a href="http://webchat.freenode.net/?randomnick=1&channels=%23WatchPeopleCode&prompt=1">Join #WatchPeopleCode on irc.freenode.net</a></p>#}
-      <div class="col-md-8">
-        {% if live_streams %}
-          {{ macros.streams(live_streams, 'live') }}
-        {% else %}
-          <h4> How about watching a random recorded stream? </h4>
-          <a href={{ random_stream.normal_url() }}> {{ random_stream.title if random_stream.title else random_stream.normal_url() }}</a>
-          <br>
-          {{ random_stream.html_code() | safe }}
-          <hr>
-        {% endif %}
+    <p class="text-center"><a href={{url_for(".past_streams")}}>Big list of past streams</a></p>
+    <p class="text-center"><a href="https://www.reddit.com/r/WatchPeopleCode/comments/2xl3iv/requests_thread_viewers_what_streams_do_you_want/">[Requests Thread] Viewers, what streams do you want to watch? </a></p>
+    {#<p class="text-center"><a href="http://webchat.freenode.net/?randomnick=1&channels=%23WatchPeopleCode&prompt=1">Join #WatchPeopleCode on irc.freenode.net</a></p>#}
+    <div class="col-md-8">
+      {% if live_streams %}
+        {{ macros.streams(live_streams, 'live') }}
+      {% elif not wpc_stream  %}
+        <h4> How about watching a random recorded stream? </h4>
+        <a href={{ random_stream.normal_url() }}> {{ random_stream.title if random_stream.title else random_stream.normal_url() }}</a>
+        <br>
+        {{ random_stream.html_code() | safe }}
+        <hr>
+      {% endif %}
+    </div>
 
-        {% if upcoming_streams != [] %}
-          <h4> Upcoming streams </h4><br>
-          {{ macros.streams(upcoming_streams, 'upcoming') }}
-        {% endif %}
+    <div class="col-md-4"> 
+      <form action="" method="POST" class="form form-subscribe" role="form">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h1 class="panel-title">Get notifications about upcoming streams</h1>
+          </div>
 
-      </div>
-      <div class="col-md-4"> 
-        <form action="" method="POST" class="form form-subscribe" role="form">
-          <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="form-group">
+              {{ form.hidden_tag() }}
+              {{ wtf.form_field(form.email, value="") }}
+              {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'primary'}) }}
+            </div>
+          </div>
+        </div>
+        <p><b> Get notifications in twitter </b></p>
+        <a href="https://twitter.com/WatchPeopleCode" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @WatchPeopleCode</a>
+      </form>
+    </div>
+
+    {% if wpc_stream %}
+      <div class="row">
+        <div class="col-md-8">
+          <div id="video">Loading the player...</div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="panel panel-default panel-chat">
+
             <div class="panel-heading">
-              <h1 class="panel-title">Get notifications about upcoming streams</h1>
+              <h3 class="panel-title">Chat</h3>
             </div>
 
             <div class="panel-body">
-              <div class="form-group">
-                {{ form.hidden_tag() }}
-                {{ wtf.form_field(form.email, value="") }}
-                {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'primary'}) }}
-              </div>
+              <ul class="messages"></ul>
+              <form class="compose-message-form">
+                <div class="form-group">
+                  <textarea class="form-control" name="message"></textarea>
+                  <br>
+                  <button class="btn btn-info" type="submit">Send </button>
+                </div>
+              </form>
             </div>
+
           </div>
-          <p><b> Get notifications in twitter </b></p>
-          <a href="https://twitter.com/WatchPeopleCode" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @WatchPeopleCode</a>
-          <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-        </form>
+        </div>
+
+      </div>
+    {% endif%}
+
+    <div class="col-md-8">
+      {% if upcoming_streams != [] %}
+        <h4> Upcoming streams </h4><br>
+        {{ macros.streams(upcoming_streams, 'upcoming') }}
+      {% endif %}
     </div>
+
   </div>
 
+{% endblock %}
+
+
+{% block scripts %}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='scripts/socket.io.min.js') }}"></script>
+  <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+  <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
+
+  <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
+  <script type="text/javascript">
+      jwplayer("video").setup({
+          file: 'rtmp://104.236.11.162/live/flv:test',
+          width: "640",
+          height: "390",
+          rtmp: {
+              bufferlength: 0.2
+          }
+      });
+  </script>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
 {% endblock %}
