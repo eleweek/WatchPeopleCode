@@ -6,3 +6,8 @@
 .compose-message-form {
   display: none;
 }
+
+.panel-chat {
+  max-width: 400px;
+  margin: 0 auto;
+}

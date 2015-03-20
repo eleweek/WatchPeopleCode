@@ -41,7 +41,7 @@
 {% endblock %}
 
 {% block scripts %}
-  <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+  {{ super() }}
   <script src="{{ url_for('static', filename='scripts/socket.io.min.js') }}"></script>
   <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
   <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
@@ -50,6 +50,8 @@
   <script type="text/javascript">
       jwplayer("video").setup({
           file: 'rtmp://104.236.11.162/live/flv:test',
+          width: "640",
+          height: "390",
           rtmp: {
               bufferlength: 0.2
           }

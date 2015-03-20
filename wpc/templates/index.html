@@ -20,42 +20,45 @@
     <p class="text-center"><a href={{url_for(".past_streams")}}>Big list of past streams</a></p>
     <p class="text-center"><a href="https://www.reddit.com/r/WatchPeopleCode/comments/2xl3iv/requests_thread_viewers_what_streams_do_you_want/">[Requests Thread] Viewers, what streams do you want to watch? </a></p>
     {#<p class="text-center"><a href="http://webchat.freenode.net/?randomnick=1&channels=%23WatchPeopleCode&prompt=1">Join #WatchPeopleCode on irc.freenode.net</a></p>#}
-    <div class="col-md-8">
-      {% if live_streams %}
-        {{ macros.streams(live_streams, 'live') }}
-      {% elif not wpc_stream  %}
-        <h4> How about watching a random recorded stream? </h4>
-        <a href={{ random_stream.normal_url() }}> {{ random_stream.title if random_stream.title else random_stream.normal_url() }}</a>
-        <br>
-        {{ random_stream.html_code() | safe }}
-        <hr>
-      {% endif %}
-    </div>
+    <div class="row">
+      <div class="col-md-8">
+        {% if live_streams %}
+          {{ macros.streams(live_streams, 'live') }}
+        {% elif not wpc_stream  %}
+          <h4> How about watching a random recorded stream? </h4>
+          <a href={{ random_stream.normal_url() }}> {{ random_stream.title if random_stream.title else random_stream.normal_url() }}</a>
+          <br>
+          {{ random_stream.html_code() | safe }}
+          <hr>
+        {% endif %}
+      </div>
 
-    <div class="col-md-4"> 
-      <form action="" method="POST" class="form form-subscribe" role="form">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h1 class="panel-title">Get notifications about upcoming streams</h1>
-          </div>
+      <div class="col-md-4"> 
+        <form action="" method="POST" class="form form-subscribe" role="form">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h1 class="panel-title">Get notifications about upcoming streams</h1>
+            </div>
 
-          <div class="panel-body">
-            <div class="form-group">
-              {{ form.hidden_tag() }}
-              {{ wtf.form_field(form.email, value="") }}
-              {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'primary'}) }}
+            <div class="panel-body">
+              <div class="form-group">
+                {{ form.hidden_tag() }}
+                {{ wtf.form_field(form.email, value="") }}
+                {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'primary'}) }}
+              </div>
             </div>
           </div>
-        </div>
-        <p><b> Get notifications in twitter </b></p>
-        <a href="https://twitter.com/WatchPeopleCode" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @WatchPeopleCode</a>
-      </form>
+          <p><b> Get notifications in twitter </b></p>
+          <a href="https://twitter.com/WatchPeopleCode" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @WatchPeopleCode</a>
+        </form>
+      </div>
     </div>
 
     {% if wpc_stream %}
       <div class="row">
         <div class="col-md-8">
           <div id="video">Loading the player...</div>
+          <hr>
         </div>
 
         <div class="col-md-4">
