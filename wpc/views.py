@@ -1,6 +1,6 @@
 from wpc import db, app, socketio
-from wpc.models import YoutubeStream, Stream, Streamer, Subscriber, get_or_create
 from wpc.models import MozillaStreamHack  # NOQA
+from wpc.models import YoutubeStream, Stream, Streamer, Subscriber, get_or_create
 from wpc.forms import SubscribeForm, EditStreamerInfoForm, SearchForm
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session
@@ -11,7 +11,6 @@ from flask.ext.socketio import emit
 from uuid import uuid4
 import praw
 from crossdomain import crossdomain
-import os
 import random
 from feedgen.feed import FeedGenerator
 from datetime import datetime
@@ -197,7 +196,35 @@ def logout():
 
 @app.route("/podcast_feed.xml")
 def podcast_feed():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'podcast_feed.xml', mimetype='application/rss+xml')
+    logo_url = url_for("static", filename="wpclogo_big.png", _external=True)
+
+    fg = FeedGenerator()
+    fg.load_extension('podcast')
+    fg.podcast.itunes_category('Technology', 'Podcasting')
+    fg.podcast.itunes_image(logo_url)
+    fg.author({'name': 'Nathan Kellert', 'email': 'nathankellert@gmail.com'})
+    fg.link(href='http://watchpeoplecode.com/podcast_feed.xml', rel='self')
+    fg.title('WPC Coders Podcast')
+    fg.description('WPC Coders Podcast is a weekly peek into the lives of developers and the WatchPeopleCode community. Our goal is to keep our listeners entertained by giving them new and interesting insights into our industry as well as awesome things happening within our own community. Here, you can expect hear about some of the latest news, tools, and opportunities for developers in nearly every aread of our industry. Most importantly, we hope to have some fun and a few laughs in ways only other nerds know how.')  # NOQA
+
+    episodes = [('ep1.mp3', 'Episode 1', datetime(2015, 02, 21, 23), 'Learn all about the WPC hosts, and where we came from in Episode 1!'),
+                ('ep2.mp3', 'Episode 2', datetime(2015, 02, 28, 23), 'This week we cover your news, topics and questions in episode 2!'),
+                ('ep3.mp3', 'Episode 3', datetime(2015, 03, 07, 23), "On todays podcast we talk to WatchPeopleCode's founder Alex Putilin. Hear about how the reddit search engine thousands watched him write. Also, hear the inside scoop of how WatchPeopleCode got started!"),  # NOQA
+                ('ep4.mp3', 'Episode 4', datetime(2015, 03, 14, 23), "This week we talk to FreeCodeCamps Quincy Larson(http://www.freecodecamp.com) about their project that combines teaching new developers how to code and completing projects for non-profits! Lets find out how this group of streamers code with a cause!")]  # NOQA
+
+    for epfile, eptitle, epdate, epdescription in episodes[::-1]:
+        epurl = "https://s3.amazonaws.com/wpcpodcast/{}".format(epfile)
+        fe = fg.add_entry()
+        fe.id(epurl)
+        fe.title(eptitle)
+        fe.description(epdescription)
+        fe.podcast.itunes_image(logo_url)
+        fe.pubdate(epdate.replace(tzinfo=pytz.UTC))
+        fe.enclosure(epurl, 0, 'audio/mpeg')
+
+    return Response(response=fg.rss_str(pretty=True),
+                    status=200,
+                    mimetype='application/rss+xml')
 
 
 @app.route("/streams")
@@ -240,32 +267,3 @@ def chat_message(message_text):
                "text": nl2br_py(message_text)}
     emit("message", message, broadcast=True)
     return True
-    logo_url = url_for("static", filename="wpclogo_big.png", _external=True)
-
-    fg = FeedGenerator()
-    fg.load_extension('podcast')
-    fg.podcast.itunes_category('Technology', 'Podcasting')
-    fg.podcast.itunes_image(logo_url)
-    fg.author({'name': 'Nathan Kellert', 'email': 'nathankellert@gmail.com'})
-    fg.link(href='http://watchpeoplecode.com/podcast_feed.xml', rel='self')
-    fg.title('WPC Coders Podcast')
-    fg.description('WPC Coders Podcast is a weekly peek into the lives of developers and the WatchPeopleCode community. Our goal is to keep our listeners entertained by giving them new and interesting insights into our industry as well as awesome things happening within our own community. Here, you can expect hear about some of the latest news, tools, and opportunities for developers in nearly every aread of our industry. Most importantly, we hope to have some fun and a few laughs in ways only other nerds know how.')  # NOQA
-
-    episodes = [('ep1.mp3', 'Episode 1', datetime(2015, 02, 21, 23), 'Learn all about the WPC hosts, and where we came from in Episode 1!'),
-                ('ep2.mp3', 'Episode 2', datetime(2015, 02, 28, 23), 'This week we cover your news, topics and questions in episode 2!'),
-                ('ep3.mp3', 'Episode 3', datetime(2015, 03, 07, 23), "On todays podcast we talk to WatchPeopleCode's founder Alex Putilin. Hear about how the reddit search engine thousands watched him write. Also, hear the inside scoop of how WatchPeopleCode got started!"),  # NOQA
-                ('ep4.mp3', 'Episode 4', datetime(2015, 03, 14, 23), "This week we talk to FreeCodeCamps Quincy Larson(http://www.freecodecamp.com) about their project that combines teaching new developers how to code and completing projects for non-profits! Lets find out how this group of streamers code with a cause!")]  # NOQA
-
-    for epfile, eptitle, epdate, epdescription in episodes[::-1]:
-        epurl = "https://s3.amazonaws.com/wpcpodcast/{}".format(epfile)
-        fe = fg.add_entry()
-        fe.id(epurl)
-        fe.title(eptitle)
-        fe.description(epdescription)
-        fe.podcast.itunes_image(logo_url)
-        fe.pubdate(epdate.replace(tzinfo=pytz.UTC))
-        fe.enclosure(epurl, 0, 'audio/mpeg')
-
-    return Response(response=fg.rss_str(pretty=True),
-                    status=200,
-                    mimetype='application/rss+xml')
