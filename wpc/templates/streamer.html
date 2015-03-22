@@ -66,10 +66,12 @@
       {{ macros.render_pagination(streams) }}
       <br>
       {% for stream in streams.items %}
-        <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
-        <br>
-        {{ stream.html_code() |safe }}
-        <hr>
+        {% if stream.type != 'wpc_stream' %}
+          <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+          <br>
+          {{ stream.html_code() |safe }}
+          <hr>
+        {% endif %}
       {% endfor %}
       {{ macros.render_pagination(streams) }}
     </div>
