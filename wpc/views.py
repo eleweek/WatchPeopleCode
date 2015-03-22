@@ -1,6 +1,6 @@
 from wpc import db, app, socketio
 from wpc.models import MozillaStreamHack  # NOQA
-from wpc.models import YoutubeStream, Stream, Streamer, Subscriber, get_or_create
+from wpc.models import YoutubeStream, Stream, Streamer, Subscriber, get_or_create, WPCStream
 from wpc.forms import SubscribeForm, EditStreamerInfoForm, SearchForm
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session
@@ -37,8 +37,8 @@ app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    wpc_stream = Stream.query.filter_by(type='wpc_stream', status='live').first()
     live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
-    wpc_stream = 1 if [stream for stream in live_streams if stream.type == 'wpc_stream'] else 0
     # Uncomment this when mozilla guys start livestreaming
     # live_streams.insert(0, MozillaStreamHack())
 
@@ -230,9 +230,9 @@ def podcast_feed():
                     mimetype='application/rss+xml')
 
 
-@app.route("/streams")
+@app.route("/no_lag_alpha_test")
 def streams():
-    return render_template("streams.html")
+    return render_template("streams.html", wpc_stream=WPCStream.query.first())
 
 
 users = list()

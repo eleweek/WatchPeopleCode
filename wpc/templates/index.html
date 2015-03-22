@@ -56,11 +56,18 @@
     {% if wpc_stream %}
       <div class="row">
         <div class="col-md-8">
+          <a href={{ url_for('.streams') }}> {{ wpc_stream.title if wpc_stream.title else 'No lag alpha test' }}</a>
+          {% if wpc_stream.streamer %}
+            by <a href={{ url_for('.streamer_page', streamer_name=wpc_stream.streamer.reddit_username) }}>{{ wpc_stream.streamer.reddit_username }}</a>
+          {% endif %}
+          | {{ wpc_stream.viewer_num }} viewers
+          <br>
           <div id="video">Loading the player...</div>
           <hr>
         </div>
 
         <div class="col-md-4">
+          <br>
           <div class="panel panel-default panel-chat">
 
             <div class="panel-heading">
@@ -85,7 +92,7 @@
     {% endif%}
 
     <div class="col-md-8">
-        {% if upcoming_streams|length - wpc_stream > 0 %}
+        {% if upcoming_streams|length %}
         <h4> Upcoming streams </h4><br>
         {{ macros.streams(upcoming_streams, 'upcoming') }}
       {% endif %}
