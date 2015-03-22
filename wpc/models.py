@@ -127,13 +127,11 @@ class YoutubeStream(Stream):
         try:
             r = requests_get_with_retries(
                 "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(
-                    self.ytid,
-                    app.config['YOUTUBE_KEY'],
-                    retries_num=15))
+                    self.ytid, app.config['YOUTUBE_KEY']), retries_num=15)
 
             r.raise_for_status()
         except Exception as e:
-            app.logger.error("Error while updating {}".format(YoutubeStream))
+            app.logger.error("Error while updating {}".format(self))
             app.logger.exception(e)
             raise
 
@@ -386,13 +384,11 @@ class Streamer(db.Model, UserMixin):
             try:
                 r = requests_get_with_retries(
                     "https://www.googleapis.com/youtube/v3/channels?id={}&part=snippet&key={}".format(
-                        yc,
-                        app.config['YOUTUBE_KEY'],
-                        retries_num=15))
+                        yc, app.config['YOUTUBE_KEY']), retries_num=15)
 
                 r.raise_for_status()
             except Exception as e:
-                app.logger.error("Error while updating {}".format(Streamer))
+                app.logger.error("Error while updating {}".format(self))
                 app.logger.exception(e)
                 raise
 
