@@ -124,7 +124,7 @@ def nl2br_py(value):
 @app.route('/streamer/<streamer_name>/<int:page>', methods=["GET", "POST"])
 def streamer_page(streamer_name, page):
     streamer = Streamer.query.filter_by(reddit_username=streamer_name).first()
-    streams = streamer.streams.order_by(Stream.scheduled_start_time.desc().nullslast()).paginate(page, per_page=5)
+    streams = streamer.streams.order_by(Stream.actual_start_time.desc().nullslast()).paginate(page, per_page=5)
     form = EditStreamerInfoForm()
 
     if current_user.is_authenticated() and current_user == streamer:
