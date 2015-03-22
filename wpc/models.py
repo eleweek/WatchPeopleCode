@@ -3,10 +3,11 @@ from wpc.utils import requests_get_with_retries
 
 from flask.ext.login import UserMixin, current_user
 from sqlalchemy.orm.properties import ColumnProperty
+from flask import url_for
 
 import humanize
 from datetime import datetime, timedelta
-from bs4 import BeautifulStoneSoup
+from bs4 import BeautifulSoup
 
 
 @login_manager.user_loader
@@ -66,10 +67,8 @@ class Stream(db.Model):
 
 class WPCStream(Stream):
     channel_name = db.Column(db.String(30), unique=True)
-    viewer_num = db.Column(db.Integer)
 
     def __init__(self, name):
-        self.viewer_num = 0
         self.status = 'upcoming'
         self.channel_name = name
         self.submissions = []
@@ -93,13 +92,16 @@ class WPCStream(Stream):
             app.logger.exception(e)
             raise
 
-        soup = BeautifulStoneSoup(r.content)
+        soup = BeautifulSoup(r.content, feature='xml')
         client_num = int(soup.find('nclients').string)
         if client_num < 1:
             self.status = 'completed'
         else:
             self.status = 'live'
-            self.viewer_num = client_num - 1
+            self.current_viewers = client_num - 1
+
+    def normal_url(self):
+        return url_for('.streams', _external=True)
 
     __mapper_args__ = {
         'polymorphic_identity': 'wpc_stream'
