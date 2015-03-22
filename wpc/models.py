@@ -6,6 +6,7 @@ from sqlalchemy.orm.properties import ColumnProperty
 
 import humanize
 from datetime import datetime, timedelta
+from bs4 import BeautifulStoneSoup
 
 
 @login_manager.user_loader
@@ -61,6 +62,48 @@ class Stream(db.Model):
     def add_submission(self, submission):
         if submission not in self.submissions:
             self.submissions.append(submission)
+
+
+class WPCStream(Stream):
+    channel_name = db.Column(db.String(30), unique=True)
+    viewer_num = db.Column(db.Integer)
+
+    def __init__(self, name):
+        self.viewer_num = 0
+        self.status = 'upcoming'
+        self.channel_name = name
+        self.submissions = []
+
+    def __eq__(self, other):
+        return type(self) == type(other) and self.channel_name == other.channel_name
+
+    def __hash__(self):
+        return hash(self.channel_name)
+
+    def __repr__(self):
+        return '<WPC Stream %d %r>' % (self.id, self.channel_name)
+
+    def _update_status(self):
+        app.logger.info("Updating status for {}".format(self))
+        try:
+            r = requests_get_with_retries("http://104.236.11.162/stat")
+            r.raise_for_status()
+        except Exception as e:
+            app.logger.error("Error while updating {}".format(self))
+            app.logger.exception(e)
+            raise
+
+        soup = BeautifulStoneSoup(r.content)
+        client_num = int(soup.find('nclients').string)
+        if client_num < 1:
+            self.status = 'completed'
+        else:
+            self.status = 'live'
+            self.viewer_num = client_num - 1
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'wpc_stream'
+    }
 
 
 class YoutubeStream(Stream):
@@ -376,8 +419,3 @@ def get_or_create(model, **kwargs):
         instance = model(**kwargs)
         db.session.add(instance)
     return instance
-
-
-class WPCStream(db.Model):
-    path = db.Column(db.String(30), primary_key=True)
-    is_live = db.Column(db.Boolean(), default=False)

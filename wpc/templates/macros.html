@@ -1,15 +1,17 @@
 {% macro streams(streams, status) %}
   {% for stream in streams %}
-    {% if status == 'upcoming'%}
-      {% if stream.scheduled_start_time %}<p><b>{{stream.format_start_time()}}</b></p> {% endif %}
+    {% if stream.type != 'wpc_stream' %}
+      {% if status == 'upcoming'%}
+        {% if stream.scheduled_start_time %}<p><b>{{stream.format_start_time()}}</b></p> {% endif %}
+      {% endif %}
+      <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+      {% if stream.streamer %}
+       by <a href={{ url_for('.streamer_page', streamer_name=stream.streamer.reddit_username) }}>{{ stream.streamer.reddit_username }}</a>
+      {% endif %} 
+      <br>
+      {{ stream.html_code(autoplay=(loop.index == 1) if status == 'live' else False ) |safe }}
+      <hr>
     {% endif %}
-    <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
-    {% if stream.streamer %}
-     by <a href={{ url_for('.streamer_page', streamer_name=stream.streamer.reddit_username) }}>{{ stream.streamer.reddit_username }}</a>
-    {% endif %} 
-    <br>
-    {{ stream.html_code(autoplay=(loop.index == 1) if status == 'live' else False ) |safe }}
-    <hr>
   {% endfor %}
 {% endmacro %}
 

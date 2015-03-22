@@ -12,7 +12,7 @@
   <div class="container">
     <h1 class="text-center"> Watch People Code </h1>
     {% if live_streams is not none %}
-        <h2 class="text-center"> Livestreams right now: {{ live_streams|length  + wpc_stream }}</h2>
+        <h2 class="text-center"> Livestreams right now: {{ live_streams|length }}</h2>
     {% else %}
         <h2 class="text-center"> Error getting live streams. :( Maybe try refreshing the page? </h2>
     {% endif %}
@@ -85,7 +85,7 @@
     {% endif%}
 
     <div class="col-md-8">
-      {% if upcoming_streams != [] %}
+        {% if upcoming_streams|length - wpc_stream > 0 %}
         <h4> Upcoming streams </h4><br>
         {{ macros.streams(upcoming_streams, 'upcoming') }}
       {% endif %}

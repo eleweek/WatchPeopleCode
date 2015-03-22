@@ -1,6 +1,6 @@
 from wpc import db, app, socketio
 from wpc.models import MozillaStreamHack  # NOQA
-from wpc.models import YoutubeStream, Stream, Streamer, Subscriber, get_or_create, WPCStream
+from wpc.models import YoutubeStream, Stream, Streamer, Subscriber, get_or_create
 from wpc.forms import SubscribeForm, EditStreamerInfoForm, SearchForm
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session
@@ -38,6 +38,7 @@ app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 @app.route('/', methods=['GET', 'POST'])
 def index():
     live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
+    wpc_stream = 1 if [stream for stream in live_streams if stream.type == 'wpc_stream'] else 0
     # Uncomment this when mozilla guys start livestreaming
     # live_streams.insert(0, MozillaStreamHack())
 
@@ -54,8 +55,7 @@ def index():
     upcoming_streams = Stream.query.filter_by(status='upcoming').order_by(Stream.scheduled_start_time.asc()).all()
     return render_template('index.html', form=form, live_streams=live_streams,
                            random_stream=random_stream,
-                           upcoming_streams=upcoming_streams,
-                           wpc_stream=WPCStream.query.one().is_live)
+                           upcoming_streams=upcoming_streams, wpc_stream=wpc_stream)
 
 
 # TODO it is copypasted from index(), but whatever, this is one time change
