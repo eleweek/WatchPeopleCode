@@ -120,7 +120,7 @@ def update_flairs():
                     if is_twitch_stream:
                         created_dt = datetime.datetime.utcfromtimestamp(s.created_utc)
                         now = datetime.datetime.utcnow()
-                        if now - created_dt > datetime.timedelta(hours=12):
+                        if now - created_dt > datetime.timedelta(hours=24):
                             allow_flair_change = False
 
                     if allow_flair_change:
