@@ -1,6 +1,6 @@
 from wpc import db, app, socketio
 from wpc.models import MozillaStreamHack  # NOQA
-from wpc.models import YoutubeStream, Stream, Streamer, Subscriber, get_or_create, WPCStream
+from wpc.models import YoutubeStream, Stream, Streamer, Subscriber, get_or_create
 from wpc.forms import SubscribeForm, EditStreamerInfoForm, SearchForm
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session
@@ -37,7 +37,6 @@ app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    wpc_stream = Stream.query.filter_by(type='wpc_stream', status='live').first()
     live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
     # Uncomment this when mozilla guys start livestreaming
     # live_streams.insert(0, MozillaStreamHack())
@@ -55,7 +54,7 @@ def index():
     upcoming_streams = Stream.query.filter_by(status='upcoming').order_by(Stream.scheduled_start_time.asc()).all()
     return render_template('index.html', form=form, live_streams=live_streams,
                            random_stream=random_stream,
-                           upcoming_streams=upcoming_streams, wpc_stream=wpc_stream)
+                           upcoming_streams=upcoming_streams)
 
 
 # TODO it is copypasted from index(), but whatever, this is one time change
@@ -228,11 +227,6 @@ def podcast_feed():
     return Response(response=fg.rss_str(pretty=True),
                     status=200,
                     mimetype='application/rss+xml')
-
-
-@app.route("/no_lag_alpha_test")
-def streams():
-    return render_template("streams.html", wpc_stream=WPCStream.query.first())
 
 
 users = list()

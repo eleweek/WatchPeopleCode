@@ -3,11 +3,21 @@
 
 {% block title %} Streamer {{ streamer.reddit_username }} {% endblock %}
 
+{% block styles %}
+  {{super()}}
+  <link rel="stylesheet" href="{{url_for('static', filename='chat.css')}}">
+{% endblock %}
+
 {% block content %}
   {{super()}}
+  {# do not move the next string, it's here because it's needed before using jwplayer #}
+  <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
   <div class="container">
     <div class="col-md-offset-2 col-md-8">
       <p class="text-center"><a href={{url_for(".index")}}>Back to main page</a></p>
+    </div>
+
+    <div class="col-md-8">
       <div class="info-block" {% if edit %} style="display:none;" {% endif %}>
         <strong>Reddit username:</strong> <a href='http://www.reddit.com/user/{{ streamer.reddit_username }}'> {{ streamer.reddit_username }}</a>
         {% if streamer == current_user %}
@@ -32,7 +42,6 @@
             <br>
             <br>
             <div class="text-left"><button type="button" class="btn btn-default edit-button">Edit info</button></div>
-        </div>
 
         <form action="" method="POST" class="form form-edit-info" role="form" {% if not edit %} style="display:none;" {% endif %}>
           <div class="form-group">
@@ -62,17 +71,48 @@
           Info: {{ streamer.info | nl2br }}
         {% endif %}
       {% endif %}
-      <br>
+      </div>
+      <hr><br>
+    </div>
+
+    <div class="col-md-8">
       {{ macros.render_pagination(streams) }}
       <br>
-      {% for stream in streams.items %}
-        {% if stream.type != 'wpc_stream' %}
-          <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+    </div>
+
+    {% for stream in streams.items %}
+      <div class="col-md-8">
+        <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+        <br>
+        {{ stream.html_code()|safe }}
+        <hr>
+      </div>
+
+      {% if stream.type == 'wpc_stream' %}
+        <div class="col-md-4">
           <br>
-          {{ stream.html_code() |safe }}
-          <hr>
-        {% endif %}
-      {% endfor %}
+          <div class="panel panel-default panel-chat">
+
+            <div class="panel-heading">
+              <h3 class="panel-title">Chat</h3>
+            </div>
+
+            <div class="panel-body">
+              <ul class="messages"></ul>
+              <form class="compose-message-form">
+                <div class="form-group">
+                  <textarea class="form-control" name="message"></textarea>
+                  <br>
+                  <button class="btn btn-info" type="submit">Send </button>
+                </div>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+    <div class="col-md-8">
       {{ macros.render_pagination(streams) }}
     </div>
   </div>
@@ -80,6 +120,10 @@
 
 {% block scripts %}
   {{ super() }}
+  <script src="{{ url_for('static', filename='scripts/socket.io.min.js') }}"></script>
+  <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+  <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
+
   <script>
     (function($, window, undefined){
       $(".edit-button").click(function() {

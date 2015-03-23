@@ -4,11 +4,12 @@
 {% block styles %}
   {{super()}}
   <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}">
-  <link rel="stylesheet" href="{{url_for('static', filename='chat.css')}}">
 {% endblock %}
 
 {% block content %}
   {{super()}}
+  {# do not move the next string, it's here because it's needed before using jwplayer #}
+  <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
   <div class="container">
     <h1 class="text-center"> Watch People Code </h1>
     {% if live_streams is not none %}
@@ -20,19 +21,27 @@
     <p class="text-center"><a href={{url_for(".past_streams")}}>Big list of past streams</a></p>
     {#<p class="text-center"><a href="http://webchat.freenode.net/?randomnick=1&channels=%23WatchPeopleCode&prompt=1">Join #WatchPeopleCode on irc.freenode.net</a></p>#}
     <div class="row">
+
       <div class="col-md-8">
         {% if live_streams %}
           {{ macros.streams(live_streams, 'live') }}
-        {% elif not wpc_stream  %}
+        {% else %}
           <h4> How about watching a random recorded stream? </h4>
           <a href={{ random_stream.normal_url() }}> {{ random_stream.title if random_stream.title else random_stream.normal_url() }}</a>
           <br>
-          {{ random_stream.html_code() | safe }}
+          {{ random_stream.html_code()|safe }}
           <hr>
+        {% endif %}
+
+
+        {% if upcoming_streams %}
+          <h4> Upcoming streams </h4><br>
+          {{ macros.streams(upcoming_streams, 'upcoming') }}
         {% endif %}
       </div>
 
       <div class="col-md-4"> 
+        <br>
         <form action="" method="POST" class="form form-subscribe" role="form">
           <div class="panel panel-default">
             <div class="panel-heading">
@@ -53,51 +62,6 @@
       </div>
     </div>
 
-    {% if wpc_stream %}
-      <div class="row">
-        <div class="col-md-8">
-          <a href={{ url_for('.streams') }}> {{ wpc_stream.title if wpc_stream.title else 'No lag alpha test' }}</a>
-          {% if wpc_stream.streamer %}
-            by <a href={{ url_for('.streamer_page', streamer_name=wpc_stream.streamer.reddit_username) }}>{{ wpc_stream.streamer.reddit_username }}</a>
-          {% endif %}
-          | {{ wpc_stream.viewer_num }} viewers
-          <br>
-          <div id="video">Loading the player...</div>
-          <hr>
-        </div>
-
-        <div class="col-md-4">
-          <br>
-          <div class="panel panel-default panel-chat">
-
-            <div class="panel-heading">
-              <h3 class="panel-title">Chat</h3>
-            </div>
-
-            <div class="panel-body">
-              <ul class="messages"></ul>
-              <form class="compose-message-form">
-                <div class="form-group">
-                  <textarea class="form-control" name="message"></textarea>
-                  <br>
-                  <button class="btn btn-info" type="submit">Send </button>
-                </div>
-              </form>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-    {% endif%}
-
-    <div class="col-md-8">
-        {% if upcoming_streams|length %}
-        <h4> Upcoming streams </h4><br>
-        {{ macros.streams(upcoming_streams, 'upcoming') }}
-      {% endif %}
-    </div>
-
   </div>
 
 {% endblock %}
@@ -105,20 +69,5 @@
 
 {% block scripts %}
   {{ super() }}
-  <script src="{{ url_for('static', filename='scripts/socket.io.min.js') }}"></script>
-  <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
-  <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
-
-  <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
-  <script type="text/javascript">
-      jwplayer("video").setup({
-          file: 'rtmp://104.236.11.162/live/flv:test',
-          width: "640",
-          height: "390",
-          rtmp: {
-              bufferlength: 0.2
-          }
-      });
-  </script>
   <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
 {% endblock %}
