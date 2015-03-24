@@ -96,9 +96,12 @@ class WPCStream(Stream):
         client_num = int(soup.find('nclients').string)
         if client_num < 1:
             self.status = 'completed'
+            self.actual_start_time = None
         else:
             self.status = 'live'
             self.current_viewers = client_num - 1
+            if self.actual_start_time is None:
+                self.actual_start_time = datetime.utcnow()
 
     def normal_url(self):
         return url_for('.streamer_page', streamer_name=self.streamer.reddit_username, _external=True)
