@@ -11,3 +11,8 @@
   max-width: 400px;
   margin: 0 auto;
 }
+
+.panel-chat .messages {
+    height: 400px;
+    overflow-y: scroll;
+}
