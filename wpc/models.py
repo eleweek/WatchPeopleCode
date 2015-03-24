@@ -92,11 +92,12 @@ class WPCStream(Stream):
             app.logger.exception(e)
             raise
 
-        soup = BeautifulSoup(r.content, feature='xml')
+        soup = BeautifulSoup(r.content, 'xml')
         client_num = int(soup.find('nclients').string)
         if client_num < 1:
-            self.status = 'completed'
-            self.actual_start_time = None
+            if self.status == 'live':
+                self.status = 'completed'
+                self.actual_start_time = None
         else:
             self.status = 'live'
             self.current_viewers = client_num - 1
