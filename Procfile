@@ -1,2 +1,2 @@
-web: gunicorn wpc:app  --workers $WEB_CONCURRENCY
+web: gunicorn --worker-class socketio.sgunicorn.GeventSocketIOWorker wpc:app
 clock: python update_state.py
