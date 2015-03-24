@@ -18,7 +18,6 @@
             });
 
             this.socket.on('message', function(message){
-                console.log(message);
                 if(that.onMessage){
                     that.onMessage(message);
                 }
