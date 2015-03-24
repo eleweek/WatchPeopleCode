@@ -101,7 +101,31 @@ class WPCStream(Stream):
             self.current_viewers = client_num - 1
 
     def normal_url(self):
-        return url_for('.streams', _external=True)
+        return url_for('.streamer_page', streamer_name=self.streamer.reddit_username, _external=True)
+
+    def html_code(self, autoplay=False):
+        return """
+                <div id="video">Loading the player...</div>
+
+                <script type="text/javascript">
+                    jwplayer("video").setup({{
+                        playlist: [{{
+                            sources: [{{
+                                file: 'rtmp://104.236.11.162/live/flv:{}'
+                            }},{{
+                                file: "http://104.236.11.162/hls/{}.m3u8"
+                            }}]
+                        }}],
+                        width: "640",
+                        height: "390",
+                        autostart: {},
+                        androidhls: true,
+                        rtmp: {{
+                            bufferlength: 0.4
+                        }}
+                    }});
+                </script>
+            """.format(self.channel_name, self.channel_name, "true" if autoplay else "false")
 
     __mapper_args__ = {
         'polymorphic_identity': 'wpc_stream'
