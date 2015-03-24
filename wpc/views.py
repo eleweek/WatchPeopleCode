@@ -123,6 +123,7 @@ def nl2br_py(value):
 @app.route('/streamer/<streamer_name>/<int:page>', methods=["GET", "POST"])
 def streamer_page(streamer_name, page):
     streamer = Streamer.query.filter_by(reddit_username=streamer_name).first()
+    wpc_stream = streamer.streams.filter_by(type='wpc_stream', status='live').first()
     streams = streamer.streams.order_by(Stream.actual_start_time.desc().nullslast()).paginate(page, per_page=5)
     form = EditStreamerInfoForm()
 
@@ -140,7 +141,7 @@ def streamer_page(streamer_name, page):
             form.twitch_channel.data = current_user.twitch_channel
             form.info.data = current_user.info
 
-    return render_template('streamer.html', streamer=streamer, streams=streams, form=form, edit=False)
+    return render_template('streamer.html', streamer=streamer, streams=streams, form=form, edit=False, wpc_stream=wpc_stream)
 
 
 @app.route('/json')
