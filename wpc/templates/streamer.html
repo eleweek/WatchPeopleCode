@@ -75,46 +75,57 @@
       <hr><br>
     </div>
 
+    {% if wpc_stream %}
+      <div class="col-md-8">
+        {{ wpc_stream.title if wpc_stream.title else '' }}
+        <br>
+        {{ wpc_stream.html_code(autoplay=True)|safe }}
+        <hr>
+      </div>
+
+      <div class="col-md-4">
+        <br>
+        <div class="panel panel-default panel-chat">
+
+          <div class="panel-heading">
+            <h3 class="panel-title">Chat</h3>
+          </div>
+
+          <div class="panel-body">
+            <ul class="messages"></ul>
+            <form class="compose-message-form">
+              <div class="form-group">
+                <textarea class="form-control" name="message"></textarea>
+                <br>
+                <button class="btn btn-info" type="submit">Send </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    {% endif %}
+
     <div class="col-md-8">
       {{ macros.render_pagination(streams) }}
       <br>
     </div>
 
     {% for stream in streams.items %}
-      <div class="col-md-8">
-        <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
-        <br>
-        {{ stream.html_code(autoplay=(loop.index == 1) if stream.status == 'live' else False )|safe }}
-        <hr>
-      </div>
-
-      {% if stream.type == 'wpc_stream' %}
-        <div class="col-md-4">
+      {% if stream != wpc_stream %}
+        <div class="col-md-8">
+          <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
           <br>
-          <div class="panel panel-default panel-chat">
-
-            <div class="panel-heading">
-              <h3 class="panel-title">Chat</h3>
-            </div>
-
-            <div class="panel-body">
-              <ul class="messages"></ul>
-              <form class="compose-message-form">
-                <div class="form-group">
-                  <textarea class="form-control" name="message"></textarea>
-                  <br>
-                  <button class="btn btn-info" type="submit">Send </button>
-                </div>
-              </form>
-            </div>
-
-          </div>
+          {{ stream.html_code(autoplay=(loop.index == 1 and wpc_stream is none) if stream.status == 'live' else False )|safe }}
+          <hr>
         </div>
       {% endif %}
     {% endfor %}
+
     <div class="col-md-8">
       {{ macros.render_pagination(streams) }}
     </div>
+
   </div>
 {% endblock %}
 
