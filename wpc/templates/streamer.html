@@ -77,7 +77,8 @@
 
     {% if wpc_stream %}
       <div class="col-md-8">
-        {{ wpc_stream.title if wpc_stream.title else '' }}
+        {{ wpc_stream.title + ' |' if wpc_stream.title else '' }}
+        {{ wpc_stream.current_viewers }} viewers
         <br>
         {{ wpc_stream.html_code(autoplay=True)|safe }}
         <hr>
