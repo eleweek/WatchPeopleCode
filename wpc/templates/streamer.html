@@ -84,7 +84,7 @@
       <div class="col-md-8">
         <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
         <br>
-        {{ stream.html_code()|safe }}
+        {{ stream.html_code(autoplay=(loop.index == 1) if stream.status == 'live' else False )|safe }}
         <hr>
       </div>
 
