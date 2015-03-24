@@ -109,16 +109,23 @@ class WPCStream(Stream):
 
                 <script type="text/javascript">
                     jwplayer("video").setup({{
-                        file: 'rtmp://104.236.11.162/live/flv:{}',
+                        playlist: [{{
+                            sources: [{{
+                                file: 'rtmp://104.236.11.162/live/flv:{}'
+                            }},{{
+                                file: "http://104.236.11.162/hls/{}.m3u8"
+                            }}]
+                        }}],
                         width: "640",
                         height: "390",
                         autostart: {},
+                        androidhls: true,
                         rtmp: {{
-                            bufferlength: 0.2
+                            bufferlength: 0.4
                         }}
                     }});
                 </script>
-            """.format(self.channel_name, "true" if autoplay else "false")
+            """.format(self.channel_name, self.channel_name, "true" if autoplay else "false")
 
     __mapper_args__ = {
         'polymorphic_identity': 'wpc_stream'
