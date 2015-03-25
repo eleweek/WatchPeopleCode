@@ -93,17 +93,24 @@ class WPCStream(Stream):
             raise
 
         soup = BeautifulSoup(r.content, 'xml')
-        client_num = int(soup.find('nclients').string)
-        is_live = soup.find('codec')
-        if is_live:
-            self.status = 'live'
-            self.current_viewers = client_num - 1
-            if self.actual_start_time is None:
-                self.actual_start_time = datetime.utcnow()
+        for stream in soup.find_all('stream'):
+            if stream.find('name').string == self.channel_name:
+                client_num = int(stream.find('nclients').string)
+                is_live = stream.find('codec')
+                if is_live:
+                    self.status = 'live'
+                    self.current_viewers = client_num - 1
+                    if self.actual_start_time is None:
+                        self.actual_start_time = datetime.utcnow()
+                elif self.status == 'live':
+                    self.status = 'completed'
+                    self.actual_start_time = None
+                    self.current_viewers = None
+                break
         else:
-            if self.status == 'live':
-                self.status = 'completed'
-                self.actual_start_time = None
+            self.status = 'completed'
+            self.actual_start_time = None
+            self.current_viewers = None
 
     def normal_url(self):
         return url_for('.streamer_page', streamer_name=self.streamer.reddit_username, _external=True)
