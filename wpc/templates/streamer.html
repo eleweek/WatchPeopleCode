@@ -18,7 +18,7 @@
     </div>
 
     <div class="col-md-8">
-      <strong>Reddit username:</strong> <a href='http://www.reddit.com/user/{{ streamer.reddit_username }}'> {{ streamer.reddit_username }}</a>
+      <strong>Reddit username:</strong> <a href='http://www.reddit.com/user/{{ streamer.reddit_username }}'><div class="streamer-name"> {{ streamer.reddit_username }}</div></a>
       {% if streamer == current_user %}
         <div class="info-block" {% if edit %} style="display:none;" {% endif %}>
             <strong>Youtube channel:</strong>

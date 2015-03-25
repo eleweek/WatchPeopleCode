@@ -6,7 +6,7 @@ from wpc.forms import SubscribeForm, EditStreamerInfoForm, SearchForm
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session
 from flask.ext.login import login_user, logout_user, login_required, current_user
 from jinja2 import escape, evalcontextfilter, Markup
-from flask.ext.socketio import emit
+from flask.ext.socketio import emit, join_room
 
 from uuid import uuid4
 import praw
@@ -249,9 +249,15 @@ def chat_connect():
             session['username'] = random.choice(first_words) + ' ' + random.choice(second_words)
             if session['username'] not in users:
                 break
-
     users.append(session['username'])
-    emit('join', True, session['username'])
+
+    return True
+
+
+@socketio.on('join', namespace='/chat')
+def join(streamer):
+    join_room(streamer)
+    emit('join', True, session['username'], room=streamer)
 
 
 @socketio.on('disconnect', namespace='/chat')
@@ -260,8 +266,8 @@ def chat_disconnect():
 
 
 @socketio.on('message', namespace='/chat')
-def chat_message(message_text):
+def chat_message(message_text, streamer):
     message = {"sender": session['username'],
                "text": nl2br_py(message_text)}
-    emit("message", message, broadcast=True)
+    emit("message", message, room=streamer)
     return True

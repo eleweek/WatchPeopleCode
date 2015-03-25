@@ -1,6 +1,6 @@
 (function($, window, undefined){
     
-    var myUsername;
+    var myUsername, streamer=$(".streamer-name").html();
 
     var chatAPI = {
 
@@ -29,10 +29,11 @@
                 }
             });
 
+            this.socket.emit('join', streamer);
         },
 
         sendMessage : function(message, onSent) {
-            this.socket.emit('message', message, onSent);
+            this.socket.emit('message', message, streamer, onSent);
         }
 
     };  
