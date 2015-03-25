@@ -79,7 +79,7 @@
       <div class="col-md-8">
         {{ wpc_stream.title if wpc_stream.title else '' }}
         {% if wpc_stream.current_viewers is not none %}
-          | {{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}
+          | {{ wpc_stream.current_viewers }} {{ 'viewers' if wpc_stream.current_viewers != 1 else 'viewer' }}
         {% endif %}
         <br>
         {{ wpc_stream.html_code(autoplay=True)|safe }}
