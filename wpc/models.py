@@ -117,10 +117,10 @@ class WPCStream(Stream):
 
     def html_code(self, autoplay=False):
         return """
-                <div id="video">Loading the player...</div>
+                <div id="{}">Loading the player...</div>
 
                 <script type="text/javascript">
-                    jwplayer("video").setup({{
+                    jwplayer("{}").setup({{
                         playlist: [{{
                             sources: [{{
                                 file: 'rtmp://104.236.11.162/live/flv:{}'
@@ -137,7 +137,7 @@ class WPCStream(Stream):
                         }}
                     }});
                 </script>
-            """.format(self.channel_name, self.channel_name, "true" if autoplay else "false")
+            """.format(self.channel_name, self.channel_name, self.channel_name, self.channel_name, "true" if autoplay else "false")
 
     __mapper_args__ = {
         'polymorphic_identity': 'wpc_stream'
