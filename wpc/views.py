@@ -257,7 +257,7 @@ def chat_connect():
 @socketio.on('join', namespace='/chat')
 def join(streamer):
     join_room(streamer)
-    emit('join', True, session['username'], room=streamer)
+    emit('join', True, session['username'])
 
 
 @socketio.on('disconnect', namespace='/chat')
