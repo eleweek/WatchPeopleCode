@@ -45,7 +45,6 @@ class Stream(db.Model):
     tags = db.relationship('Tag', secondary=stream_tag, backref=db.backref('streams', lazy='dynamic'))
     current_viewers = db.Column(db.Integer)
     confstream = db.Column(db.Boolean(), default=False)
-    rtmp_key = db.Column(db.String(50))
     __mapper_args__ = {
         'polymorphic_on': type,
         'polymorphic_identity': 'stream'
@@ -367,6 +366,7 @@ class Streamer(db.Model, UserMixin):
     youtube_name = db.Column(db.String(30))
     info = db.Column(db.Text())
     checked = db.Column(db.Boolean(), default=False)
+    rtmp_secret = db.Column(db.String(50))
 
     def __init__(self, reddit_username, checked=False):
         self.reddit_username = reddit_username

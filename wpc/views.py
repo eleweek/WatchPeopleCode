@@ -3,7 +3,7 @@ from wpc.models import MozillaStreamHack  # NOQA
 from wpc.models import YoutubeStream, Stream, Streamer, Subscriber, get_or_create
 from wpc.forms import SubscribeForm, EditStreamerInfoForm, SearchForm
 
-from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session
+from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session, abort
 from flask.ext.login import login_user, logout_user, login_required, current_user
 from jinja2 import escape, evalcontextfilter, Markup
 from flask.ext.socketio import emit, join_room
@@ -187,6 +187,16 @@ def authorize():
     session['unique_key'] = uuid4()
     url = r.get_authorize_url(session['unique_key'], 'identity')
     return redirect(url)
+
+
+@app.route('/rtmp_auth', methods=['POST'])
+def rtmp_auth():
+    streamer_username = request.values.get('name', '')
+    rtmp_secret = request.values.get('pass', '')
+    streamer = Streamer.query.filter_by(reddit_username=streamer_username).first()
+    if not streamer or not streamer.rtmp_secret or streamer.rtmp_secret != rtmp_secret:
+        abort(403)
+    return "OK"
 
 
 @app.route("/logout")
