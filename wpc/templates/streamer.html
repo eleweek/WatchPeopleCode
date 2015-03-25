@@ -77,8 +77,10 @@
 
     {% if wpc_stream %}
       <div class="col-md-8">
-        {{ wpc_stream.title + ' |' if wpc_stream.title else '' }}
-        {{ wpc_stream.current_viewers }} viewers
+        {{ wpc_stream.title if wpc_stream.title else '' }}
+        {% if wpc_stream.current_viewers is not none %}
+          | {{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}
+        {% endif %}
         <br>
         {{ wpc_stream.html_code(autoplay=True)|safe }}
         <hr>
@@ -116,6 +118,9 @@
       {% if stream != wpc_stream %}
         <div class="col-md-8">
           <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+            {% if stream.current_viewers is not none %}
+              | {{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}
+            {% endif %}
           <br>
           {{ stream.html_code(autoplay=(loop.index == 1 and wpc_stream is none) if stream.status == 'live' else False )|safe }}
           <hr>

@@ -8,7 +8,7 @@
      by <a href={{ url_for('.streamer_page', streamer_name=stream.streamer.reddit_username) }}>{{ stream.streamer.reddit_username }}</a> 
     {% endif %}
     {% if stream.current_viewers is not none %}
-      | {{ stream.current_viewers }} viewers
+      | {{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}
     {% endif %}
     <br>
     {{ stream.html_code(autoplay=(loop.index == 1) if status == 'live' else False ) |safe }}
