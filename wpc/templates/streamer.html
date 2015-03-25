@@ -118,7 +118,7 @@
       {% if stream != wpc_stream %}
         <div class="col-md-8">
           <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
-            {% if stream.current_viewers is not none %}
+            {% if stream.current_viewers is not none and stream.status == 'live' %}
               | {{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}
             {% endif %}
           <br>
