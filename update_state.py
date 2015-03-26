@@ -66,6 +66,11 @@ def get_reddit_username(submission, url):
 
 
 def get_new_streams():
+    moditem = list(r.get_subreddit('watchpeoplecode').get_mod_queue(limit=1))
+    if moditem and datetime.datetime.now() - datetime.datetime.utcfromtimestamp(moditem[0].created_utc) < datetime.timedelta(hours=2):
+        if Streamer.query.filter_by(reddit_username=moditem[0].author.name).first() is not None:
+            moditem[0].approve()
+
     submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
     new_streams = set()
     # TODO : don't forget about http vs https
