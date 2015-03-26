@@ -60,7 +60,7 @@ def index():
 # TODO it is copypasted from index(), but whatever, this is one time change
 @app.route('/onlineconf', methods=['GET', 'POST'])
 def onlineconf():
-    streams = Stream.query.filter_by(confstream=True).filter(Stream.status == 'completed').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
+    streams = YoutubeStream.query.filter_by(confstream=True).filter(Stream.status == 'completed').order_by(Stream.actual_start_time.desc().nullsfirst(), Stream.id.desc()).all()
 
     form = SubscribeForm()
     if request.method == "POST" and form.validate_on_submit():
