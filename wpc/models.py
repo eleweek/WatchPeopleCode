@@ -175,6 +175,7 @@ class YoutubeStream(Stream):
 
         if not r.json()['items']:
             self.status = 'completed'
+            self.current_viewers = None
             return
 
         for item in r.json()['items']:
@@ -190,6 +191,7 @@ class YoutubeStream(Stream):
                 self.status = 'upcoming'
             else:
                 self.status = 'completed'
+                self.current_viewers = None
 
             # add channel to streamer table if it's needed and fix if it's needed
             if self.streamer is not None:
@@ -277,6 +279,7 @@ class TwitchStream(Stream):
                 # this is workaround for situations like stream going offline shortly
                 if datetime.utcnow() - self.last_time_live > timedelta(minutes=12):
                     self.status = 'completed'
+                    self.current_viewers = None
 
             if self.status == 'upcoming':
                 self._update_title_from_channel()
