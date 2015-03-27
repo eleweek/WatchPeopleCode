@@ -40,17 +40,17 @@
             {% endif %}
               <br>
               <br>
-              <div class="text-left"><button type="button" class="btn btn-default edit-button">Edit info</button></div>
+              <div class="text-left"><button type="button" class="btn btn-default edit-info-button">Edit info</button></div>
         </div>
 
-        <form action="" method="POST" class="form form-edit-info" role="form" {% if not edit %} style="display:none;" {% endif %}>
+        <form action="" method="POST" class="form form-edit-info" role="form" {% if not edit_info %} style="display:none;" {% endif %}>
           <br>
           <div class="form-group">
-            {{ form.hidden_tag() }}
-            {{ wtf.form_field(form.youtube_channel) }}
-            {{ wtf.form_field(form.twitch_channel) }}
-            {{ wtf.form_field(form.info, rows=10) }}
-            {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'default'}) }}
+            {{ info_form.hidden_tag() }}
+            {{ wtf.form_field(info_form.youtube_channel) }}
+            {{ wtf.form_field(info_form.twitch_channel) }}
+            {{ wtf.form_field(info_form.info, rows=10) }}
+            {{ wtf.form_field(info_form.submit_button, button_map={'submit_button': 'default'}) }}
           </div>
         </form>
       {% else %}
@@ -75,14 +75,27 @@
       <hr><br>
     </div>
 
-    {% if wpc_stream %}
+    {% if wpc_live %}
       <div class="col-md-8">
-        {{ wpc_stream.title if wpc_stream.title else '' }}
-        {% if wpc_stream.current_viewers is not none %}
-          | {{ wpc_stream.current_viewers }} {{ 'viewers' if wpc_stream.current_viewers != 1 else 'viewer' }}
+        <div class="stream-title">
+          <strong>{{ wpc_live.title if wpc_live.title else '' }}</strong>
+          {% if wpc_live.current_viewers is not none %}
+            | {{ wpc_live.current_viewers }} {{ 'viewers' if wpc_live.current_viewers != 1 else 'viewer' }}
+        {% endif %}
+        </div>
+        {% if streamer == current_user %}
+          <div class="text-left"><button type="button" class="btn btn-default edit-title-button">Edit title of stream</button></div>
+          <form action="" method="POST" class="form form-edit-title" role="form" {% if not edit_title %} style="display:none;" {% endif %}>
+            <br>
+            <div class="form-group">
+              {{ title_form.hidden_tag() }}
+              {{ wtf.form_field(title_form.title) }}
+              {{ wtf.form_field(title_form.submit_button, button_map={'submit_button': 'default'}) }}
+            </div>
+          </form>
         {% endif %}
         <br>
-        {{ wpc_stream.html_code(autoplay=True)|safe }}
+        {{ wpc_live.html_code(autoplay=True)|safe }}
         <hr>
       </div>
 
@@ -115,14 +128,27 @@
     </div>
 
     {% for stream in streams.items %}
-      {% if stream != wpc_stream %}
+      {% if stream != wpc_live %}
         <div class="col-md-8">
-          <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
-            {% if stream.current_viewers is not none and stream.status == 'live' %}
-              | {{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}
-            {% endif %}
+         {% if stream.type =='wpc_stream' %} <div class="stream-title"> {% endif %}
+            <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+              {% if stream.current_viewers is not none %}
+                | {{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}
+              {% endif %}
+        {% if stream.type =='wpc_stream' %} </div> {% endif %}
+        {% if stream.type == 'wpc_stream' and streamer == current_user %}
+          <div class="text-left"><button type="button" class="btn btn-default edit-title-button">Edit title of stream</button></div>
+          <form action="" method="POST" class="form form-edit-title" role="form" {% if not edit_title %} style="display:none;" {% endif %}>
+            <br>
+            <div class="form-group">
+              {{ title_form.hidden_tag() }}
+              {{ wtf.form_field(title_form.title) }}
+              {{ wtf.form_field(title_form.submit_button, button_map={'submit_button': 'default'}) }}
+            </div>
+          </form>
+        {% endif %}
           <br>
-          {{ stream.html_code(autoplay=(loop.index == 1 and wpc_stream is none) if stream.status == 'live' else False )|safe }}
+          {{ stream.html_code(autoplay=(loop.index == 1 and wpc_live is none) if stream.status == 'live' else False )|safe }}
           <hr>
         </div>
       {% endif %}
@@ -143,9 +169,21 @@
 
   <script>
     (function($, window, undefined){
-      $(".edit-button").click(function() {
+      $(".edit-info-button").click(function() {
+        $(".form-edit-title").hide();
+        $(".stream-title").show();
+        $(".edit-title-button").show();
+
         $(".info-block").hide();
         $(".form-edit-info").show();
+      });
+      $(".edit-title-button").click(function() {
+        $(".form-edit-info").hide();
+        $(".info-block").show();
+
+        $(".stream-title").hide();
+        $(".edit-title-button").hide();
+        $(".form-edit-title").show();
       });
     }($, window));
   </script> 

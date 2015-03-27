@@ -1,7 +1,7 @@
 from wpc import db, app, socketio
 from wpc.models import MozillaStreamHack  # NOQA
 from wpc.models import YoutubeStream, Stream, Streamer, Subscriber, get_or_create
-from wpc.forms import SubscribeForm, EditStreamerInfoForm, SearchForm
+from wpc.forms import SubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session, abort
 from flask.ext.login import login_user, logout_user, login_required, current_user
@@ -123,25 +123,40 @@ def nl2br_py(value):
 @app.route('/streamer/<streamer_name>/<int:page>', methods=["GET", "POST"])
 def streamer_page(streamer_name, page):
     streamer = Streamer.query.filter_by(reddit_username=streamer_name).first()
-    wpc_stream = streamer.streams.filter_by(type='wpc_stream', status='live').first()
+    wpc_stream = streamer.streams.filter_by(type='wpc_stream').first()
+    wpc_live = wpc_stream if wpc_stream and  wpc_stream.status == 'live' else None
     streams = streamer.streams.order_by(Stream.actual_start_time.desc().nullslast()).paginate(page, per_page=5)
-    form = EditStreamerInfoForm()
+    info_form = EditStreamerInfoForm(prefix='info')
+    title_form = EditStreamTitleForm(prefix='title')
 
     if current_user.is_authenticated() and current_user == streamer:
         if request.method == 'POST':
-            if form.validate_on_submit():
-                current_user.populate(form)
-                db.session.commit()
-                flash("Updated successfully", category='success')
-                return redirect(url_for('.streamer_page', streamer_name=streamer_name))
-            else:
-                return render_template('streamer.html', streamer=streamer, streams=streams, form=form, edit=True)
-        else:
-            form.youtube_channel.data = current_user.youtube_channel
-            form.twitch_channel.data = current_user.twitch_channel
-            form.info.data = current_user.info
+            if info_form.submit_button.data:
+                if info_form.validate_on_submit():
+                    current_user.populate(info_form)
+                    db.session.commit()
+                    flash("Updated successfully", category='success')
+                    return redirect(url_for('.streamer_page', streamer_name=streamer_name))
+                else:
+                    return render_template('streamer.html', streamer=streamer, streams=streams, info_form=info_form, title_form=title_form, edit_info=True, edit_title=False, wpc_live=wpc_live)
 
-    return render_template('streamer.html', streamer=streamer, streams=streams, form=form, edit=False, wpc_stream=wpc_stream)
+            elif title_form.submit_button.data:
+                if title_form.validate_on_submit():
+                    wpc_stream.title = title_form.title.data
+                    db.session.commit()
+                    flash("Updated successfully", category='success')
+                    return redirect(url_for('.streamer_page', streamer_name=streamer_name))
+
+                else:
+                    return render_template('streamer.html', streamer=streamer, streams=streams, info_form=info_form, title_form=title_form, edit_info=False, edit_title=True, wpc_live=wpc_live)
+        else:
+            info_form.youtube_channel.data = current_user.youtube_channel
+            info_form.twitch_channel.data = current_user.twitch_channel
+            info_form.info.data = current_user.info
+            if wpc_stream:
+                title_form.title.data = wpc_stream.title
+
+    return render_template('streamer.html', streamer=streamer, streams=streams, info_form=info_form, title_form=title_form, edit_info=False, edit_title=False, wpc_live=wpc_live)
 
 
 @app.route('/json')

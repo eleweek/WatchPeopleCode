@@ -20,6 +20,11 @@ class SubscribeForm(Form):
     submit_button = SubmitField('Subscribe')
 
 
+class EditStreamTitleForm(Form):
+    title = StringField("Title", [validators.Length(max=200)])
+    submit_button = SubmitField('Submit')
+
+
 class EditStreamerInfoForm(Form):
     youtube_channel = StringField("Youtube channel", [validators.Length(max=100)])
     twitch_channel = StringField("Twitch channel", [validators.Length(max=100)])
