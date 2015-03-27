@@ -125,7 +125,10 @@ def streamer_page(streamer_name, page):
     streamer = Streamer.query.filter_by(reddit_username=streamer_name).first()
     wpc_stream = streamer.streams.filter_by(type='wpc_stream').first()
     wpc_live = wpc_stream if wpc_stream and  wpc_stream.status == 'live' else None
-    streams = streamer.streams.order_by(Stream.actual_start_time.desc().nullslast()).paginate(page, per_page=5)
+    streams = streamer.streams
+    if wpc_live:
+        streams = streams.filter(Stream.id != wpc_live.id)
+    streams = streams.order_by(Stream.actual_start_time.desc().nullslast()).paginate(page, per_page=5)
     info_form = EditStreamerInfoForm(prefix='info')
     title_form = EditStreamTitleForm(prefix='title')
 

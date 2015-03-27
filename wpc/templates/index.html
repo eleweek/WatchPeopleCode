@@ -27,9 +27,7 @@
           {{ macros.streams(live_streams, 'live') }}
         {% else %}
           <h4> How about watching a random recorded stream? </h4>
-          <a href={{ random_stream.normal_url() }}> {{ random_stream.title if random_stream.title else random_stream.normal_url() }}</a>
-          <br>
-          {{ random_stream.html_code()|safe }}
+          {{ macros.stream_macro(random_stream, false) }}
           <hr>
         {% endif %}
 

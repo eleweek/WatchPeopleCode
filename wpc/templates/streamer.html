@@ -77,26 +77,7 @@
 
     {% if wpc_live %}
       <div class="col-md-8">
-        <div class="stream-title">
-          <strong>{{ wpc_live.title if wpc_live.title else '' }}</strong>
-          {% if wpc_live.current_viewers is not none %}
-            | {{ wpc_live.current_viewers }} {{ 'viewers' if wpc_live.current_viewers != 1 else 'viewer' }}
-        {% endif %}
-        </div>
-        {% if streamer == current_user %}
-          <div class="text-left"><button type="button" class="btn btn-default edit-title-button">Edit title of stream</button></div>
-          <form action="" method="POST" class="form form-edit-title" role="form" {% if not edit_title %} style="display:none;" {% endif %}>
-            <br>
-            <div class="form-group">
-              {{ title_form.hidden_tag() }}
-              {{ wtf.form_field(title_form.title) }}
-              {{ wtf.form_field(title_form.submit_button, button_map={'submit_button': 'default'}) }}
-            </div>
-          </form>
-        {% endif %}
-        <br>
-        {{ wpc_live.html_code(autoplay=True)|safe }}
-        <hr>
+        {{ macros.stream_macro(wpc_live, true, title_form if streamer == current_user else none) }}
       </div>
 
       <div class="col-md-4">
@@ -125,36 +106,7 @@
     <div class="col-md-8">
       {{ macros.render_pagination(streams) }}
       <br>
-    </div>
-
-    {% for stream in streams.items %}
-      {% if stream != wpc_live %}
-        <div class="col-md-8">
-         {% if stream.type =='wpc_stream' %} <div class="stream-title"> {% endif %}
-            <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
-              {% if stream.current_viewers is not none %}
-                | {{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}
-              {% endif %}
-        {% if stream.type =='wpc_stream' %} </div> {% endif %}
-        {% if stream.type == 'wpc_stream' and streamer == current_user %}
-          <div class="text-left"><button type="button" class="btn btn-default edit-title-button">Edit title of stream</button></div>
-          <form action="" method="POST" class="form form-edit-title" role="form" {% if not edit_title %} style="display:none;" {% endif %}>
-            <br>
-            <div class="form-group">
-              {{ title_form.hidden_tag() }}
-              {{ wtf.form_field(title_form.title) }}
-              {{ wtf.form_field(title_form.submit_button, button_map={'submit_button': 'default'}) }}
-            </div>
-          </form>
-        {% endif %}
-          <br>
-          {{ stream.html_code(autoplay=(loop.index == 1 and wpc_live is none) if stream.status == 'live' else False )|safe }}
-          <hr>
-        </div>
-      {% endif %}
-    {% endfor %}
-
-    <div class="col-md-8">
+      {{ macros.streams(streams.items, title_form=title_form if streamer == current_user) }}
       {{ macros.render_pagination(streams) }}
     </div>
 

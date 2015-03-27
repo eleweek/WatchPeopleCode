@@ -1,20 +1,51 @@
-{% macro streams(streams, status, chat) %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% macro stream_macro(stream, autoplay=false, title_form=none) %}
+  {# time #}
+  {% if stream.status == 'upcoming' and stream.scheduled_start_time %}
+    <p><b>{{stream.format_start_time()}}</b></p>
+  {% endif %}
+  
+  {# title & #}
+  {% if title_form %} <div class="stream-title"> {% endif %}
+
+  <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+
+  {% if stream.streamer %}
+   by <a href={{ url_for('.streamer_page', streamer_name=stream.streamer.reddit_username) }}>{{ stream.streamer.reddit_username }}</a> 
+  {% endif %}
+
+  {% if stream.current_viewers is not none %}
+    | {{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}
+  {% endif %}
+
+  {% if title_form %}
+    <button type="button" class="btn btn-default edit-title-button">Edit stream title</button>
+    </div>
+    <form action="" method="POST" class="form form-edit-title" role="form" {% if not edit_title %} style="display:none;" {% endif %}>
+      <br>
+      <div class="form-group">
+        {{ title_form.hidden_tag() }}
+        {{ wtf.form_field(title_form.title) }}
+        {{ wtf.form_field(title_form.submit_button, button_map={'submit_button': 'default'}) }}
+      </div>
+    </form>
+  {% endif %}
+
+  {# video #}
+  <br>
+  {{ stream.html_code(autoplay=autoplay)|safe }}
+  <hr>
+{% endmacro %}
+
+
+{% macro streams(streams, status, title_form) %}
   {% for stream in streams %}
-    {% if status == 'upcoming'%}
-      {% if stream.scheduled_start_time %}<p><b>{{stream.format_start_time()}}</b></p> {% endif %}
-    {% endif %}
-    <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
-    {% if stream.streamer %}
-     by <a href={{ url_for('.streamer_page', streamer_name=stream.streamer.reddit_username) }}>{{ stream.streamer.reddit_username }}</a> 
-    {% endif %}
-    {% if stream.current_viewers is not none %}
-      | {{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}
-    {% endif %}
-    <br>
-    {{ stream.html_code(autoplay=(loop.index == 1) if status == 'live' else False ) |safe }}
-    <hr>
+    {{ stream_macro(stream, true if status == 'live' and loop.index == 1 else false, title_form if stream.type == 'wpc_stream' else none) }}
   {% endfor %}
 {% endmacro %}
+
 
 {% macro render_pagination(pagination) %}
   {% if pagination.pages > 1 %}

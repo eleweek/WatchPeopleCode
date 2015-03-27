@@ -17,17 +17,11 @@
       <div class="col-md-offset-2 col-md-8 text-center">
         {{ macros.render_pagination(streams) }}
         <br>
-        {% for stream in streams.items %}
-          <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
-        {% if stream.streamer %}
-         by <a href={{ url_for('.streamer_page', streamer_name=stream.streamer.reddit_username) }}>{{ stream.streamer.reddit_username }}</a>
-        {% endif %} 
-          <br>
-          {{ stream.html_code() |safe }}
-          <hr>
+        {% if streams.items %}
+          {{ macros.streams(streams.items) }}
         {% else %}
           Sorry, we have no results for your request right now.
-        {% endfor %}
+        {% endif %}
         {{ macros.render_pagination(streams) }}
       </div>
   </div>
