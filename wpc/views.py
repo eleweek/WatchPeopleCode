@@ -139,7 +139,7 @@ def streamer_page(streamer_name, page):
                     current_user.populate(info_form)
                     db.session.commit()
                     flash("Updated successfully", category='success')
-                    return redirect(url_for('.streamer_page', streamer_name=streamer_name))
+                    return redirect(url_for('.streamer_page', streamer_name=streamer_name, page=page))
                 else:
                     return render_template('streamer.html', streamer=streamer, streams=streams, info_form=info_form, title_form=title_form, edit_info=True, edit_title=False, wpc_live=wpc_live)
 
@@ -148,7 +148,7 @@ def streamer_page(streamer_name, page):
                     wpc_stream.title = title_form.title.data
                     db.session.commit()
                     flash("Updated successfully", category='success')
-                    return redirect(url_for('.streamer_page', streamer_name=streamer_name))
+                    return redirect(url_for('.streamer_page', streamer_name=streamer_name, page=page))
 
                 else:
                     return render_template('streamer.html', streamer=streamer, streams=streams, info_form=info_form, title_form=title_form, edit_info=False, edit_title=True, wpc_live=wpc_live)
