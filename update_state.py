@@ -71,7 +71,7 @@ def get_new_streams():
         if Streamer.query.filter_by(reddit_username=moditem[0].author.name).first() is not None:
             moditem[0].approve()
 
-    submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
+    submissions = r.get_subreddit('watchpeoplecode').get_hot(limit=50)
     new_streams = set()
     # TODO : don't forget about http vs https
     # TODO better way of caching api requests
