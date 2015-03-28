@@ -106,7 +106,7 @@ def update_flairs():
 
     try:
         wpc_sub = r.get_subreddit('watchpeoplecode')
-        submissions = wpc_sub.get_new(limit=25)
+        submissions = wpc_sub.get_hot(limit=25)
         for s in submissions:
             if s.id == '2v1bnt' or s.id == '2v70uo':  # ignore LCS threads TODO
                 continue
