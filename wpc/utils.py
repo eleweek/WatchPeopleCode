@@ -37,6 +37,13 @@ def twitch_channel(url):
         return None
 
 
+def wpc_channel(url):
+    query = urlparse(url)
+    path_elements = query.path.strip('/').split('/')
+    if query.hostname == 'www.watchpeoplecode.com' and len(path_elements) == 2 and path_elements[0] == 'streamer':
+        return path_elements[1]
+
+
 def requests_get_with_retries(url, retries_num=5):
     # Use a `Session` instance to customize how `requests` handles making HTTP requests.
     session = requests.Session()

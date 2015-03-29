@@ -140,6 +140,23 @@ class WPCStream(Stream):
                 </script>
             """.format(self.channel_name, self.channel_name, self.channel_name, self.channel_name, "true" if autoplay else "false")
 
+    def _get_flair(self):
+        fst = self.format_start_time(start_time=False)
+        status_to_flair = {"live": (u"Live", u"one"),
+                           "completed": (u"Finished", u"three"),
+                           "upcoming": (fst if fst else u"Upcoming", u"two"),
+                           None: (None, None)}
+
+        return status_to_flair[self.status]
+
+    def add_submission(self, submission):
+        if submission not in self.submissions:
+            self.status = 'upcoming'
+            self.scheduled_start_time = None
+            self.actual_start_time = None
+
+        Stream.add_submission(self, submission)
+
     __mapper_args__ = {
         'polymorphic_identity': 'wpc_stream'
     }

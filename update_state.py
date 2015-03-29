@@ -1,6 +1,6 @@
 from wpc import db, app
-from wpc.models import Stream, YoutubeStream, TwitchStream, Streamer, Submission, get_or_create
-from wpc.utils import youtube_video_id, twitch_channel, requests_get_with_retries
+from wpc.models import Stream, YoutubeStream, TwitchStream, WPCStream, Streamer, Submission, get_or_create
+from wpc.utils import youtube_video_id, twitch_channel, wpc_channel, requests_get_with_retries
 
 
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -40,6 +40,10 @@ def get_stream_from_url(url, submission=None, only_new=False):
             return TwitchStream(tc)
         if submission and submission not in db_stream.submissions:
             return db_stream
+
+    wc = wpc_channel(url)
+    if wc is not None:
+        return WPCStream.query.filter_by(channel_name=wc).first()
 
     return None if only_new else db_stream
 
@@ -121,8 +125,8 @@ def update_flairs():
 
                     allow_flair_change = True
 
-                    is_twitch_stream = ('channel' in dir(stream))  # TODO: better way
-                    if is_twitch_stream:
+                    isnt_youtube_stream = (stream.type != 'youtube')
+                    if isnt_youtube_stream:
                         created_dt = datetime.datetime.utcfromtimestamp(s.created_utc)
                         now = datetime.datetime.utcnow()
                         if now - created_dt > datetime.timedelta(hours=24):
