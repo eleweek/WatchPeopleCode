@@ -27,6 +27,7 @@ stream_sub = db.Table('stream_sub',
 
 class Submission(db.Model):
     submission_id = db.Column(db.String(6), primary_key=True)
+    recording_available = db.Column(db.Boolean())
 
     def __repr__(self):
         return '<Submission %r>' % (self.submission_id)
