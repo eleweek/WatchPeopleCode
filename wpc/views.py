@@ -1,6 +1,6 @@
 from wpc import db, app, socketio
 from wpc.models import MozillaStreamHack  # NOQA
-from wpc.models import YoutubeStream, Stream, Streamer, Subscriber, get_or_create
+from wpc.models import YoutubeStream, WPCStream, Stream, Streamer, Subscriber, get_or_create
 from wpc.forms import SubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session, abort
@@ -225,6 +225,12 @@ def rtmp_auth():
     streamer = Streamer.query.filter_by(reddit_username=streamer_username).first()
     if not streamer or not streamer.rtmp_secret or streamer.rtmp_secret != rtmp_secret:
         abort(403)
+
+    stream = get_or_create(WPCStream, channel_name=streamer.reddit_username)
+    stream.streamer = streamer
+    stream.status = 'live'
+    stream._update_status()
+    db.session.commit()
     return "OK"
 
 
