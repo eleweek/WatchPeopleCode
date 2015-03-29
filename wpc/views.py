@@ -270,26 +270,28 @@ def podcast_feed():
                     mimetype='application/rss+xml')
 
 
-users = list()
-first_words = ['True', 'False', 'For', 'While', 'If', 'Else', 'Elif', 'Undefined', 'Do',
-               'Exit', 'Continue', 'Super', 'Break', 'Try', 'Catch', 'Class', 'Object',
-               'Def', 'Var', 'Pass', 'Return']
-second_words = ['C', 'C++', 'Lisp', 'Python', 'Java', 'JavaScript', 'Pascal', 'Objective-C',
-                'C#', 'Perl', 'Ruby', 'Ada', 'Haskell', 'Octave', 'Basic', 'Fortran']
+chat_users = list()
 
 
 @socketio.on('connect', namespace='/chat')
 def chat_connect():
+    first_words = ['True', 'False', 'For', 'While', 'If', 'Else', 'Elif', 'Undefined', 'Do',
+                   'Exit', 'Continue', 'Super', 'Break', 'Try', 'Catch', 'Class', 'Object',
+                   'Def', 'Var', 'Pass', 'Return', 'Static', 'Const', 'Template', 'Delete', 'Int',
+                   'Float', 'Struct', 'Void', 'Self', 'This']
+    second_words = ['C', 'C++', 'Lisp', 'Python', 'Java', 'JavaScript', 'Pascal', 'Objective-C',
+                    'C#', 'Perl', 'Ruby', 'Ada', 'Haskell', 'Octave', 'Basic', 'Fortran', 'PHP', 'R',
+                    'Assembly', 'COBOL', 'Rust', 'Swift', 'Bash']
     print('New connection')
 
     if current_user.is_authenticated():
         session['username'] = current_user.reddit_username
-    elif 'username' not in session or session['username'] in users:
+    elif 'username' not in session or session['username'] in chat_users:
         while True:
             session['username'] = random.choice(first_words) + ' ' + random.choice(second_words)
-            if session['username'] not in users:
+            if session['username'] not in chat_users:
                 break
-    users.append(session['username'])
+    chat_users.append(session['username'])
 
     return True
 
@@ -302,7 +304,7 @@ def join(streamer):
 
 @socketio.on('disconnect', namespace='/chat')
 def chat_disconnect():
-    users.remove(session['username'])
+    chat_users.remove(session['username'])
 
 
 @socketio.on('message', namespace='/chat')
