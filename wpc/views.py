@@ -60,7 +60,10 @@ def index():
 # TODO it is copypasted from index(), but whatever, this is one time change
 @app.route('/onlineconf', methods=['GET', 'POST'])
 def onlineconf():
-    streams = YoutubeStream.query.filter_by(confstream=True).filter(Stream.status == 'completed').order_by(Stream.actual_start_time.desc().nullsfirst(), Stream.id.desc()).all()
+    streams = YoutubeStream.query.filter_by(confstream=True).filter(
+        Stream.status == 'completed').order_by(
+        Stream.actual_start_time.desc().nullsfirst(),
+        Stream.id.desc()).all()
 
     form = SubscribeForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -124,7 +127,7 @@ def nl2br_py(value):
 def streamer_page(streamer_name, page):
     streamer = Streamer.query.filter_by(reddit_username=streamer_name).first()
     wpc_stream = streamer.streams.filter_by(type='wpc_stream').first()
-    wpc_live = wpc_stream if wpc_stream and  wpc_stream.status == 'live' else None
+    wpc_live = wpc_stream if wpc_stream and wpc_stream.status == 'live' else None
     streams = streamer.streams
     if wpc_live:
         streams = streams.filter(Stream.id != wpc_live.id)
@@ -141,7 +144,10 @@ def streamer_page(streamer_name, page):
                     flash("Updated successfully", category='success')
                     return redirect(url_for('.streamer_page', streamer_name=streamer_name, page=page))
                 else:
-                    return render_template('streamer.html', streamer=streamer, streams=streams, info_form=info_form, title_form=title_form, edit_info=True, edit_title=False, wpc_live=wpc_live)
+                    return render_template('streamer.html', streamer=streamer,
+                                           streams=streams, info_form=info_form,
+                                           title_form=title_form, edit_info=True,
+                                           edit_title=False, wpc_live=wpc_live)
 
             elif title_form.submit_button.data:
                 if title_form.validate_on_submit():
@@ -151,7 +157,10 @@ def streamer_page(streamer_name, page):
                     return redirect(url_for('.streamer_page', streamer_name=streamer_name, page=page))
 
                 else:
-                    return render_template('streamer.html', streamer=streamer, streams=streams, info_form=info_form, title_form=title_form, edit_info=False, edit_title=True, wpc_live=wpc_live)
+                    return render_template('streamer.html', streamer=streamer,
+                                           streams=streams, info_form=info_form,
+                                           title_form=title_form, edit_info=False,
+                                           edit_title=True, wpc_live=wpc_live)
         else:
             info_form.youtube_channel.data = current_user.youtube_channel
             info_form.twitch_channel.data = current_user.twitch_channel
@@ -159,7 +168,10 @@ def streamer_page(streamer_name, page):
             if wpc_stream:
                 title_form.title.data = wpc_stream.title
 
-    return render_template('streamer.html', streamer=streamer, streams=streams, info_form=info_form, title_form=title_form, edit_info=False, edit_title=False, wpc_live=wpc_live)
+    return render_template('streamer.html', streamer=streamer,
+                           streams=streams, info_form=info_form,
+                           title_form=title_form, edit_info=False,
+                           edit_title=False, wpc_live=wpc_live)
 
 
 @app.route('/json')
