@@ -229,7 +229,7 @@ def rtmp_auth():
     stream = get_or_create(WPCStream, channel_name=streamer.reddit_username)
     stream.streamer = streamer
     stream.status = 'live'
-    stream._update_status()
+    stream.actual_start_time = datetime.utcnow()
     db.session.commit()
     return "OK"
 
