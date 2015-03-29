@@ -103,15 +103,18 @@ class WPCStream(Stream):
                     self.current_viewers = client_num - 1
                     if self.actual_start_time is None:
                         self.actual_start_time = datetime.utcnow()
-                elif self.status == 'live':
+                # workaround for situations when update_state changes status before streamer get authorization
+                elif self.status == 'live' and datetime.utcnow() - self.actual_start_time > timedelta(seconds=30):
                     self.status = 'completed'
                     self.actual_start_time = None
                     self.current_viewers = None
                 break
+        # same workaround
         else:
-            self.status = 'completed'
-            self.actual_start_time = None
-            self.current_viewers = None
+            if datetime.utcnow() - self.actual_start_time > timedelta(seconds=30):
+                self.status = 'completed'
+                self.actual_start_time = None
+                self.current_viewers = None
 
     def normal_url(self):
         return url_for('.streamer_page', streamer_name=self.streamer.reddit_username, _external=True)
