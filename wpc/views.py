@@ -127,10 +127,9 @@ def nl2br_py(value):
 def streamer_page(streamer_name, page):
     streamer = Streamer.query.filter_by(reddit_username=streamer_name).first()
     wpc_stream = streamer.streams.filter_by(type='wpc_stream').first()
-    wpc_live = wpc_stream if wpc_stream and wpc_stream.status == 'live' else None
     streams = streamer.streams
-    if wpc_live:
-        streams = streams.filter(Stream.id != wpc_live.id)
+    if wpc_stream:
+        streams = streams.filter(Stream.id != wpc_stream.id)
     streams = streams.order_by(Stream.actual_start_time.desc().nullslast()).paginate(page, per_page=5)
     info_form = EditStreamerInfoForm(prefix='info')
     title_form = EditStreamTitleForm(prefix='title')
@@ -147,7 +146,7 @@ def streamer_page(streamer_name, page):
                     return render_template('streamer.html', streamer=streamer,
                                            streams=streams, info_form=info_form,
                                            title_form=title_form, edit_info=True,
-                                           edit_title=False, wpc_live=wpc_live)
+                                           edit_title=False, wpc_stream=wpc_stream)
 
             elif title_form.submit_button.data:
                 if title_form.validate_on_submit():
@@ -160,7 +159,7 @@ def streamer_page(streamer_name, page):
                     return render_template('streamer.html', streamer=streamer,
                                            streams=streams, info_form=info_form,
                                            title_form=title_form, edit_info=False,
-                                           edit_title=True, wpc_live=wpc_live)
+                                           edit_title=True, wpc_stream=wpc_stream)
         else:
             info_form.youtube_channel.data = current_user.youtube_channel
             info_form.twitch_channel.data = current_user.twitch_channel
@@ -171,7 +170,7 @@ def streamer_page(streamer_name, page):
     return render_template('streamer.html', streamer=streamer,
                            streams=streams, info_form=info_form,
                            title_form=title_form, edit_info=False,
-                           edit_title=False, wpc_live=wpc_live)
+                           edit_title=False, wpc_stream=wpc_stream)
 
 
 @app.route('/json')
