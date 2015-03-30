@@ -119,8 +119,8 @@ def update_flairs():
             db_s = Submission.query.filter_by(submission_id=s.id).first()
             if not db_s.recording_available:
                 s.replace_more_comments()
-                for c in list(s.comments) + [s]:
-                    if c.author == s.author and re.search("recording available", c.body, flags=re.IGNORECASE):
+                for author, text in map(lambda c: (c.author, c.body), s.comments) + [(s.author, s.selftext)]:
+                    if author.name == s.author.name and re.search("recording available", text, flags=re.IGNORECASE):
                         db_s.recording_available = True
                         db.session.commit()
 
@@ -157,10 +157,10 @@ def update_flairs():
                             new_flair_text, new_flair_css = flair_text, flair_css
 
                     if stream.type == 'youtube':
-                        s.recording_available = True
+                        db_s.recording_available = True
 
             if new_flair_text and new_flair_css:
-                s.set_flair(flair_text, flair_css)
+                s.set_flair(new_flair_text, new_flair_css)
     except Exception as e:
         app.logger.exception(e)
 
