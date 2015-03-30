@@ -116,14 +116,15 @@ def update_flairs():
             if s.id == '2v1bnt' or s.id == '2v70uo':  # ignore LCS threads TODO
                 continue
 
-            if not s.recording_available:
-                s.expand_more_comments()
-                for c in s.comments:
+            db_s = Submission.query.filter_by(submission_id=s.id).first()
+            if not db_s.recording_available:
+                s.replace_more_comments()
+                for c in list(s.comments) + [s]:
                     if c.author == s.author and re.search("recording available", c.body, flags=re.IGNORECASE):
-                        s.recording_available = True
+                        db_s.recording_available = True
                         db.session.commit()
 
-            if not s.recording_available:
+            if not db_s or not db_s.recording_available:
                 new_flair_text = None
                 new_flair_css = None
             else:
