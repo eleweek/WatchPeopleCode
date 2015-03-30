@@ -79,8 +79,9 @@
             {{ streamer.twitch_channel }}
           </a>
         {% endif %}
-        {% if info %}
-          Info: {{ streamer.info | nl2br }}
+        {% if streamer.info %}
+          <br>
+          <strong> Info: </strong> {{ streamer.info | nl2br }}
         {% endif %}
       {% endif %}
       <hr><br>
