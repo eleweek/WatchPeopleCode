@@ -104,14 +104,14 @@ class WPCStream(Stream):
                     if self.actual_start_time is None:
                         self.actual_start_time = datetime.utcnow()
                 # workaround for situations when update_state changes status before streamer get authorization
-                elif self.status == 'live' and datetime.utcnow() - self.actual_start_time > timedelta(seconds=30):
+                elif self.status == 'live' and self.actual_start_time and datetime.utcnow() - self.actual_start_time > timedelta(seconds=30):
                     self.status = 'completed'
                     self.actual_start_time = None
                     self.current_viewers = None
                 break
         # same workaround
         else:
-            if datetime.utcnow() - self.actual_start_time > timedelta(seconds=30):
+            if self.actual_start_time and datetime.utcnow() - self.actual_start_time > timedelta(seconds=30):
                 self.status = 'completed'
                 self.actual_start_time = None
                 self.current_viewers = None
