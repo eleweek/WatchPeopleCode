@@ -115,6 +115,21 @@ def update_flairs():
         for s in submissions:
             if s.id == '2v1bnt' or s.id == '2v70uo':  # ignore LCS threads TODO
                 continue
+
+            if not s.recording_available:
+                s.expand_more_comments()
+                for c in s.comments:
+                    if c.author == s.author and re.search("recording available", c.body, flags=re.IGNORECASE):
+                        s.recording_available = True
+                        db.session.commit()
+
+            if not s.recording_available:
+                new_flair_text = None
+                new_flair_css = None
+            else:
+                new_flair_text = u"Recording Available"
+                new_flair_css = u"four"
+
             for url in get_submission_urls(s):
                 stream = get_stream_from_url(url, None)
                 if stream:
@@ -135,8 +150,16 @@ def update_flairs():
 
                     if allow_flair_change:
                         flair_text, flair_css = stream._get_flair()
-                        if flair_text and flair_css:
-                            s.set_flair(flair_text, flair_css)
+                        # Somewhat complex logic for multi-stream submissions
+                        # Live > Recording Available > everything else
+                        if not new_flair_text or flair_text == "Live" or (new_flair_text != "Live" and flair_text == "Recording Available"):
+                            new_flair_text, new_flair_css = flair_text, flair_css
+
+                    if stream.type == 'youtube':
+                        s.recording_available = True
+
+            if new_flair_text and new_flair_css:
+                s.set_flair(flair_text, flair_css)
     except Exception as e:
         app.logger.exception(e)
 
