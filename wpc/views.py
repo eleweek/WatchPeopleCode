@@ -218,20 +218,38 @@ def authorize():
     return redirect(url)
 
 
-@app.route('/rtmp_auth', methods=['POST'])
-def rtmp_auth():
+def authenticate_stream(request):
     streamer_username = request.values.get('name', '')
     rtmp_secret = request.values.get('pass', '')
     streamer = Streamer.query.filter_by(reddit_username=streamer_username).first()
     if not streamer or not streamer.rtmp_secret or streamer.rtmp_secret != rtmp_secret:
+        app.logger.info("Fail to check credentials for streamer {}", steamer_username)
+        return None
+    return get_or_create(WPCStream, channel_name=streamer_username)
+
+
+
+@app.route('/rtmp_auth', methods=['POST'])
+def rtmp_auth():
+    stream = authenticate_stream(request)
+    if stream is None:
         abort(403)
 
-    stream = get_or_create(WPCStream, channel_name=streamer.reddit_username)
     stream.streamer = streamer
     stream.status = 'live'
     stream.actual_start_time = datetime.utcnow()
     db.session.commit()
     return "OK"
+
+
+@app.route('/rtmp_done', methods=['POST'])
+def rtmp_done():
+    stream = authenticate_stream(request)
+    if stream is not None:
+        stream.status = 'completed'
+        stream.actual_start_time = None
+        stream.current_viewers = None
+        db.session.commit()
 
 
 @app.route("/logout")
