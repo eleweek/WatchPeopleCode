@@ -43,7 +43,7 @@ def get_stream_from_url(url, submission=None, only_new=False):
 
     wc = wpc_channel(url)
     if wc is not None:
-        return WPCStream.query.filter_by(channel_name=wc).first()
+        db_stream = WPCStream.query.filter_by(channel_name=wc).first()
 
     return None if only_new else db_stream
 
@@ -77,7 +77,6 @@ def get_new_streams():
                 moditem[0].approve()
 
     submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
-    new_streams = set()
     # TODO : don't forget about http vs https
     # TODO better way of caching api requests
     for s in submissions:
@@ -94,7 +93,6 @@ def get_new_streams():
                     stream._update_status()
 
                     db.session.add(stream)
-                    new_streams.add(stream)
                     db.session.commit()
         except Exception as e:
             app.logger.exception(e)
