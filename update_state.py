@@ -120,7 +120,7 @@ def update_flairs():
             if not db_s.recording_available:
                 s.replace_more_comments()
                 for author, text in map(lambda c: (c.author, c.body), s.comments) + [(s.author, s.selftext)]:
-                    if author.name == s.author.name and re.search("recording\s+(is)?\s+available", text, flags=re.IGNORECASE):
+                    if author.name == s.author.name and re.search("recording\s+(is)?\s+(now)?\s+available", text, flags=re.IGNORECASE):
                         db_s.recording_available = True
                         db.session.commit()
 
