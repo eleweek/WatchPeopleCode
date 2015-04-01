@@ -220,6 +220,9 @@ def authorize():
 
 def authenticate_streamer():
     streamer_username = request.values.get('name', '')
+    if streamer_username == '%23test':
+        streamer_username = '#test'
+
     rtmp_secret = request.values.get('pass', '')
     streamer = Streamer.query.filter_by(reddit_username=streamer_username).first()
     if not streamer or not streamer.rtmp_secret or streamer.rtmp_secret != rtmp_secret:
@@ -233,6 +236,10 @@ def rtmp_auth():
     stream, streamer = authenticate_streamer()
     if stream is None:
         abort(403)
+
+    # test stream
+    if streamer.reddit_username == '#test':
+        return "OK"
 
     stream.streamer = streamer
     stream.status = 'live'
