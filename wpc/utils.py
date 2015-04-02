@@ -40,7 +40,7 @@ def twitch_channel(url):
 def wpc_channel(url):
     query = urlparse(url)
     path_elements = query.path.strip('/').split('/')
-    if query.hostname == 'www.watchpeoplecode.com' and len(path_elements) == 2 and path_elements[0] == 'streamer':
+    if query.hostname in ('www.watchpeoplecode.com', 'watchpeoplecode.com') and len(path_elements) == 2 and path_elements[0] == 'streamer':
         return path_elements[1]
 
 
