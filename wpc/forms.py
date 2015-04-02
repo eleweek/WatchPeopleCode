@@ -20,6 +20,11 @@ class SubscribeForm(Form):
     submit_button = SubmitField('Subscribe')
 
 
+class IdeaForm(Form):
+    description = TextAreaField("Soo... Streamers need your ideas. What kind of streams would you like to see here?", [validators.DataRequired()])
+    submit_button = SubmitField('Submit your idea')
+
+
 class EditStreamTitleForm(Form):
     title = StringField("Title", [validators.Length(max=200)])
     submit_button = SubmitField('Submit')

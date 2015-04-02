@@ -382,6 +382,11 @@ class Subscriber(db.Model):
         return '<Subscriber %d %r>' % (self.id, self.email)
 
 
+class Idea(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.Text(), nullable=False)
+
+
 class Streamer(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     reddit_username = db.column_property(db.Column(db.String(20), unique=True), comparator_factory=CaseInsensitiveComparator)

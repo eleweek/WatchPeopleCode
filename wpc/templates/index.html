@@ -26,6 +26,9 @@
         {% if live_streams %}
           {{ macros.streams(live_streams, 'live') }}
         {% else %}
+          <p>
+            {{ wtf.quick_form(idea_form) }}
+          </p>
           <h4> How about watching a random recorded stream? </h4>
           {{ macros.stream_macro(random_stream, false) }}
           <hr>
@@ -48,9 +51,9 @@
 
             <div class="panel-body">
               <div class="form-group">
-                {{ form.hidden_tag() }}
-                {{ wtf.form_field(form.email, value="") }}
-                {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'primary'}) }}
+                {{ subscribe_form.hidden_tag() }}
+                {{ wtf.form_field(subscribe_form.email, value="") }}
+                {{ wtf.form_field(subscribe_form.submit_button, button_map={'submit_button': 'primary'}) }}
               </div>
             </div>
           </div>

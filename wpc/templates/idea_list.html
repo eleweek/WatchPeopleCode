@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros with context %}
+
+{% block title %} Ideas for streamers {% endblock %}
+
+{% block content %}
+  {{super()}}
+  <div class="container">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th> Description </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for idea in ideas %} 
+          <tr>
+            <th scope="row">{{loop.index}}</th>
+            <td>{{idea.description}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
