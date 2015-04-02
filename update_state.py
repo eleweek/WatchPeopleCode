@@ -44,6 +44,8 @@ def get_stream_from_url(url, submission=None, only_new=False):
     wc = wpc_channel(url)
     if wc is not None:
         db_stream = WPCStream.query.filter_by(channel_name=wc).first()
+        if submission and submission not in db_stream.submissions:
+            return db_stream
 
     return None if only_new else db_stream
 
@@ -115,7 +117,7 @@ def update_flairs():
                 continue
 
             db_s = Submission.query.filter_by(submission_id=s.id).first()
-            if not db_s.recording_available:
+            if db_s and not db_s.recording_available:
                 s.replace_more_comments()
                 for author, text in map(lambda c: (c.author, c.body), s.comments) + [(s.author, s.selftext)]:
                     if author.name == s.author.name and re.search("recording\s+(is)?\s*(now)?\s*available", text, flags=re.IGNORECASE):
