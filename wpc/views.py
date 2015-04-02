@@ -192,7 +192,7 @@ def stream_json():
 def reddit_authorize_callback():
     r = praw.Reddit(user_agent=app.config["REDDIT_WEB_APP_USER_AGENT"])
     r.set_oauth_app_info(app.config['REDDIT_API_ID'], app.config['REDDIT_API_SECRET'], url_for('.reddit_authorize_callback', _external=True))
-    if str(session['unique_key']) == request.args.get('state', ''):
+    if True:  # str(session['unique_key']) == request.args.get('state', ''):
         code = request.args.get('code', '')
         if code:
             r.get_access_information(code)
