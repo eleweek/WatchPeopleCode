@@ -121,27 +121,27 @@ class WPCStream(Stream):
 
     def html_code(self, autoplay=False):
         return """
-                <div id="{}">Loading the player...</div>
+                <div id="{0}">Loading the player...</div>
 
                 <script type="text/javascript">
-                    jwplayer("{}").setup({{
+                    jwplayer("{0}").setup({{
                         playlist: [{{
                             sources: [{{
-                                file: 'rtmp://104.236.11.162/live/flv:{}'
+                                file: 'rtmp://104.236.11.162/live/flv:{0}'
                             }},{{
-                                file: "http://104.236.11.162/hls/{}.m3u8"
+                                file: "http://104.236.11.162/hls/{0}.m3u8"
                             }}]
                         }}],
                         width: "640",
                         height: "390",
-                        autostart: {},
+                        autostart: {1},
                         androidhls: true,
                         rtmp: {{
                             bufferlength: 0.4
                         }}
                     }});
                 </script>
-            """.format(self.channel_name, self.channel_name, self.channel_name, self.channel_name, "true" if autoplay else "false")
+            """.format(self.channel_name, "true" if autoplay else "false")
 
     def _get_flair(self):
         fst = self.format_start_time(start_time=False)
