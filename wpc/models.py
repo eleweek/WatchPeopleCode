@@ -69,9 +69,9 @@ class Stream(db.Model):
 class WPCStream(Stream):
     channel_name = db.Column(db.String(30), unique=True)
 
-    def __init__(self, name):
+    def __init__(self, channel_name):
         self.status = 'upcoming'
-        self.channel_name = name
+        self.channel_name = channel_name
         self.submissions = []
 
     def __eq__(self, other):
