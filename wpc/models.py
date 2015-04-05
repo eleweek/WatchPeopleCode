@@ -386,6 +386,15 @@ class Idea(db.Model):
     description = db.Column(db.Text(), nullable=False)
 
 
+class ChatMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sent_on = db.Column(db.DateTime, default=db.func.now())
+    streamer = db.relationship('Streamer', backref=db.backref('chat_messages', lazy='dynamic'))
+    streamer_id = db.Column('streamer_id', db.Integer(), db.ForeignKey('streamer.id'))
+    sender = db.Column(db.String())
+    text = db.Column(db.String())
+
+
 class Streamer(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     reddit_username = db.column_property(db.Column(db.String(20), unique=True), comparator_factory=CaseInsensitiveComparator)

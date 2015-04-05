@@ -1,6 +1,6 @@
 from wpc import db, app, socketio
 from wpc.models import MozillaStreamHack  # NOQA
-from wpc.models import YoutubeStream, WPCStream, Stream, Streamer, Subscriber, Idea, get_or_create
+from wpc.models import YoutubeStream, WPCStream, Stream, Streamer, Subscriber, Idea, ChatMessage, get_or_create
 from wpc.forms import SubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm, IdeaForm
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session, abort
@@ -343,20 +343,41 @@ def chat_connect():
     return True
 
 
+def check_chat_access_and_get_streamer(streamer_username=None):
+    if 'username' not in session:
+        abort(403)
+    if streamer_username is not None:
+        streamer = Streamer.query.filter_by(reddit_username=streamer_username.strip()).first_or_404()
+        return streamer
+
+
 @socketio.on('join', namespace='/chat')
-def join(streamer):
-    join_room(streamer)
+def join(streamer_username):
+    streamer = check_chat_access_and_get_streamer(streamer_username)
+    join_room(streamer.reddit_username)
     emit('join', True, session['username'])
 
 
 @socketio.on('disconnect', namespace='/chat')
 def chat_disconnect():
+    if 'username' not in session:
+        abort(403)
     chat_users.remove(session['username'])
 
 
 @socketio.on('message', namespace='/chat')
-def chat_message(message_text, streamer):
+def chat_message(message_text, streamer_username):
+    streamer = check_chat_access_and_get_streamer(streamer_username)
+    cm = ChatMessage(streamer=streamer, text=message_text, sender=session['username'])
+    db.session.add(cm)
+    db.session.commit()
+
     message = {"sender": session['username'],
                "text": nl2br_py(message_text)}
-    emit("message", message, room=streamer)
+    emit("message", message, room=streamer.reddit_username)
     return True
+
+
+@socketio.on_error_default
+def default_error_handler(e):
+    app.logger.error(e)
