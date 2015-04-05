@@ -256,6 +256,7 @@ def rtmp_auth():
 
     # test stream
     if streamer.reddit_username == '#test':
+        db.session.commit()
         return "OK"
 
     stream.status = 'live'
