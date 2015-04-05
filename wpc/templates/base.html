@@ -38,6 +38,11 @@
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
+          {% if current_user.is_authenticated() %}
+            <a href="{{ url_for("streamer_page", streamer_name=current_user.reddit_username) }}" class="btn navbar-btn">My Profile</a>
+          {% endif %}
+        </ul>
+        <ul class="nav navbar-nav">
           <form action="{{url_for('search')}}" method="POST" class="navbar-form" role="search">
             {{ g.search_form.hidden_tag() }}
             <input class="form-control" id="query" name="query" required type="text" value="">
