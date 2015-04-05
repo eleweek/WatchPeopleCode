@@ -252,11 +252,12 @@ def rtmp_auth():
     if stream is None:
         abort(403)
 
+    stream.streamer = streamer
+
     # test stream
     if streamer.reddit_username == '#test':
         return "OK"
 
-    stream.streamer = streamer
     stream.status = 'live'
     stream.actual_start_time = datetime.utcnow()
     db.session.commit()
@@ -271,6 +272,7 @@ def rtmp_done():
         stream.actual_start_time = None
         stream.current_viewers = None
         db.session.commit()
+    return "OK"
 
 
 @app.route("/logout")
