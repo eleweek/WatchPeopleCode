@@ -73,7 +73,7 @@ def index():
 
 @app.route('/idea_list', methods=['GET', 'POST'])
 def idea_list():
-    ideas = Idea.query.all()
+    ideas = Idea.query.order_by(Idea.id.desc()).all()
 
     idea_form = IdeaForm(prefix='idea')
     redir = process_idea_form(idea_form)
