@@ -51,7 +51,7 @@ def index():
     # Uncomment this when mozilla guys start livestreaming
     # live_streams.insert(0, MozillaStreamHack())
     idea_form = IdeaForm(prefix='idea')
-    redir = process_idea_form()
+    redir = process_idea_form(idea_form)
     if redir:
         return redir
 
