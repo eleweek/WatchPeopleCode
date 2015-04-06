@@ -35,11 +35,25 @@ def url_for_other_page(page):
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 
 
+def process_idea_form(idea_form):
+    if idea_form.submit_button.data and idea_form.validate_on_submit():
+        idea = Idea()
+        idea_form.populate_obj(idea)
+        db.session.add(idea)
+        db.session.commit()
+        flash("Your idea was added successfully", "success")
+        return redirect(url_for("idea_list"))
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
     # Uncomment this when mozilla guys start livestreaming
     # live_streams.insert(0, MozillaStreamHack())
+    idea_form = IdeaForm(prefix='idea')
+    redir = process_idea_form()
+    if redir:
+        return redir
 
     subscribe_form = SubscribeForm(prefix='subscribe')
     if subscribe_form.submit_button.data and subscribe_form.validate_on_submit():
@@ -50,15 +64,6 @@ def index():
         flash("you've subscribed successfully", "success")
         return redirect(url_for('.index'))
 
-    idea_form = IdeaForm(prefix='idea')
-    if idea_form.submit_button.data and idea_form.validate_on_submit():
-        idea = Idea()
-        idea_form.populate_obj(idea)
-        db.session.add(idea)
-        db.session.commit()
-        flash("Your idea was added successfully", "success")
-        return redirect(url_for("idea_list"))
-
     random_stream = YoutubeStream.query.filter(YoutubeStream.status != 'upcoming').order_by(db.func.random()).first()
     upcoming_streams = Stream.query.filter_by(status='upcoming').order_by(Stream.scheduled_start_time.asc()).all()
     return render_template('index.html', subscribe_form=subscribe_form, idea_form=idea_form, live_streams=live_streams,
@@ -66,10 +71,16 @@ def index():
                            upcoming_streams=upcoming_streams)
 
 
-@app.route('/idea_list')
+@app.route('/idea_list', methods=['GET', 'POST'])
 def idea_list():
     ideas = Idea.query.all()
-    return render_template("idea_list.html", ideas=ideas)
+
+    idea_form = IdeaForm(prefix='idea')
+    redir = process_idea_form(idea_form)
+    if redir:
+        return redir
+
+    return render_template("idea_list.html", ideas=ideas, idea_form=idea_form)
 
 
 # TODO it is copypasted from index(), but whatever, this is one time change
