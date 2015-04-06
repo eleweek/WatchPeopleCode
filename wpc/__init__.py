@@ -45,6 +45,8 @@ def create_app():
     app.config['GA_TRACKING_CODE'] = os.environ.get('GA_TRACKING_CODE', '')
     app.config['REDDIT_API_ID'] = os.environ.get('WPC_APP_ID', '')
     app.config['REDDIT_API_SECRET'] = os.environ.get('WPC_APP_SECRET', '')
+    app.config['RTMP_LOGIN'] = os.environ.get('RTMP_LOGIN', '')
+    app.config['RTMP_PASSWORD'] = os.environ.get('RTMP_PASSWORD', '')
 
     app.config['REDDIT_WEB_APP_USER_AGENT'] = "/r/WatchPeopleCode web app(main contact: /u/godlikesme)"
 

@@ -86,7 +86,9 @@ class WPCStream(Stream):
     def _update_status(self):
         app.logger.info("Updating status for {}".format(self))
         try:
-            r = requests_get_with_retries("http://104.236.11.162/stat")
+            r = requests_get_with_retries(
+                "http://{}:{}@104.236.11.162/stat".format(
+                    app.config['RTMP_LOGIN'], app.config['RTMP_PASSWORD']))
             r.raise_for_status()
         except Exception as e:
             app.logger.error("Error while updating {}".format(self))
@@ -104,14 +106,14 @@ class WPCStream(Stream):
                     if self.actual_start_time is None:
                         self.actual_start_time = datetime.utcnow()
                 # workaround for situations when update_state changes status before streamer get authorization
-                elif self.status == 'live' and self.actual_start_time and datetime.utcnow() - self.actual_start_time > timedelta(seconds=30):
+                elif self.status == 'live' and (self.actual_start_time is None or datetime.utcnow() - self.actual_start_time > timedelta(seconds=30)):
                     self.status = 'completed'
                     self.actual_start_time = None
                     self.current_viewers = None
                 break
         # same workaround
         else:
-            if self.actual_start_time and datetime.utcnow() - self.actual_start_time > timedelta(seconds=30):
+            if self.status == 'live' and (self.actual_start_time is None or datetime.utcnow() - self.actual_start_time > timedelta(seconds=30)):
                 self.status = 'completed'
                 self.actual_start_time = None
                 self.current_viewers = None
