@@ -372,6 +372,10 @@ def check_chat_access_and_get_streamer(streamer_username=None):
 def join(streamer_username):
     streamer = check_chat_access_and_get_streamer(streamer_username)
     join_room(streamer.reddit_username)
+    emit('last_messages',
+         [{"sender": msg.sender,
+           "text": nl2br_py(msg.text)}
+          for msg in reversed(ChatMessage.query.filter_by(streamer=streamer).order_by(ChatMessage.id.desc()).limit(20).all())])
     emit('join', True, session['username'])
 
 

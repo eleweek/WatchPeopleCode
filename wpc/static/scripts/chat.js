@@ -29,6 +29,12 @@
                 }
             });
 
+            this.socket.on('last_messages', function(messages, group){
+                if (that.onLastMessages) {
+                    that.onLastMessages(messages);
+                }
+            });
+
             this.socket.emit('join', streamer);
         },
 
@@ -125,7 +131,18 @@
                 )
             );
         };
-        
+
+        chatAPI.onLastMessages = function(messages){
+            var msgs = $(".messages");
+            for (i = 0; i < messages.length; i++ ) {
+                msgs.append(
+                    jQuery("<li>").html(
+                        format_message(messages[i])
+                    )
+                )
+            }
+            msgs.animate({ scrollTop: msgs[0].scrollHeight }, "fast");
+        }
     };
 
     var ready = function(){
