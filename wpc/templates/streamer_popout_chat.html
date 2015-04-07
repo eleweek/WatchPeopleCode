@@ -1,0 +1,37 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %} {{ streamer.reddit_username }}'s chat {% endblock %}
+tchStream.query.filter_by(channel='liveoverflow').one().status = 'live'
+{% block styles %}
+  {{super()}}
+  <link rel="stylesheet" href="{{url_for('static', filename='chat.css')}}">
+{% endblock %}
+
+{% block content %}
+  <div class="panel panel-default panel-chat">
+
+    <div class="panel-heading">
+      <h3 class="panel-title">Chat:
+        <span class="streamer-name"> {{ streamer.reddit_username }}</span>
+      </h3>
+    </div>
+
+    <div class="panel-body">
+      <ul class="messages"></ul>
+      <form class="compose-message-form">
+        <div class="form-group">
+          <textarea class="form-control" name="message"></textarea>
+          <br>
+          <button class="btn btn-info" type="submit">Send </button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='scripts/socket.io.min.js') }}"></script>
+  <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+  <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
+{% endblock scripts %}

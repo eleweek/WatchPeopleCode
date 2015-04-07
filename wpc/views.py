@@ -148,10 +148,16 @@ def nl2br_py(value):
     return result
 
 
+@app.route('/streamer/<streamer_name>/popout_chat', methods=["GET", "POST"])
+def streamer_popout_chat(streamer_name):
+    streamer = Streamer.query.filter_by(reddit_username=streamer_name).first_or_404()
+    return render_template("streamer_popout_chat.html", streamer=streamer)
+
+
 @app.route('/streamer/<streamer_name>', defaults={'page': 1}, methods=["GET", "POST"])
 @app.route('/streamer/<streamer_name>/<int:page>', methods=["GET", "POST"])
 def streamer_page(streamer_name, page):
-    streamer = Streamer.query.filter_by(reddit_username=streamer_name).first()
+    streamer = Streamer.query.filter_by(reddit_username=streamer_name).first_or_404()
     wpc_stream = streamer.streams.filter_by(type='wpc_stream').first()
     streams = streamer.streams
     if wpc_stream:
