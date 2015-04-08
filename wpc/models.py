@@ -142,6 +142,18 @@ class WPCStream(Stream):
                             bufferlength: 0.4
                         }}
                     }});
+                    jwplayer({0}).onBuffer(function(){{
+                        theTimeout{0} = setTimeout(function(){{
+                            var playlistItem = jwplayer({0}).getPlaylistItem(0);
+                            playlistItem.image = "http://placekitten.com/640/390";
+                            console.log(playlistItem);
+                            jwplayer({0}).load([playlistItem]);
+                            console.log(jwplayer({0}).getPlaylist());
+                        }},3000);
+                    }});
+                    jwplayer({0}).onPlay(function(){{
+                        clearTimeout(theTimeout{0});
+                    }});
                 </script>
             """.format(self.channel_name, "true" if autoplay else "false")
 
