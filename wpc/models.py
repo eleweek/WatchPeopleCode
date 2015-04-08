@@ -149,7 +149,7 @@ class WPCStream(Stream):
                             console.log(playlistItem);
                             jwplayer({0}).load([playlistItem]);
                             console.log(jwplayer({0}).getPlaylist());
-                        }},3000);
+                        }},7000);
                     }});
                     jwplayer({0}).onPlay(function(){{
                         clearTimeout(theTimeout{0});
