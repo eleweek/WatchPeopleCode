@@ -145,7 +145,7 @@ class WPCStream(Stream):
                     jwplayer({0}).onBuffer(function(){{
                         theTimeout{0} = setTimeout(function(){{
                             var playlistItem = jwplayer({0}).getPlaylistItem(0);
-                            playlistItem.image = "http://placekitten.com/640/390";
+                            playlistItem.image = "{2}";
                             console.log(playlistItem);
                             jwplayer({0}).load([playlistItem]);
                             console.log(jwplayer({0}).getPlaylist());
@@ -155,7 +155,7 @@ class WPCStream(Stream):
                         clearTimeout(theTimeout{0});
                     }});
                 </script>
-            """.format(self.channel_name, "true" if autoplay else "false")
+            """.format(self.channel_name, "true" if autoplay else "false", url_for("static", filename="dragon_is_offline.png", _external=True))
 
     def _get_flair(self):
         fst = self.format_start_time(start_time=False)
