@@ -221,7 +221,10 @@ class YoutubeStream(Stream):
                     self.current_viewers = item['liveStreamingDetails']['concurrentViewers']
             if item['snippet']['liveBroadcastContent'] == 'live':
                 self.status = 'live'
-                self.actual_start_time = item['liveStreamingDetails']['actualStartTime']
+                if 'actualStartTime' in item['liveStreamingDetails']:
+                    self.actual_start_time = item['liveStreamingDetails']['actualStartTime']
+                else:  # Youtube is weird, and sometimes this happens. If there is no actual start time, then we fall back to scheduledStartTime
+                    self.actual_start_time = item['liveStreamingDetails']['scheduledStartTime']
             elif item['snippet']['liveBroadcastContent'] == 'upcoming':
                 self.status = 'upcoming'
             else:
