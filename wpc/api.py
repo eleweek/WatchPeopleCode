@@ -24,7 +24,7 @@ def transform_streamer(streamer):
     }
 
 
-@app.route('/api/streams/live')
+@app.route('/api/v1/streams/live')
 @crossdomain(origin='*', max_age=15)
 def api_streams_live():
     try:
@@ -34,7 +34,7 @@ def api_streams_live():
         app.logger.exception(e)
         abort(500)
 
-@app.route('/api/streams/upcoming')
+@app.route('/api/v1/streams/upcoming')
 @crossdomain(origin='*', max_age=15)
 def api_streams_upcoming():
     try:
@@ -44,7 +44,7 @@ def api_streams_upcoming():
         app.logger.exception(e)
         abort(500)
 
-@app.route('/api/streams/completed')
+@app.route('/api/v1/streams/completed')
 @crossdomain(origin='*', max_age=15)
 def api_streams_past():
     try:
@@ -54,7 +54,7 @@ def api_streams_past():
         app.logger.exception(e)
         abort(500)
 
-@app.route('/api/streams/<stream_id>')
+@app.route('/api/v1/streams/<stream_id>')
 @crossdomain(origin='*', max_age=15)
 def api_streams_view(stream_id):
     try:
@@ -68,7 +68,7 @@ def api_streams_view(stream_id):
         abort(500)
 
 
-@app.route('/api/streamers')
+@app.route('/api/v1/streamers')
 @crossdomain(origin='*', max_age=15)
 def api_streamers():
     try:
@@ -78,7 +78,7 @@ def api_streamers():
         app.logger.exception(e)
         abort(500)
 
-@app.route('/api/streamers/<name>')
+@app.route('/api/v1/streamers/<name>')
 @crossdomain(origin='*', max_age=15)
 def api_streamers_view(name):
     try:
@@ -91,7 +91,7 @@ def api_streamers_view(name):
         app.logger.exception(e)
         abort(500)
 
-@app.route('/api/streamers/<name>/upcoming')
+@app.route('/api/v1/streamers/<name>/upcoming')
 @crossdomain(origin='*', max_age=15)
 def api_streamers_upcoming(name):
     try:
@@ -105,7 +105,7 @@ def api_streamers_upcoming(name):
         app.logger.exception(e)
         abort(500)
 
-@app.route('/api/streamers/<name>/live')
+@app.route('/api/v1/streamers/<name>/live')
 @crossdomain(origin='*', max_age=15)
 def api_streamers_live(name):
     try:
@@ -119,7 +119,7 @@ def api_streamers_live(name):
         app.logger.exception(e)
         abort(500)
 
-@app.route('/api/streamers/<name>/completed')
+@app.route('/api/v1/streamers/<name>/completed')
 @crossdomain(origin='*', max_age=15)
 def api_streamers_past(name):
     try:
