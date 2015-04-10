@@ -421,6 +421,7 @@ class Streamer(db.Model, UserMixin):
     info = db.Column(db.Text())
     checked = db.Column(db.Boolean(), default=False)
     rtmp_secret = db.Column(db.String(50))
+    test = db.Column(db.Boolean(), default=False)
 
     def __init__(self, reddit_username, checked=False):
         self.reddit_username = reddit_username
