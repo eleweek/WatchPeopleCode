@@ -11,8 +11,7 @@ import datetime
 import re
 
 
-reddit_user_agent = "/r/WatchPeopleCode flairs&streams bot (main contact: /u/godlikesme)"
-r = praw.Reddit(user_agent=reddit_user_agent)
+r = praw.Reddit(user_agent=app.config['REDDIT_BOT_USER_AGENT'])
 r.config.decode_html_entities = True
 if app.config['REDDIT_PASSWORD']:
     r.login(app.config['REDDIT_USERNAME'], app.config['REDDIT_PASSWORD'])
