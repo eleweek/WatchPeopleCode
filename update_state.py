@@ -153,7 +153,7 @@ def update_flairs():
                         flair_text, flair_css = stream._get_flair()
                         # Somewhat complex logic for multi-stream submissions
                         # Live > Recording Available > everything else
-                        if not new_flair_text or flair_text == "Live" or (new_flair_text != "Live" and flair_text == "Recording Available"):
+                        if not new_flair_text or flair_text == "Live" or (new_flair_text != "Live" and flair_text == "Recording Available") or (new_flair_text != "Live" and stream.status == "upcoming"):
                             new_flair_text, new_flair_css = flair_text, flair_css
 
                     if stream.type == 'youtube':
