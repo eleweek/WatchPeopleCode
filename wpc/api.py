@@ -58,9 +58,7 @@ def api_streams_past():
 @crossdomain(origin='*', max_age=15)
 def api_streams_view(stream_id):
     try:
-        st = Stream.query.get(stream_id)
-        if st is None:
-            abort(404)
+        st = Stream.query.get_or_404(stream_id)
         return jsonify(data=transform_stream(st),
                        info={'status': 200})
     except Exception as e:
@@ -83,8 +81,6 @@ def api_streamers():
 def api_streamers_view(name):
     try:
         streamer = Streamer.query.filter_by(reddit_username=name).first_or_404()
-        if streamer is None:
-            abort(404)
         return jsonify(data=transform_streamer(streamer),
                        info={'status': 200})
     except Exception as e:
@@ -96,8 +92,6 @@ def api_streamers_view(name):
 def api_streamers_upcoming(name):
     try:
         streamer = Streamer.query.filter_by(reddit_username=name).first_or_404()
-        if streamer is None:
-            abort(404)
         streams = streamer.streams.filter(Stream.status == 'upcoming')
         return jsonify(data=[transform_stream(st) for st in streams],
                        info={'status': 200})
@@ -110,8 +104,6 @@ def api_streamers_upcoming(name):
 def api_streamers_live(name):
     try:
         streamer = Streamer.query.filter_by(reddit_username=name).first_or_404()
-        if streamer is None:
-            abort(404)
         streams = streamer.streams.filter(Stream.status == 'live')
         return jsonify(data=[transform_stream(st) for st in streams],
                        info={'status': 200})
@@ -124,8 +116,6 @@ def api_streamers_live(name):
 def api_streamers_past(name):
     try:
         streamer = Streamer.query.filter_by(reddit_username=name).first_or_404()
-        if streamer is None:
-            abort(404)
         streams = streamer.streams.filter(Stream.status == 'completed')
         return jsonify(data=[transform_stream(st) for st in streams],
                        info={'status': 200})
