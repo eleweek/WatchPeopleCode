@@ -12,6 +12,7 @@
             this.socket.on('connect', done);
 
             this.socket.on('join', function(joined, my_username){
+                console.log('join');
                 if(that.onJoin){
                     that.onJoin(joined, my_username);
                 }
@@ -24,9 +25,12 @@
             });
 
             this.socket.on('disconnect', function(){
+                console.log('disconnect');
                 if (that.onDisconnect) {
                     that.onDisconnect();
                 }
+                that.socket.emit('initialize');
+                that.socket.emit('join', streamer);
             });
 
             this.socket.on('last_messages', function(messages, group){
@@ -35,6 +39,7 @@
                 }
             });
 
+            this.socket.emit('initialize');
             this.socket.emit('join', streamer);
         },
 

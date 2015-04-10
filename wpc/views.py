@@ -340,6 +340,12 @@ chat_users = list()
 
 @socketio.on('connect', namespace='/chat')
 def chat_connect():
+    print('New connection')
+    return True
+
+
+@socketio.on('initialize', namespace='/chat')
+def chat_initialize():
     first_words = ['True', 'False', 'For', 'While', 'If', 'Else', 'Elif', 'Undefined', 'Do',
                    'Exit', 'Continue', 'Super', 'Break', 'Try', 'Catch', 'Class', 'Object',
                    'Def', 'Var', 'Pass', 'Return', 'Static', 'Const', 'Template', 'Delete', 'Int',
@@ -347,7 +353,6 @@ def chat_connect():
     second_words = ['C', 'C++', 'Lisp', 'Python', 'Java', 'JavaScript', 'Pascal', 'Objective-C',
                     'C#', 'Perl', 'Ruby', 'Ada', 'Haskell', 'Octave', 'Basic', 'Fortran', 'PHP', 'R',
                     'Assembly', 'COBOL', 'Rust', 'Swift', 'Bash']
-    print('New connection')
 
     if current_user.is_authenticated():
         session['username'] = current_user.reddit_username
@@ -357,8 +362,6 @@ def chat_connect():
             if session['username'] not in chat_users:
                 break
     chat_users.append(session['username'])
-
-    return True
 
 
 def check_chat_access_and_get_streamer(streamer_username=None):
