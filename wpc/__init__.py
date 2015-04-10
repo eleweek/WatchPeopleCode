@@ -66,3 +66,4 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 socketio = SocketIO(app)
 import wpc.views  # NOQA
+import wpc.api    # NOQA
