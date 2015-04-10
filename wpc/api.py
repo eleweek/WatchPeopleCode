@@ -92,7 +92,7 @@ def api_streamers_view(name):
 def api_streamers_upcoming(name):
     try:
         streamer = Streamer.query.filter_by(reddit_username=name).first_or_404()
-        streams = streamer.streams.filter(Stream.status == 'upcoming')
+        streams = streamer.streams.filter_by(status = 'upcoming')
         return jsonify(data=[transform_stream(st) for st in streams],
                        info={'status': 200})
     except Exception as e:
@@ -104,7 +104,7 @@ def api_streamers_upcoming(name):
 def api_streamers_live(name):
     try:
         streamer = Streamer.query.filter_by(reddit_username=name).first_or_404()
-        streams = streamer.streams.filter(Stream.status == 'live')
+        streams = streamer.streams.filter_by(status = 'live')
         return jsonify(data=[transform_stream(st) for st in streams],
                        info={'status': 200})
     except Exception as e:
@@ -116,7 +116,7 @@ def api_streamers_live(name):
 def api_streamers_past(name):
     try:
         streamer = Streamer.query.filter_by(reddit_username=name).first_or_404()
-        streams = streamer.streams.filter(Stream.status == 'completed')
+        streams = streamer.streams.filter_by(status = 'completed')
         return jsonify(data=[transform_stream(st) for st in streams],
                        info={'status': 200})
     except Exception as e:
