@@ -142,20 +142,20 @@ class WPCStream(Stream):
                             bufferlength: 0.4
                         }}
                     }});
-                    jwplayer({0}).onBuffer(function(){{
+                    jwplayer("{0}").onBuffer(function(){{
                         theTimeout{0} = setTimeout(function(){{
-                            var playlistItem = jwplayer({0}).getPlaylistItem(0);
+                            var playlistItem = jwplayer("{0}").getPlaylistItem(0);
                             playlistItem.image = "{2}";
                             console.log(playlistItem);
-                            jwplayer({0}).load([playlistItem]);
-                            console.log(jwplayer({0}).getPlaylist());
+                            jwplayer("{0}").load([playlistItem]);
+                            console.log(jwplayer("{0}").getPlaylist());
                         }},7000);
                     }});
-                    jwplayer({0}).onPlay(function(){{
+                    jwplayer("{0}").onPlay(function(){{
                         clearTimeout(theTimeout{0});
                     }});
                 </script>
-            """.format(self.channel_name, "true" if autoplay else "false", url_for("static", filename="dragon_is_offline.png", _external=True))
+            """.format(self.channel_name, "true" if autoplay else "false", url_for("static", filename="dragon_is_offline.png"))
 
     def _get_flair(self):
         fst = self.format_start_time(start_time=False)
