@@ -55,9 +55,7 @@ def extract_links_from_selftexts(selftext_html):
 
 
 def get_submission_urls(submission):
-    reddit_urls = [submission.url] + (extract_links_from_selftexts(submission.selftext_html) if submission.selftext_html else [])
-    db_urls = [s.normal_url() for s in Submission.query.filter_by(submission_id=submission.id).one().streams if s.type != "wpc_stream"]
-    return list(set(reddit_urls + db_urls))
+    return [submission.url] + (extract_links_from_selftexts(submission.selftext_html) if submission.selftext_html else [])
 
 
 def get_reddit_username(submission, url):
