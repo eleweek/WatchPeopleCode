@@ -87,8 +87,8 @@ class WPCStream(Stream):
         app.logger.info("Updating status for {}".format(self))
         try:
             r = requests_get_with_retries(
-                "http://{}:{}@104.236.11.162/stat".format(
-                    app.config['RTMP_LOGIN'], app.config['RTMP_PASSWORD']))
+                "http://{}:{}@{}/stat".format(
+                    app.config['RTMP_LOGIN'], app.config['RTMP_PASSWORD'], app.config['RTMP_SERVER']))
             r.raise_for_status()
         except Exception as e:
             app.logger.error("Error while updating {}".format(self))
@@ -129,9 +129,9 @@ class WPCStream(Stream):
                     jwplayer("{0}").setup({{
                         playlist: [{{
                             sources: [{{
-                                file: 'rtmp://104.236.11.162/live/flv:{0}'
+                                file: 'rtmp://{3}/live/flv:{0}'
                             }},{{
-                                file: "http://104.236.11.162/hls/{0}.m3u8"
+                                file: "http://{3}/hls/{0}.m3u8"
                             }}]
                         }}],
                         width: "640",
@@ -155,7 +155,7 @@ class WPCStream(Stream):
                         clearTimeout(theTimeout{0});
                     }});
                 </script>
-            """.format(self.channel_name, "true" if autoplay else "false", url_for("static", filename="dragon_is_offline.png"))
+            """.format(self.channel_name, "true" if autoplay else "false", url_for("static", filename="dragon_is_offline.png"), app.config['RTMP_SERVER'])
 
     def _get_flair(self):
         fst = self.format_start_time(start_time=False)
