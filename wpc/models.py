@@ -146,9 +146,7 @@ class WPCStream(Stream):
                         theTimeout{0} = setTimeout(function(){{
                             var playlistItem = jwplayer("{0}").getPlaylistItem(0);
                             playlistItem.image = "{2}";
-                            console.log(playlistItem);
                             jwplayer("{0}").load([playlistItem]);
-                            console.log(jwplayer("{0}").getPlaylist());
                         }},7000);
                     }});
                     jwplayer("{0}").onPlay(function(){{
