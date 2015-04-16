@@ -184,8 +184,7 @@ def streamer_page(streamer_name, page):
                 if title_form.validate_on_submit():
                     wpc_stream.title = title_form.title.data
                     db.session.commit()
-                    flash("Updated successfully", category='success')
-                    return redirect(url_for('.streamer_page', streamer_name=streamer_name, page=page))
+                    return jsonify(newTitle=Markup.escape(title_form.title.data))
 
                 else:
                     return render_template('streamer.html', streamer=streamer,

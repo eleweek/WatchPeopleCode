@@ -131,6 +131,7 @@
   <script src="{{ url_for('static', filename='scripts/socket.io.min.js') }}"></script>
   <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
   <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
+  <script src="http://malsup.github.com/jquery.form.js"></script>
 
   <script>
     (function($, window, undefined){
@@ -163,5 +164,26 @@
         }
       });
     }($, window));
-  </script> 
+
+    $(document).ready(function() {
+        console.log("OMNOM form");
+        var options = {
+            success: function(responseText){
+              $(".form-edit-title").hide();
+              $(".stream-title-name").html(responseText.newTitle);
+              $(".stream-title").show();
+              $(".edit-title-button").show();
+            },
+            dataType: 'json',
+            clearForm: false,
+            resetForm: false
+        }
+        $('.form-edit-title').ajaxForm();
+        $('.form-edit-title').submit(function() {
+            console.log("Submitted form");
+            $(this).ajaxSubmit(options);
+            return false;
+        });
+    });
+  </script>
 {% endblock %}
