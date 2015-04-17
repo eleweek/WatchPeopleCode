@@ -153,10 +153,21 @@ def streamer_popout_chat(streamer_name):
     streamer = Streamer.query.filter_by(reddit_username=streamer_name).first_or_404()
     return render_template("streamer_popout_chat.html", streamer=streamer)
 
+@app.route('/admin/streamer/<streamer_name>/rtmp_redirect/<int:redirect_id>')
+def streamer_rtmp_redirect(streamer_name, redirect_id):
+    print request.remote_addr
+    if request.remote_addr not in ['5.9.36.114', '127.0.0.1']:
+        abort(403)
+    if redirect_id not in [1, 2, 3]:
+        abort(404)
+    streamer = Streamer.query.filter_by(reddit_username=streamer_name).first_or_404()
+    redirect_url = getattr(streamer, 'rtmp_redirect_{}'.format(redirect_id))
+    if not redirect_url:
+        abort(404)
+    return redirect_url
 
-@app.route('/streamer/<streamer_name>', defaults={'page': 1}, methods=["GET", "POST"])
-@app.route('/streamer/<streamer_name>/<int:page>', methods=["GET", "POST"])
-def streamer_page(streamer_name, page):
+@app.route('/streamer/<streamer_name>/<int:redirect_id>', methods=["GET", "POST"])
+def streamer_page(streamer_name, redirect_id):
     streamer = Streamer.query.filter_by(reddit_username=streamer_name).first_or_404()
     wpc_stream = streamer.streams.filter_by(type='wpc_stream').first()
     streams = streamer.streams

@@ -420,6 +420,12 @@ class Streamer(db.Model, UserMixin):
     checked = db.Column(db.Boolean(), default=False)
     rtmp_secret = db.Column(db.String(50))
     test = db.Column(db.Boolean(), default=False)
+    # XXX: this is kinda ugly, but simple
+    # nginx-rtmp supports only fixed number of redirects
+    # TODO: This should be fixed later
+    rtmp_redirect_1 = db.Column(db.String())
+    rtmp_redirect_2 = db.Column(db.String())
+    rtmp_redirect_3 = db.Column(db.String())
 
     def __init__(self, reddit_username, checked=False):
         self.reddit_username = reddit_username
