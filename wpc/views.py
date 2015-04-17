@@ -15,6 +15,7 @@ import random
 from feedgen.feed import FeedGenerator
 from datetime import datetime
 import pytz
+import uuid
 
 
 @app.before_request
@@ -25,6 +26,12 @@ def add_ga_tracking_code():
 @app.before_request
 def create_search_form():
     g.search_form = SearchForm()
+
+
+@app.before_request
+def add_rtmp_secret():
+    if current_user.is_authenticated() and not current_user.rtmp_secret:
+        current_user.rtmp_secret == uuid.uuid4()
 
 
 @app.before_request
