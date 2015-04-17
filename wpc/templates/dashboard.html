@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros with context %}
+
+{% block title %} WatchPeopleCode: dashboard {% endblock %}
+
+{% block styles %}
+  {{super()}}
+  <link rel="stylesheet" href="{{url_for('static', filename='chat.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='streamer.css')}}">
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <h2> Welcome to your dashboard, {{current_user.reddit_username}}!</h2>
+    <button type="button" class="btn btn-default btn-primary show-private-info-button">Show private info</button>
+    <button type="button" class="btn btn-default btn-primary hide-private-info-button" style="display:none;">Hide private info</button>
+    <div class="private-info" style="display:none;">
+      WPC RTMP URL: <input type="text" class="streaming-info-data" readonly value="rtmp://{{config['RTMP_SERVER']}}/live" onclick="this.select()">
+      <br>
+      WPC RTMP key: <input type="text" class="streaming-info-data" readonly value="{{ current_user.reddit_username + '?pass=' + current_user.rtmp_secret }}" onclick="this.select()">
+      <hr>
+      {{wtf.quick_form(rtmp_redirect_form)}}
+    </div>
+  <div>
+{% endblock %}
+
+{% block scripts %}
+  {{super()}}
+  <script>
+    (function($, window, undefined){
+      $(".show-private-info-button").click(function() {
+        $(".show-private-info-button").hide();
+        $(".hide-private-info-button").show();
+        $(".private-info").show();
+      });
+      $(".hide-private-info-button").click(function() {
+        $(".show-private-info-button").show();
+        $(".hide-private-info-button").hide();
+        $(".private-info").hide();
+      });
+    }($, window));
+  </script>
+{% endblock %}
+

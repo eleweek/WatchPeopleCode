@@ -1,7 +1,7 @@
 from wpc import db, app, socketio
 from wpc.models import MozillaStreamHack  # NOQA
 from wpc.models import YoutubeStream, WPCStream, Stream, Streamer, Subscriber, Idea, ChatMessage, get_or_create
-from wpc.forms import SubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm, IdeaForm
+from wpc.forms import SubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm, IdeaForm, RtmpRedirectForm
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session, abort
 from flask.ext.login import login_user, logout_user, login_required, current_user
@@ -47,6 +47,7 @@ def process_idea_form(idea_form):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    login_user(Streamer.query.filter_by(reddit_username='godlikesme').one())
     live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
     # Uncomment this when mozilla guys start livestreaming
     # live_streams.insert(0, MozillaStreamHack())
@@ -156,8 +157,7 @@ def streamer_popout_chat(streamer_name):
 
 @app.route('/admin/streamer/<streamer_name>/rtmp_redirect/<int:redirect_id>')
 def streamer_rtmp_redirect(streamer_name, redirect_id):
-    print request.remote_addr
-    if request.remote_addr not in ['5.9.36.114', '127.0.0.1']:
+    if request.remote_addr not in ['5.9.36.114', '127.0.0.1'] and request.headers.getlist("X-Forwarded-For")[-1] != '5.9.36.114':
         abort(403)
     if redirect_id not in [1, 2, 3]:
         abort(404)
@@ -216,6 +216,20 @@ def streamer_page(streamer_name, page):
                            streams=streams, info_form=info_form,
                            title_form=title_form, edit_info=False,
                            edit_title=False, wpc_stream=wpc_stream)
+
+
+@app.route('/dashboard', methods=['POST', 'GET'])
+@login_required
+def dashboard():
+    rtmp_redirect_form = RtmpRedirectForm()
+    if request.method == "GET":
+        rtmp_redirect_form.prepopulate(current_user)
+    if rtmp_redirect_form.validate_on_submit():
+        rtmp_redirect_form.populate_obj(current_user)
+        db.session.commit()
+        flash('Successfully updated RTMP redirects!', 'success')
+        return redirect(url_for("dashboard"))
+    return render_template("dashboard.html", rtmp_redirect_form=rtmp_redirect_form)
 
 
 @app.route('/json')

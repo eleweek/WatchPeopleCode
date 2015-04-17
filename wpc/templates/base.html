@@ -40,6 +40,7 @@
         <ul class="nav navbar-nav">
           {% if current_user.is_authenticated() %}
             <a href="{{ url_for("streamer_page", streamer_name=current_user.reddit_username) }}" class="btn navbar-btn">My Profile</a>
+            <a href="{{ url_for("dashboard") }}" class="btn navbar-btn">My Dashboard</a>
           {% endif %}
         </ul>
         <ul class="nav navbar-nav">

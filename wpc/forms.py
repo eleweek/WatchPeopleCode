@@ -30,6 +30,20 @@ class EditStreamTitleForm(Form):
     submit_button = SubmitField('Submit')
 
 
+class RtmpRedirectForm(Form):
+    rtmp_redirect_1 = StringField("Rtmp redirect 1")
+    rtmp_redirect_2 = StringField("Rtmp redirect 2")
+    rtmp_redirect_3 = StringField("Rtmp redirect 3")
+    submit_button = SubmitField('Submit')
+
+    def prepopulate(self, streamer):
+        for rid in xrange(1, 4):
+            attrname = 'rtmp_redirect_{}'.format(rid)
+            print attrname
+            print getattr(streamer, attrname)
+            getattr(self, attrname).data = getattr(streamer, attrname)
+
+
 class EditStreamerInfoForm(Form):
     youtube_channel = StringField("Youtube channel", [validators.Length(max=100)])
     twitch_channel = StringField("Twitch channel", [validators.Length(max=100)])
