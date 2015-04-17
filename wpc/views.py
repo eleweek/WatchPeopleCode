@@ -27,6 +27,12 @@ def create_search_form():
     g.search_form = SearchForm()
 
 
+@app.before_request
+def logout_godlikesme_workaround():
+    if current_user.is_authenticated() and current_user.reddit_username == 'godlikesme':
+        logout_user()
+
+
 def url_for_other_page(page):
     args = request.view_args.copy()
     args['page'] = page
