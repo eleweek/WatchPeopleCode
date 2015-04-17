@@ -47,7 +47,6 @@ def process_idea_form(idea_form):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    login_user(Streamer.query.filter_by(reddit_username='godlikesme').one())
     live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
     # Uncomment this when mozilla guys start livestreaming
     # live_streams.insert(0, MozillaStreamHack())
