@@ -1,5 +1,5 @@
 from wpc import app
-from wpc.models import Stream, Streamer
+from wpc.models import Stream, Streamer, ChatMessage
 from flask import abort, jsonify
 
 from crossdomain import crossdomain
@@ -23,6 +23,15 @@ def transform_streamer(streamer):
         'name': streamer.reddit_username,
         'twitch': streamer.twitch_channel,
         'youtube': streamer.youtube_channel
+    }
+
+
+def transform_chat_message(message):
+    return {
+        'id': message.id,
+        'sent_on': message.sent_on,
+        'sender': message.sender,
+        'text': message.text,
     }
 
 
@@ -88,6 +97,18 @@ def api_streamers_view(name):
     try:
         streamer = Streamer.query.filter_by(reddit_username=name).first_or_404()
         return jsonify(data=transform_streamer(streamer),
+                       info={'status': 200})
+    except Exception as e:
+        app.logger.exception(e)
+        abort(500)
+
+
+@app.route('/api/v1/streamers/<name>/last_chat_messages/<msg_count>')
+@crossdomain(origin='*', max_age=15)
+def api_streamers_last_chat_messages(name, msg_count):
+    try:
+        streamer = Streamer.query.filter_by(reddit_username=name).first_or_404()
+        return jsonify(data=[transform_chat_message(cm) for cm in streamer.chat_messages.order_by(ChatMessage.id.desc()).limit(msg_count)],
                        info={'status': 200})
     except Exception as e:
         app.logger.exception(e)
