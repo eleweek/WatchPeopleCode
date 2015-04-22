@@ -24,7 +24,7 @@
 
       <div class="col-md-8">
         {% if live_streams %}
-          {{ macros.streams(live_streams, 'live') }}
+          {{ macros.streams(live_streams, 'live', true) }}
         {% else %}
           <p>
             {{ wtf.quick_form(idea_form) }}
@@ -37,7 +37,7 @@
 
         {% if upcoming_streams %}
           <h4> Upcoming streams </h4><br>
-          {{ macros.streams(upcoming_streams, 'upcoming') }}
+          {{ macros.streams(upcoming_streams, 'upcoming', true) }}
         {% endif %}
       </div>
 

@@ -34,10 +34,11 @@ def add_rtmp_secret():
         current_user.rtmp_secret == uuid.uuid4()
 
 
-@app.before_request
-def logout_godlikesme_workaround():
-    if current_user.is_authenticated() and current_user.reddit_username == 'godlikesme':
-        logout_user()
+@app.after_request
+def set_subscribing_cookies(response):
+    subscribe_send_only_id = current_user.is_authenticated() and current_user.as_subscriber
+    response.set_cookie("subscribe_send_only_id", value="true" if subscribe_send_only_id else "false")
+    return response
 
 
 def url_for_other_page(page):
@@ -242,6 +243,33 @@ def dashboard():
         flash('Successfully updated RTMP redirects!', 'success')
         return redirect(url_for("dashboard"))
     return render_template("dashboard.html", rtmp_redirect_form=rtmp_redirect_form)
+
+
+@app.route('/_subscribe_to_streamer', methods=["POST"])
+def _subscribe_to_streamer():
+    if ('email' not in request.form and not current_user.is_authenticated()) or 'streamer_id' not in request.form:
+        abort(400)
+    streamer_id = request.form['streamer_id']
+    if current_user.is_anonymous() or not current_user.as_subscriber:
+        email = request.form['email']
+    else:
+        email = current_user.as_subscriber.email
+
+    streamer = Streamer.query.get_or_404(streamer_id)
+
+    subscriber = get_or_create(Subscriber, email=email)
+    if current_user.is_authenticated():
+        print "STS", subscriber, current_user.as_subscriber
+        current_user.as_subscriber = subscriber
+        print "STS2", subscriber, current_user.as_subscriber
+
+    if subscriber not in streamer.subscribers:
+        streamer.subscribers.append(subscriber)
+
+    db.session.commit()
+    response = app.make_response(jsonify(result="OK"))
+    response.set_cookie("email", value=email)
+    return response
 
 
 @app.route('/json')

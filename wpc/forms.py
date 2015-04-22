@@ -39,8 +39,6 @@ class RtmpRedirectForm(Form):
     def prepopulate(self, streamer):
         for rid in xrange(1, 4):
             attrname = 'rtmp_redirect_{}'.format(rid)
-            print attrname
-            print getattr(streamer, attrname)
             getattr(self, attrname).data = getattr(streamer, attrname)
 
 

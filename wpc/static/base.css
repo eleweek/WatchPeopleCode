@@ -7,6 +7,10 @@
   border-radius: 0;
 }
 
+.stream-title {
+    padding-bottom: 5px;
+}
+
 ::-webkit-scrollbar {
     -webkit-appearance: none;
     width: 7px;

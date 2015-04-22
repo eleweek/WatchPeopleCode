@@ -24,6 +24,10 @@ stream_sub = db.Table('stream_sub',
                       db.Column('stream_id', db.Integer(), db.ForeignKey('stream.id')),
                       db.Column('submission_id', db.String(6), db.ForeignKey('submission.submission_id')))
 
+streamer_subscriptions = db.Table('streamer_subscriptions',
+                                  db.Column('streamer_id', db.Integer(), db.ForeignKey('streamer.id')),
+                                  db.Column('subscriber_id', db.Integer(), db.ForeignKey('subscriber.id')))
+
 
 class Submission(db.Model):
     submission_id = db.Column(db.String(6), primary_key=True)
@@ -420,6 +424,10 @@ class Streamer(db.Model, UserMixin):
     checked = db.Column(db.Boolean(), default=False)
     rtmp_secret = db.Column(db.String(50))
     test = db.Column(db.Boolean(), default=False)
+    as_subscriber_id = db.Column('as_subscriber_id', db.Integer(), db.ForeignKey('subscriber.id'))
+    as_subscriber = db.relationship('Subscriber', backref=db.backref('as_streamer'))
+    subscribers = db.relationship('Subscriber', secondary=streamer_subscriptions, backref=db.backref('subscribed_to', lazy='dynamic'))
+
     # XXX: this is kinda ugly, but simple
     # nginx-rtmp supports only fixed number of redirects
     # TODO: This should be fixed later
