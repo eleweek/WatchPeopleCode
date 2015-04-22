@@ -8,6 +8,11 @@
   <link rel="stylesheet" href="{{url_for('static', filename='base.css')}}">
 {% endblock %}
 
+{% block metas %}
+  {{ super() }}
+  <meta name="apple-itunes-app" content="app-id=985079766">
+{% endblock %}
+
 {% block scripts %}
   {{ super() }}
   <script>
