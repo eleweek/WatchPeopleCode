@@ -377,10 +377,10 @@ class TwitchStream(Stream):
 
 class MozillaStreamHack(object):
     def html_code(self, autoplay=None):
-        return '''<iframe src="https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-11/video/" width="640" height="380" frameborder="0" allowfullscreen></iframe>'''  # NOQA
+        return '''<iframe src="https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-6/video/" width="640" height="380" frameborder="0" allowfullscreen></iframe>'''  # NOQA
 
     def normal_url(self):
-        return "https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-11/"
+        return "https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-6/"
 
 
 class CaseInsensitiveComparator(ColumnProperty.Comparator):
