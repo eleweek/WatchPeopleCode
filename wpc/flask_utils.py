@@ -1,7 +1,16 @@
-# From: http://flask.pocoo.org/snippets/56/
+from wpc.models import db
 from datetime import timedelta
-from flask import make_response, request, current_app
+from flask import make_response, request, current_app, url_for
 from functools import update_wrapper
+from jinja2 import escape, evalcontextfilter, Markup
+
+
+def get_or_create(model, **kwargs):
+    instance = model.query.filter_by(**kwargs).first()
+    if instance is None:
+        instance = model(**kwargs)
+        db.session.add(instance)
+    return instance
 
 
 def crossdomain(origin=None, methods=None, headers=None,
@@ -44,3 +53,22 @@ def crossdomain(origin=None, methods=None, headers=None,
         f.provide_automatic_options = False
         return update_wrapper(wrapped_function, f)
     return decorator
+
+
+def url_for_other_page(page):
+    args = request.view_args.copy()
+    args['page'] = page
+    return url_for(request.endpoint, **args)
+
+
+@evalcontextfilter
+def nl2br(eval_ctx, value):
+    result = (u'%s' % escape(value)).replace('\n', '<br>')
+    if eval_ctx.autoescape:
+        result = Markup(result)
+    return result
+
+
+def nl2br_py(value):
+    result = (u'%s' % escape(value)).replace('\n', '<br>')
+    return result

@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 
 @login_manager.user_loader
 def load_user(reddit_username):
-        return Streamer.query.filter_by(reddit_username=reddit_username).first()
+    return Streamer.query.filter_by(reddit_username=reddit_username).first()
 
 
 stream_tag = db.Table('stream_tag',
@@ -513,11 +513,3 @@ class Tag(db.Model):
 
     def __repr__(self):
         return '<Tag {}>'.format(self.name)
-
-
-def get_or_create(model, **kwargs):
-    instance = model.query.filter_by(**kwargs).first()
-    if instance is None:
-        instance = model(**kwargs)
-        db.session.add(instance)
-    return instance

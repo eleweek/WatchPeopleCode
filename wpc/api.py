@@ -2,7 +2,7 @@ from wpc import app
 from wpc.models import Stream, Streamer, ChatMessage
 from flask import abort, jsonify
 
-from crossdomain import crossdomain
+from wpc.flask_utils import crossdomain
 
 
 def transform_stream(stream):

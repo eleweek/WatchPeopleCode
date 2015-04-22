@@ -1,21 +1,24 @@
 from wpc import db, app, socketio
+from wpc.flask_utils import url_for_other_page, crossdomain, nl2br, nl2br_py, get_or_create
 from wpc.models import MozillaStreamHack  # NOQA
-from wpc.models import YoutubeStream, WPCStream, Stream, Streamer, Subscriber, Idea, ChatMessage, get_or_create
+from wpc.models import YoutubeStream, WPCStream, Stream, Streamer, Subscriber, Idea, ChatMessage
 from wpc.forms import SubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm, IdeaForm, RtmpRedirectForm
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session, abort
 from flask.ext.login import login_user, logout_user, login_required, current_user
-from jinja2 import escape, evalcontextfilter, Markup
 from flask.ext.socketio import emit, join_room
+from jinja2 import Markup
 
 from uuid import uuid4
 import praw
-from crossdomain import crossdomain
 import random
 from feedgen.feed import FeedGenerator
 from datetime import datetime
 import pytz
 import uuid
+
+app.jinja_env.globals['url_for_other_page'] = url_for_other_page
+app.add_template_filter(nl2br)
 
 
 @app.before_request
@@ -39,14 +42,6 @@ def set_subscribing_cookies(response):
     subscribe_send_only_id = current_user.is_authenticated() and current_user.as_subscriber
     response.set_cookie("subscribe_send_only_id", value="true" if subscribe_send_only_id else "false")
     return response
-
-
-def url_for_other_page(page):
-    args = request.view_args.copy()
-    args['page'] = page
-    return url_for(request.endpoint, **args)
-
-app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 
 
 def process_idea_form(idea_form):
@@ -146,20 +141,6 @@ def past_streams(query, page):
 def streamers_list(page):
     streamers = Streamer.query.filter(Streamer.streams.any()).order_by(Streamer.reddit_username).paginate(page, per_page=50)
     return render_template('streamers_list.html', streamers=streamers)
-
-
-@app.template_filter()
-@evalcontextfilter
-def nl2br(eval_ctx, value):
-    result = (u'%s' % escape(value)).replace('\n', '<br>')
-    if eval_ctx.autoescape:
-        result = Markup(result)
-    return result
-
-
-def nl2br_py(value):
-    result = (u'%s' % escape(value)).replace('\n', '<br>')
-    return result
 
 
 @app.route('/streamer/<streamer_name>/popout_chat', methods=["GET", "POST"])
