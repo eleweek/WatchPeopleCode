@@ -408,9 +408,7 @@ class Subscriber(db.Model):
         return '<Subscriber %d %r>' % (self.id, self.email)
 
     def already_subscribed(self, streamer):
-        print streamer
-        print streamer.subscribers
-        return streamer and self in streamer.subscribers
+        return streamer and (self in streamer.subscribers or self == streamer.as_subscriber)
 
 
 class Idea(db.Model):
@@ -459,7 +457,7 @@ class Streamer(db.Model, UserMixin):
         return self.reddit_username
 
     def already_subscribed(self, another_streamer):
-        return self.as_subscriber and self.as_subscriber.already_subscribed(another_streamer)
+        return another_streamer and (another_streamer == self or (self.as_subscriber and self.as_subscriber.already_subscribed(another_streamer)))
 
     def populate(self, form):
         self.info = form.info.data
