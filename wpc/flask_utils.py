@@ -1,4 +1,4 @@
-from wpc.models import db
+from wpc import db
 from datetime import timedelta
 from flask import make_response, request, current_app, url_for
 from functools import update_wrapper

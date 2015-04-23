@@ -240,9 +240,7 @@ def _subscribe_to_streamer():
 
     subscriber = get_or_create(Subscriber, email=email)
     if current_user.is_authenticated():
-        print "STS", subscriber, current_user.as_subscriber
         current_user.as_subscriber = subscriber
-        print "STS2", subscriber, current_user.as_subscriber
 
     if subscriber not in streamer.subscribers:
         streamer.subscribers.append(subscriber)

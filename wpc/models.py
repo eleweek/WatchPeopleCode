@@ -1,9 +1,10 @@
 from wpc import db, app, login_manager
 from wpc.utils import requests_get_with_retries
+from wpc.flask_utils import get_or_create
 
-from flask.ext.login import UserMixin, current_user
+from flask.ext.login import UserMixin, AnonymousUserMixin, current_user
 from sqlalchemy.orm.properties import ColumnProperty
-from flask import url_for
+from flask import url_for, request
 
 import humanize
 from datetime import datetime, timedelta
@@ -14,6 +15,13 @@ from bs4 import BeautifulSoup
 def load_user(reddit_username):
     return Streamer.query.filter_by(reddit_username=reddit_username).first()
 
+
+class Anon(AnonymousUserMixin):
+    def already_subscribed(self, streamer):
+        email = request.cookies.get("email")
+        return email and streamer and get_or_create(Subscriber, email=email) in streamer.subscribers
+
+login_manager.anonymous_user = Anon
 
 stream_tag = db.Table('stream_tag',
                       db.Column('stream_id', db.Integer(), db.ForeignKey('stream.id')),
@@ -399,6 +407,11 @@ class Subscriber(db.Model):
     def __repr__(self):
         return '<Subscriber %d %r>' % (self.id, self.email)
 
+    def already_subscribed(self, streamer):
+        print streamer
+        print streamer.subscribers
+        return streamer and self in streamer.subscribers
+
 
 class Idea(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -444,6 +457,9 @@ class Streamer(db.Model, UserMixin):
 
     def get_id(self):
         return self.reddit_username
+
+    def already_subscribed(self, another_streamer):
+        return self.as_subscriber and self.as_subscriber.already_subscribed(another_streamer)
 
     def populate(self, form):
         self.info = form.info.data

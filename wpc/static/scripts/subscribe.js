@@ -6,10 +6,12 @@ var do_subscribe = function(streamer_id, email) {
                 "streamer_id" : streamer_id
               },
         error: function() {
-            console.log("Error making ajax request");
+            console.log("Failed to subscribe to streamer with id " + streamer_id);
+            bootbox.alert("Failed to subscribe to the streamer :(");
         },
         success: function() {
-            console.log("Success making ajax request");
+            console.log("Successfully subscribed to streamer with id " + streamer_id);
+            $(".subscribe-button-" + streamer_id).hide();
         }
     });
 }
@@ -24,7 +26,6 @@ $(document).ready(function() {
         console.log("Cookie email " + email);
         console.log("Cookie only_id " + only_id);
         if (only_id) {
-            console.log("OH");
             do_subscribe(streamer_id, email);
             return;
         }
