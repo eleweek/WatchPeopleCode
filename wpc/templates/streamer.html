@@ -88,7 +88,7 @@
 
     {% if wpc_stream %}
       <div class="col-md-8">
-          {{ macros.stream_macro(wpc_stream, true, title_form if streamer == current_user else none) }}
+          {{ macros.stream_macro(wpc_stream, true, title_form if streamer == current_user else none, not current_user.already_subscribed(streamer)) }}
       </div>
 
       <div class="col-md-4">
