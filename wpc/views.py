@@ -152,13 +152,13 @@ def streamer_popout_chat(streamer_name):
 @app.route('/admin/streamer/<streamer_name>/rtmp_redirect/<int:redirect_id>')
 def streamer_rtmp_redirect(streamer_name, redirect_id):
     if request.remote_addr not in ['5.9.36.114', '127.0.0.1'] and request.headers.getlist("X-Forwarded-For")[-1] != '5.9.36.114':
-        abort(403)
+        return "", 403
     if redirect_id not in [1, 2, 3]:
-        abort(404)
+        return "", 404
     streamer = Streamer.query.filter_by(reddit_username=streamer_name).first_or_404()
     redirect_url = getattr(streamer, 'rtmp_redirect_{}'.format(redirect_id))
     if not redirect_url:
-        abort(404)
+        return "", 404
     return redirect_url
 
 
