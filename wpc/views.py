@@ -254,6 +254,8 @@ def _subscribe_to_streamer():
 @app.route('/json')
 @crossdomain(origin='*', max_age=15)
 def stream_json():
+    abort(403)
+    """
     def make_dict(stream):
         return {'username': stream.streamer.reddit_username if stream.streamer else None,
                 'title': stream.title, 'url': stream.normal_url(), 'viewers': stream.current_viewers,
@@ -265,6 +267,7 @@ def stream_json():
     except Exception as e:
         app.logger.exception(e)
         return jsonify(error=True)
+    """
 
 
 @app.route('/reddit_authorize_callback')
