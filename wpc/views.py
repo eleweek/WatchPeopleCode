@@ -251,25 +251,6 @@ def _subscribe_to_streamer():
     return response
 
 
-@app.route('/json')
-@crossdomain(origin='*', max_age=15)
-def stream_json():
-    abort(403)
-    """
-    def make_dict(stream):
-        return {'username': stream.streamer.reddit_username if stream.streamer else None,
-                'title': stream.title, 'url': stream.normal_url(), 'viewers': stream.current_viewers,
-                'scheduled_start_time': stream.scheduled_start_time, 'actual_start_time': stream.actual_start_time}
-    try:
-        return jsonify(live=[make_dict(st) for st in Stream.query.filter_by(status='live')],
-                       upcoming=[make_dict(st) for st in Stream.query.filter_by(status='upcoming')],
-                       completed=[make_dict(st) for st in YoutubeStream.query.filter_by(status='completed')])
-    except Exception as e:
-        app.logger.exception(e)
-        return jsonify(error=True)
-    """
-
-
 @app.route('/reddit_authorize_callback')
 def reddit_authorize_callback():
     r = praw.Reddit(user_agent=app.config["REDDIT_WEB_APP_USER_AGENT"])
