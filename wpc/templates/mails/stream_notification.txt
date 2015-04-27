@@ -1,18 +1,3 @@
-{# FIX THIS TEXT #}
-
-Hey, thank you for subscribing on WatchPeopleCode.com. We thought you might be interested in upcoming streams? Let us know how often you would like to receive these notifications. We don't have fancy email address yet, so just send your email messages to: avp-13@yandex.ru
-
-{% if live_streams %}
-  Live right now:
-  {% for stream in live_streams %}
-    {% if stream.title %} {{ stream.title }}: {% endif %} {{ stream.normal_url() }}
-  {% endfor %}
-{% endif %}
-
-{% if upcoming_streams %}
-  Upcoming today:
-  {% for stream in upcoming_streams %}
-    {% if stream.scheduled_start_time %} {{stream.format_start_time(countdown=False)}} {% endif %}
-    {% if stream.title %} {{ stream.title }}: {% endif %} {{ stream.normal_url() }}
-  {% endfor %}
-{% endif %}
+Stream {{stream.title if stream.title else ''}} by
+{{stream.streamer.reddit_username}} just went live.
+Link: {{ stream.normal_url() }}

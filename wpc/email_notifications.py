@@ -1,5 +1,4 @@
 from wpc import app
-from wpc.models import Stream, Subscriber
 
 from flask import render_template
 
@@ -21,19 +20,20 @@ def send_message(recipient_vars, subject, text, html):
               })
 
 
-def generate_email_notifications():
-    # fix before use
-    live = Stream.query.filter_by(status='live').order_by(Stream.scheduled_start_time).all()
-    upcoming = Stream.query.filter_by(status='upcoming').order_by(Stream.scheduled_start_time).all()
-    text = render_template('mails/stream_notification.txt', live_streams=live, upcoming_streams=upcoming)
-    html = render_template('mails/stream_notification.html', live_streams=live, upcoming_streams=upcoming)
-    return text, html
+def generate_email_notifications(stream):
+    text = render_template('mails/stream_notification.txt', stream=stream)
+    html = render_template('mails/stream_notification.html', stream=stream)
+    subscribers = stream.streamer.subscribers
+    subject = 'Stream {} by {} just went live'.format(
+        '"' + stream.title + '"' if stream.title else '', stream.streamer.reddit_username)
+    return text, html, subscribers, subject
 
 
-def send_email_notifications(text, html, subject="WatchPeopleCode: weekly update"):
-    num_subscribers = Subscriber.query.count()
+def send_email_notifications(text, html, subscribers, subject="WatchPeopleCode: weekly update"):
+    num_subscribers = len(subscribers)
     batch_size = 1000  # mailgun limit
     num_batches = (num_subscribers + batch_size - 1) / batch_size
     for b in xrange(num_batches):
-        recipient_vars = {subscriber.email: {} for subscriber in Subscriber.query.order_by(Subscriber.id).offset(b * batch_size).limit(batch_size)}
+        recipient_vars = {subscriber.email: {}
+                          for subscriber in subscribers[b * batch_size: (b + 1) * batch_size]}
         print b, send_message(recipient_vars, subject, text, html)

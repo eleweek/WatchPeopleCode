@@ -131,7 +131,7 @@ class WPCStream(Stream):
                 self.current_viewers = None
 
     def normal_url(self):
-        return url_for('.streamer_page', streamer_name=self.streamer.reddit_username, _external=True)
+        return url_for('streamer_page', streamer_name=self.streamer.reddit_username, _external=True)
 
     def html_code(self, autoplay=False):
         return """

@@ -1,27 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head><title>Today's streams</title></head>
+  <head><title>
+      Stream {{stream.title if stream.title else ''}} by
+      {{stream.streamer.reddit_username}} just went live.
+  </title></head>
 
   <body>
-    Hey, thank you for subscribing on WatchPeopleCode.com. We thought you might be interested in upcoming streams? Let us know how often you would like to receive these notifications. We don't have fancy email address yet, so just send your email messages to: avp-13@yandex.ru
 
-    {% if live_streams %}
-      <p><strong>Live right now:</strong><br>
-        {% for stream in live_streams %}
-          <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
-          <br><br>
-        {% endfor %}
-      </p>
-    {% endif %}
-
-    {% if upcoming_streams %}
-      <p><strong>Upcoming today:</strong><br>
-        {% for stream in upcoming_streams %}
-          {% if stream.scheduled_start_time %}<b>{{stream.format_start_time(countdown=False)}}</b><br>{% endif %}
-          <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
-          <br><br>
-        {% endfor %}
-      </p>
-    {% endif %}
+    <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+    by <a href={{ url_for('streamer_page', streamer_name=stream.streamer.reddit_username) }}>{{ stream.streamer.reddit_username }}</a>
   </body>
 </html>
