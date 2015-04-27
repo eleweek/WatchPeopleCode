@@ -42,7 +42,7 @@ class Submission(db.Model):
     recording_available = db.Column(db.Boolean())
 
     def __repr__(self):
-        return '<Submission %r>' % (self.submission_id)
+        return '<Submission {}>'.format(self.submission_id)
 
 
 class Stream(db.Model):
@@ -93,7 +93,7 @@ class WPCStream(Stream):
         return hash(self.channel_name)
 
     def __repr__(self):
-        return '<WPC Stream %d %r>' % (self.id, self.channel_name)
+        return '<WPC Stream {} {}>'.format(self.id, self.channel_name)
 
     def _update_status(self):
         app.logger.info("Updating status for {}".format(self))
@@ -203,7 +203,7 @@ class YoutubeStream(Stream):
         return hash(self.ytid)
 
     def __repr__(self):
-        return '<YoutubeStream %d %r>' % (self.id, self.ytid)
+        return '<YoutubeStream {} {}>'.format(self.id, self.ytid)
 
     def _update_status(self):
         app.logger.info("Updating status for {}".format(self))
@@ -405,7 +405,7 @@ class Subscriber(db.Model):
     email = db.column_property(db.Column(db.String(256), unique=True, nullable=False), comparator_factory=CaseInsensitiveComparator)
 
     def __repr__(self):
-        return '<Subscriber %d %r>' % (self.id, self.email)
+        return '<Subscriber {} {}>'.format(self.id, self.email)
 
     def already_subscribed(self, streamer):
         return streamer and (self in streamer.subscribers or self == streamer.as_subscriber)
@@ -451,7 +451,7 @@ class Streamer(db.Model, UserMixin):
         self.checked = checked
 
     def __repr__(self):
-        return '<Streamer %d %r>' % (self.id, self.reddit_username)
+        return '<Streamer {} {}>'.format(self.id, self.reddit_username)
 
     def get_id(self):
         return self.reddit_username
