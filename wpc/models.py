@@ -1,6 +1,7 @@
 from wpc import db, app, login_manager
 from wpc.utils import requests_get_with_retries
 from wpc.flask_utils import get_or_create
+from wpc.email_notifications import generate_email_notifications, send_email_notifications
 
 from flask.ext.login import UserMixin, AnonymousUserMixin, current_user
 from sqlalchemy.orm.properties import ColumnProperty
@@ -230,6 +231,8 @@ class YoutubeStream(Stream):
                 if 'concurrentViewers' in item['liveStreamingDetails']:
                     self.current_viewers = item['liveStreamingDetails']['concurrentViewers']
             if item['snippet']['liveBroadcastContent'] == 'live':
+                if self.status != 'live':
+                    send_email_notifications(*generate_email_notifications(self))
                 self.status = 'live'
                 if 'actualStartTime' in item['liveStreamingDetails']:
                     self.actual_start_time = item['liveStreamingDetails']['actualStartTime']
@@ -315,6 +318,9 @@ class TwitchStream(Stream):
 
         stream = r.json()['stream']
         if stream is not None:
+            if self.status != 'live' and (self.last_time_live is None or
+                                          (datetime.utcnow() - self.last_time_live > timedelta(hours=1))):
+                send_email_notifications(*generate_email_notifications(self))
             self.status = 'live'
             self.title = stream['channel']['status']
             self.current_viewers = stream['viewers']

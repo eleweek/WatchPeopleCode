@@ -3,6 +3,7 @@ from wpc.flask_utils import url_for_other_page, crossdomain, nl2br, nl2br_py, ge
 from wpc.models import MozillaStreamHack  # NOQA
 from wpc.models import YoutubeStream, WPCStream, Stream, Streamer, Subscriber, Idea, ChatMessage
 from wpc.forms import SubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm, IdeaForm, RtmpRedirectForm
+from wpc.email_notifications import generate_email_notifications, send_email_notifications
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session, abort
 from flask.ext.login import login_user, logout_user, login_required, current_user
@@ -13,7 +14,7 @@ from uuid import uuid4
 import praw
 import random
 from feedgen.feed import FeedGenerator
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 import uuid
 
@@ -307,6 +308,9 @@ def rtmp_auth():
 
     stream.status = 'live'
     stream.actual_start_time = datetime.utcnow()
+    if stream.last_time_live is None or\
+            (stream.actual_start_time - stream.last_time_live) > timedelta(hours=1):
+                send_email_notifications(*generate_email_notifications(stream))
     db.session.commit()
     return "OK"
 
