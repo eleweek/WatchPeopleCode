@@ -297,6 +297,7 @@ def rtmp_auth():
     if stream is None:
         abort(403)
 
+    app.logger.info("{} went live".format(stream))
     stream.streamer = streamer
 
     # test stream
@@ -314,6 +315,7 @@ def rtmp_auth():
 def rtmp_done():
     stream, streamer = authenticate_streamer()
     if stream is not None:
+        app.logger.info("{} done".format(stream))
         stream.status = 'completed'
         stream.actual_start_time = None
         stream.current_viewers = None
