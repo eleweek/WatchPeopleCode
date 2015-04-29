@@ -24,8 +24,7 @@ def generate_email_notifications(stream):
     text = render_template('mails/stream_notification.txt', stream=stream)
     html = render_template('mails/stream_notification.html', stream=stream)
     subscribers = stream.streamer.subscribers
-    subject = 'Stream {} by {} just went live'.format(
-        '"' + stream.title + '"' if stream.title else '', stream.streamer.reddit_username)
+    subject = 'Watchpeoplecode: {} just went live'.format(stream.streamer.reddit_username)
     return text, html, subscribers, subject
 
 
