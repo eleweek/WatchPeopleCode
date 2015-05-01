@@ -1,7 +1,6 @@
 from wpc import db, app, login_manager
 from wpc.utils import requests_get_with_retries
 from wpc.flask_utils import get_or_create
-from wpc.email_notifications import generate_email_notifications, send_email_notifications
 
 from flask.ext.login import UserMixin, AnonymousUserMixin, current_user
 from sqlalchemy.orm.properties import ColumnProperty
@@ -56,6 +55,7 @@ class Stream(db.Model):
     submissions = db.relationship('Submission', secondary=stream_sub, backref=db.backref('streams', lazy='dynamic'))
     streamer_id = db.Column('streamer_id', db.Integer(), db.ForeignKey('streamer.id'))
     streamer = db.relationship('Streamer', backref=db.backref('streams', lazy='dynamic'))
+    need_to_notify_subscribers = db.Column(db.Boolean, default=False)
     tags = db.relationship('Tag', secondary=stream_tag, backref=db.backref('streams', lazy='dynamic'))
     current_viewers = db.Column(db.Integer)
     confstream = db.Column(db.Boolean(), default=False)
@@ -232,7 +232,7 @@ class YoutubeStream(Stream):
                     self.current_viewers = item['liveStreamingDetails']['concurrentViewers']
             if item['snippet']['liveBroadcastContent'] == 'live':
                 if self.status != 'live':
-                    send_email_notifications(*generate_email_notifications(self))
+                    self.need_to_notify_subscribers = True
                 self.status = 'live'
                 if 'actualStartTime' in item['liveStreamingDetails']:
                     self.actual_start_time = item['liveStreamingDetails']['actualStartTime']
@@ -320,7 +320,7 @@ class TwitchStream(Stream):
         if stream is not None:
             if self.status != 'live' and (self.last_time_live is None or
                                           (datetime.utcnow() - self.last_time_live > timedelta(hours=1))):
-                send_email_notifications(*generate_email_notifications(self))
+                self.need_to_notify_subscribers = True
             self.status = 'live'
             self.title = stream['channel']['status']
             self.current_viewers = stream['viewers']
