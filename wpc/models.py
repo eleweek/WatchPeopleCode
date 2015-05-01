@@ -81,6 +81,7 @@ class Stream(db.Model):
 
 class WPCStream(Stream):
     channel_name = db.Column(db.String(30), unique=True)
+    last_time_live = db.Column(db.DateTime())
 
     def __init__(self, channel_name):
         self.status = 'upcoming'
