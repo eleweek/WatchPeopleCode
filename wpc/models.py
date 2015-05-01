@@ -59,6 +59,7 @@ class Stream(db.Model):
     tags = db.relationship('Tag', secondary=stream_tag, backref=db.backref('streams', lazy='dynamic'))
     current_viewers = db.Column(db.Integer)
     confstream = db.Column(db.Boolean(), default=False)
+    last_time_live = db.Column(db.DateTime())
     __mapper_args__ = {
         'polymorphic_on': type,
         'polymorphic_identity': 'stream'
@@ -81,7 +82,6 @@ class Stream(db.Model):
 
 class WPCStream(Stream):
     channel_name = db.Column(db.String(30), unique=True)
-    last_time_live = db.Column(db.DateTime())
 
     def __init__(self, channel_name):
         self.status = 'upcoming'
@@ -283,7 +283,6 @@ class YoutubeStream(Stream):
 
 class TwitchStream(Stream):
     channel = db.Column(db.String(25), unique=True)
-    last_time_live = db.Column(db.DateTime())
 
     def __init__(self, channel):
         self.channel = channel
