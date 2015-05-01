@@ -35,6 +35,9 @@ def create_search_form():
 def add_rtmp_secret():
     if current_user.is_authenticated() and not current_user.rtmp_secret:
         current_user.rtmp_secret = str(uuid.uuid4())
+        wpcs = WPCStream(channel_name=current_user.reddit_username)
+        current_user.streams.append(wpcs)
+        db.session.add(wpcs)
         db.session.commit()
 
 
