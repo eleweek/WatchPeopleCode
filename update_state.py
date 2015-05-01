@@ -167,6 +167,17 @@ def update_flairs():
         app.logger.exception(e)
 
 
+def get_bonus_twitch_stream():
+    app.logger.info("Getting bonus twitch stream")
+    r = requests_get_with_retries("https://api.twitch.tv/kraken/search/streams?q=Programming&type=suggest")
+    streams = sorted([s for s in r.json()['streams'] if s['game'] == 'Programming'], key=lambda s: s['viewers'], reverse=True)
+    if streams:
+        ts = get_or_create(TwitchStream, channel=streams[0]['channel']['name'])
+        ts._update_status()
+        db.session.add(ts)
+        db.session.commit()
+
+
 @sched.scheduled_job('interval', seconds=30)
 def update_state():
     app.logger.info("Updating old streams")
@@ -180,7 +191,10 @@ def update_state():
             app.logger.exception(e)
 
     app.logger.info("Updating new streams")
+
     get_new_streams()
+    if Stream.query.filter_by(status='live').count() == 0:
+        get_bonus_twitch_stream()
 
 
 @sched.scheduled_job('interval', seconds=100)
