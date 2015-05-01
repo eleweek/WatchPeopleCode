@@ -34,7 +34,7 @@ def create_search_form():
 @app.before_request
 def add_rtmp_secret():
     if current_user.is_authenticated() and not current_user.rtmp_secret:
-        current_user.rtmp_secret == uuid.uuid4()
+        current_user.rtmp_secret = str(uuid.uuid4())
         db.session.commit()
 
 
