@@ -48,6 +48,7 @@ def create_app():
     app.config['RTMP_LOGIN'] = os.environ.get('RTMP_LOGIN', '')
     app.config['RTMP_PASSWORD'] = os.environ.get('RTMP_PASSWORD', '')
     app.config['RTMP_SERVER'] = os.environ.get('RTMP_SERVER', '127.0.0.1')
+    app.config['SERVER_NAME'] = os.environ.get('SERVER_NAME', '')
 
     app.config['REDDIT_WEB_APP_USER_AGENT'] = "/r/WatchPeopleCode web app(main contact: /u/godlikesme)"
     app.config['REDDIT_BOT_USER_AGENT'] = "/r/WatchPeopleCode flairs&streams bot (main contact: /u/godlikesme)"

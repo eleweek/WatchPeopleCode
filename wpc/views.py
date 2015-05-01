@@ -13,7 +13,7 @@ from uuid import uuid4
 import praw
 import random
 from feedgen.feed import FeedGenerator
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 import uuid
 
@@ -307,6 +307,9 @@ def rtmp_auth():
 
     stream.status = 'live'
     stream.actual_start_time = datetime.utcnow()
+    if stream.last_time_live is None or\
+            (stream.actual_start_time - stream.last_time_live) > timedelta(hours=1):
+                stream.need_to_notify_subscribers = True
     db.session.commit()
     return "OK"
 

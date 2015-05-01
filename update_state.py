@@ -1,6 +1,7 @@
 from wpc import db, app
 from wpc.models import Stream, YoutubeStream, TwitchStream, WPCStream, Streamer, Submission, get_or_create
 from wpc.utils import youtube_video_id, twitch_channel, wpc_channel, requests_get_with_retries
+from wpc.email_notifications import generate_email_notifications, send_email_notifications
 
 
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -152,7 +153,9 @@ def update_flairs():
                         flair_text, flair_css = stream._get_flair()
                         # Somewhat complex logic for multi-stream submissions
                         # Live > Recording Available > everything else
-                        if not new_flair_text or flair_text == "Live" or (new_flair_text != "Live" and flair_text == "Recording Available") or (new_flair_text != "Live" and stream.status == "upcoming"):
+                        if not new_flair_text or flair_text == "Live" or\
+                                (new_flair_text != "Live" and flair_text == "Recording Available") or\
+                                (new_flair_text != "Live" and stream.status == "upcoming"):
                             new_flair_text, new_flair_css = flair_text, flair_css
 
                     if stream.type == 'youtube':
@@ -178,6 +181,23 @@ def update_state():
 
     app.logger.info("Updating new streams")
     get_new_streams()
+
+
+@sched.scheduled_job('interval', seconds=100)
+def send_notifications():
+    app.logger.info("Send email notifications")
+    for ls in Stream.query.filter_by(need_to_notify_subscribers=True):
+        try:
+            ls.need_to_notify_subscribers = False
+            db.session.commit()
+            try:
+                with app.app_context():
+                    send_email_notifications(*generate_email_notifications(ls))
+            except Exception as e:
+                app.logger.exception(e)
+        except Exception as e:
+            db.session.rollback()
+            app.logger.exception(e)
 
 
 if __name__ == '__main__':
