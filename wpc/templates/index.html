@@ -30,7 +30,7 @@
             {{ wtf.quick_form(idea_form) }}
           </p>
           <h4> How about watching a random recorded stream? </h4>
-          {{ macros.stream_macro(random_stream, false) }}
+          {{ macros.stream_macro(random_stream, false, with_subscribe_button=true) }}
           <hr>
         {% endif %}
 

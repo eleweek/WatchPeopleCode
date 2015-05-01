@@ -18,7 +18,7 @@
         {{ macros.render_pagination(streams) }}
         <br>
         {% if streams.items %}
-          {{ macros.streams(streams.items) }}
+          {{ macros.streams(streams.items, 'completed', true) }}
         {% else %}
           Sorry, we have no results for your request right now.
         {% endif %}
