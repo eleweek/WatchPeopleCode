@@ -38,6 +38,7 @@ def add_rtmp_secret():
         wpcs = get_or_create(WPCStream, channel_name=current_user.reddit_username)
         current_user.streams.append(wpcs)
         db.session.add(wpcs)
+        wpcs.status = 'completed'
         db.session.commit()
 
 
