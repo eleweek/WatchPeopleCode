@@ -202,6 +202,9 @@ def update_state():
 def send_notifications():
     app.logger.info("Send email notifications")
     for ls in Stream.query.filter_by(need_to_notify_subscribers=True):
+        # should it be here?
+        if ls.streamer is None:
+            continue
         try:
             ls.need_to_notify_subscribers = False
             db.session.commit()
