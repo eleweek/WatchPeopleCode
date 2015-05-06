@@ -322,7 +322,8 @@ class TwitchStream(Stream):
                                           (datetime.utcnow() - self.last_time_live > timedelta(hours=1))):
                 self.need_to_notify_subscribers = True
             self.status = 'live'
-            self.title = stream['channel']['status']
+            if 'status' in stream['channel']:
+                self.title = stream['channel']['status']
             self.current_viewers = stream['viewers']
             self.last_time_live = datetime.utcnow()
             if self.actual_start_time is None:
