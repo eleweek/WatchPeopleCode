@@ -111,6 +111,7 @@
             if(joined){
                 myUsername = my_username;
                 $(".compose-message-form").show();
+                $(".chat-loading").hide();
                 $(".messages").append(
                     jQuery("<li>").html(
                         "<i>You've been connected.</i>"
