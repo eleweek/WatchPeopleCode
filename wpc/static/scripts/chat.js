@@ -53,8 +53,8 @@
 
         function pasteIntoInput(el, text) {
             el.focus();
-            if (typeof el.selectionStart == "number"
-                    && typeof el.selectionEnd == "number") {
+            if (typeof el.selectionStart == "number" &&
+                    typeof el.selectionEnd == "number") {
                 var val = el.value;
                 var selStart = el.selectionStart;
                 el.value = val.slice(0, selStart) + text + val.slice(el.selectionEnd);
@@ -66,7 +66,7 @@
                 textRange.select();
             }
         }
-        var chat_msg_area = $(".compose-message-form").find("[name='message']")
+        var chat_msg_area = $(".compose-message-form").find("[name='message']");
         chat_msg_area.on("keypress", function(e){
             e = e || event;
             if (e.keyCode === 13) {
@@ -105,7 +105,7 @@
             } else {
                 return '<b style="color: blue">' + message.sender + '</b>: ' + message.text;
             }
-        }
+        };
         
         chatAPI.onJoin = function(joined, my_username) {
             if(joined){
@@ -145,10 +145,10 @@
                     jQuery("<li>").html(
                         format_message(messages[i])
                     )
-                )
+                );
             }
             msgs.animate({ scrollTop: msgs[0].scrollHeight }, "fast");
-        }
+        };
     };
 
     var ready = function(){
