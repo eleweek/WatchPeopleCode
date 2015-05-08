@@ -14,12 +14,16 @@ var do_subscribe = function(streamer_id, email) {
             $(".subscribe-button-" + streamer_id).hide();
         }
     });
-}
+};
 
 $(document).ready(function() {
     $(".subscribe-button").click(function(){
         var that = this;
-        var streamer_id_class = $(that).attr("class").split(' ').filter(function(cn){return cn.indexOf("subscribe-button-") == 0})[0];
+        var streamer_id_class = $(that).attr("class").split(' ').filter(
+                function(cn){
+                    return cn.indexOf("subscribe-button-") === 0;
+                }
+            )[0];
         var streamer_id = +streamer_id_class.split('-')[2];
         var email = $.cookie('email');
         var only_id = $.cookie('subscribe_send_only_id') == "true";
