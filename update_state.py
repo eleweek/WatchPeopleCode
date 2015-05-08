@@ -198,13 +198,14 @@ def update_state():
         get_bonus_twitch_stream()
 
 
-@sched.scheduled_job('interval', seconds=10)
+@sched.scheduled_job('interval', seconds=100)
 def send_notifications():
     app.logger.info("Send email notifications")
     with app.app_context():
         for streamer in Streamer.query.filter_by(need_to_notify_subscribers=True):
             try:
                 streamer.need_to_notify_subscribers = False
+                streamer.last_time_notified = datetime.datetime.utcnow()
                 db.session.commit()
                 if streamer.streams.filter_by(status='live').count() > 0:
                     try:

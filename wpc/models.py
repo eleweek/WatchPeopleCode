@@ -58,7 +58,6 @@ class Stream(db.Model):
     tags = db.relationship('Tag', secondary=stream_tag, backref=db.backref('streams', lazy='dynamic'))
     current_viewers = db.Column(db.Integer)
     confstream = db.Column(db.Boolean(), default=False)
-    last_time_live = db.Column(db.DateTime())
     __mapper_args__ = {
         'polymorphic_on': type,
         'polymorphic_identity': 'stream'
@@ -77,6 +76,14 @@ class Stream(db.Model):
     def add_submission(self, submission):
         if submission not in self.submissions:
             self.submissions.append(submission)
+
+    def go_live(self):
+        if self.status != 'live' and\
+                self.streamer and\
+                (self.streamer.last_time_notified is None or
+                        (datetime.utcnow() - self.streamer.last_time_notified) > timedelta(hours=1)):
+            self.streamer.need_to_notify_subscribers = True
+        self.status = 'live'
 
 
 class WPCStream(Stream):
@@ -231,9 +238,6 @@ class YoutubeStream(Stream):
                 if 'concurrentViewers' in item['liveStreamingDetails']:
                     self.current_viewers = item['liveStreamingDetails']['concurrentViewers']
             if item['snippet']['liveBroadcastContent'] == 'live':
-                if self.status != 'live' and self.streamer:
-                    self.streamer.need_to_notify_subscribers = True
-                self.status = 'live'
                 if 'actualStartTime' in item['liveStreamingDetails']:
                     self.actual_start_time = item['liveStreamingDetails']['actualStartTime']
                 else:  # Youtube is weird, and sometimes this happens. If there is no actual start time, then we fall back to scheduledStartTime
@@ -282,6 +286,7 @@ class YoutubeStream(Stream):
 
 class TwitchStream(Stream):
     channel = db.Column(db.String(25), unique=True)
+    last_time_live = db.Column(db.DateTime())
 
     def __init__(self, channel):
         self.channel = channel
@@ -317,12 +322,7 @@ class TwitchStream(Stream):
 
         stream = r.json()['stream']
         if stream is not None:
-            if self.status != 'live' and\
-                    self.streamer and\
-                    (self.last_time_live is None or
-                        (datetime.utcnow() - self.last_time_live > timedelta(hours=1))):
-                self.streamer.need_to_notify_subscribers = True
-            self.status = 'live'
+            self.go_live()
             if 'status' in stream['channel']:
                 self.title = stream['channel']['status']
             self.current_viewers = stream['viewers']
@@ -447,6 +447,7 @@ class Streamer(db.Model, UserMixin):
     as_subscriber = db.relationship('Subscriber', backref=db.backref('as_streamer'))
     subscribers = db.relationship('Subscriber', secondary=streamer_subscriptions, backref=db.backref('subscribed_to', lazy='dynamic'))
     need_to_notify_subscribers = db.Column(db.Boolean, default=False)
+    last_time_notified = db.Column(db.DateTime())
 
     # XXX: this is kinda ugly, but simple
     # nginx-rtmp supports only fixed number of redirects

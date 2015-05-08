@@ -310,11 +310,8 @@ def rtmp_auth():
         db.session.commit()
         return "OK"
 
-    stream.status = 'live'
     stream.actual_start_time = datetime.utcnow()
-    if stream.last_time_live is None or\
-            (stream.actual_start_time - stream.last_time_live) > timedelta(hours=1):
-                stream.streamer.need_to_notify_subscribers = True
+    stream.go_live()
     db.session.commit()
     return "OK"
 
