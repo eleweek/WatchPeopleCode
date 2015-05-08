@@ -20,11 +20,14 @@ def send_message(recipient_vars, subject, text, html):
               })
 
 
-def generate_email_notifications(stream):
-    text = render_template('mails/stream_notification.txt', stream=stream)
-    html = render_template('mails/stream_notification.html', stream=stream)
-    subscribers = stream.streamer.subscribers
-    subject = 'Watchpeoplecode: {} just went live'.format(stream.streamer.reddit_username)
+def generate_email_notifications(streamer):
+    streams = streamer.streams.filter_by(status='live').all()
+    text = render_template('mails/stream_notification.txt',
+                           streamer=streamer, streams=streams)
+    html = render_template('mails/stream_notification.html',
+                           streamer=streamer, streams=streams)
+    subscribers = streamer.subscribers
+    subject = 'Watchpeoplecode: {} just went live'.format(streamer.reddit_username)
     return text, html, subscribers, subject
 
 

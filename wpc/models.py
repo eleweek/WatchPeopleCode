@@ -55,7 +55,6 @@ class Stream(db.Model):
     submissions = db.relationship('Submission', secondary=stream_sub, backref=db.backref('streams', lazy='dynamic'))
     streamer_id = db.Column('streamer_id', db.Integer(), db.ForeignKey('streamer.id'))
     streamer = db.relationship('Streamer', backref=db.backref('streams', lazy='dynamic'))
-    need_to_notify_subscribers = db.Column(db.Boolean, default=False)
     tags = db.relationship('Tag', secondary=stream_tag, backref=db.backref('streams', lazy='dynamic'))
     current_viewers = db.Column(db.Integer)
     confstream = db.Column(db.Boolean(), default=False)
@@ -232,8 +231,8 @@ class YoutubeStream(Stream):
                 if 'concurrentViewers' in item['liveStreamingDetails']:
                     self.current_viewers = item['liveStreamingDetails']['concurrentViewers']
             if item['snippet']['liveBroadcastContent'] == 'live':
-                if self.status != 'live':
-                    self.need_to_notify_subscribers = True
+                if self.status != 'live' and self.streamer:
+                    self.streamer.need_to_notify_subscribers = True
                 self.status = 'live'
                 if 'actualStartTime' in item['liveStreamingDetails']:
                     self.actual_start_time = item['liveStreamingDetails']['actualStartTime']
@@ -318,9 +317,11 @@ class TwitchStream(Stream):
 
         stream = r.json()['stream']
         if stream is not None:
-            if self.status != 'live' and (self.last_time_live is None or
-                                          (datetime.utcnow() - self.last_time_live > timedelta(hours=1))):
-                self.need_to_notify_subscribers = True
+            if self.status != 'live' and\
+                    self.streamer and\
+                    (self.last_time_live is None or
+                        (datetime.utcnow() - self.last_time_live > timedelta(hours=1))):
+                self.streamer.need_to_notify_subscribers = True
             self.status = 'live'
             if 'status' in stream['channel']:
                 self.title = stream['channel']['status']
@@ -445,6 +446,7 @@ class Streamer(db.Model, UserMixin):
     as_subscriber_id = db.Column('as_subscriber_id', db.Integer(), db.ForeignKey('subscriber.id'))
     as_subscriber = db.relationship('Subscriber', backref=db.backref('as_streamer'))
     subscribers = db.relationship('Subscriber', secondary=streamer_subscriptions, backref=db.backref('subscribed_to', lazy='dynamic'))
+    need_to_notify_subscribers = db.Column(db.Boolean, default=False)
 
     # XXX: this is kinda ugly, but simple
     # nginx-rtmp supports only fixed number of redirects

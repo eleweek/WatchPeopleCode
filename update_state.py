@@ -198,24 +198,22 @@ def update_state():
         get_bonus_twitch_stream()
 
 
-@sched.scheduled_job('interval', seconds=100)
+@sched.scheduled_job('interval', seconds=10)
 def send_notifications():
     app.logger.info("Send email notifications")
-    for ls in Stream.query.filter_by(need_to_notify_subscribers=True):
-        # should it be here?
-        if ls.streamer is None:
-            continue
-        try:
-            ls.need_to_notify_subscribers = False
-            db.session.commit()
+    with app.app_context():
+        for streamer in Streamer.query.filter_by(need_to_notify_subscribers=True):
             try:
-                with app.app_context():
-                    send_email_notifications(*generate_email_notifications(ls))
+                streamer.need_to_notify_subscribers = False
+                db.session.commit()
+                if streamer.streams.filter_by(status='live').count() > 0:
+                    try:
+                        send_email_notifications(*generate_email_notifications(streamer))
+                    except Exception as e:
+                        app.logger.exception(e)
             except Exception as e:
+                db.session.rollback()
                 app.logger.exception(e)
-        except Exception as e:
-            db.session.rollback()
-            app.logger.exception(e)
 
 
 if __name__ == '__main__':

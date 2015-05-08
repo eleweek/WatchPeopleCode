@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head><title>
-      Stream {{stream.title if stream.title else ''}} by
-      {{stream.streamer.reddit_username}} just went live.
+    {{ streamer.reddit_username }} just went live.
   </title></head>
 
   <body>
-
-    <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
-    by <a href={{ url_for('streamer_page', streamer_name=stream.streamer.reddit_username) }}>{{ stream.streamer.reddit_username }}</a>
+    {% for stream in streams %}
+      <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a><br>
+    {% endfor %}
+    by <a href={{ url_for('streamer_page', streamer_name=streamer.reddit_username) }}>{{ streamer.reddit_username }}</a>
+    <hr>
   </body>
 </html>

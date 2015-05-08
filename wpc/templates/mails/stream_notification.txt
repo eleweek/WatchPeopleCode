@@ -1,3 +1,6 @@
-Stream {{stream.title if stream.title else ''}} by
-{{stream.streamer.reddit_username}} just went live.
-Link: {{ stream.normal_url() }}
+{% if streams|length > 1 %}Streams:{% else %}Stream{% endif %}
+{%- for stream in streams -%}
+{{ stream.title if stream.title else ''}}
+Link: {{ stream.normal_url()}}
+{% endfor %} by {{streamer.reddit_username}}
+{%- if streams|length > 1 %}are{% else %}is{% endif %} live right now.
