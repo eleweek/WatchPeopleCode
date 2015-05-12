@@ -14,7 +14,6 @@ manager.add_command('db', MigrateCommand)
 
 @manager.command
 def run():
-    app.debug = True
     socketio.run(app)
 
 if __name__ == '__main__':

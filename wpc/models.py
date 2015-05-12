@@ -445,7 +445,7 @@ class Streamer(db.Model, UserMixin):
     test = db.Column(db.Boolean(), default=False)
     as_subscriber_id = db.Column('as_subscriber_id', db.Integer(), db.ForeignKey('subscriber.id'))
     as_subscriber = db.relationship('Subscriber', backref=db.backref('as_streamer'))
-    subscribers = db.relationship('Subscriber', secondary=streamer_subscriptions, backref=db.backref('subscribed_to', lazy='dynamic'))
+    subscribers = db.relationship('Subscriber', secondary=streamer_subscriptions, lazy='dynamic', backref=db.backref('subscribed_to', lazy='dynamic'))
     need_to_notify_subscribers = db.Column(db.Boolean, default=False)
     last_time_notified = db.Column(db.DateTime())
 

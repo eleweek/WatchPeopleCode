@@ -12,6 +12,9 @@
 {% block content %}
   <div class="container">
     <h2> Welcome to your dashboard, {{current_user.reddit_username}}!</h2>
+    {% if current_user.subscribers.count() %}
+      <h3> You have {{current_user.subscribers.count()}} suscribers!</h3>
+    {% endif %}
     <button type="button" class="btn btn-default btn-primary show-private-info-button">Show private info</button>
     <button type="button" class="btn btn-default btn-primary hide-private-info-button" style="display:none;">Hide private info</button>
     <div class="private-info" style="display:none;">
