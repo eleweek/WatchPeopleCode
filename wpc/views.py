@@ -1,5 +1,5 @@
 from wpc import db, app, socketio
-from wpc.flask_utils import url_for_other_page, crossdomain, nl2br, nl2br_py, get_or_create
+from wpc.flask_utils import url_for_other_page, nl2br, nl2br_py, get_or_create
 from wpc.models import MozillaStreamHack  # NOQA
 from wpc.models import YoutubeStream, WPCStream, Stream, Streamer, Subscriber, Idea, ChatMessage
 from wpc.forms import SubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm, IdeaForm, RtmpRedirectForm
@@ -13,7 +13,7 @@ from uuid import uuid4
 import praw
 import random
 from feedgen.feed import FeedGenerator
-from datetime import datetime, timedelta
+from datetime import datetime
 import pytz
 import uuid
 
