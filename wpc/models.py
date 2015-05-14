@@ -78,8 +78,7 @@ class Stream(db.Model):
             self.submissions.append(submission)
 
     def go_live(self):
-        if self.status != 'live' and\
-            self.streamer and\
+        if self.status != 'live' and self.streamer and\
             (self.streamer.last_time_notified is None or
                 (datetime.utcnow() - self.streamer.last_time_notified) > timedelta(hours=1)):
             self.streamer.need_to_notify_subscribers = True
@@ -238,6 +237,7 @@ class YoutubeStream(Stream):
                 if 'concurrentViewers' in item['liveStreamingDetails']:
                     self.current_viewers = item['liveStreamingDetails']['concurrentViewers']
             if item['snippet']['liveBroadcastContent'] == 'live':
+                self.go_live()
                 if 'actualStartTime' in item['liveStreamingDetails']:
                     self.actual_start_time = item['liveStreamingDetails']['actualStartTime']
                 else:  # Youtube is weird, and sometimes this happens. If there is no actual start time, then we fall back to scheduledStartTime
