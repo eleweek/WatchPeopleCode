@@ -3,6 +3,7 @@ from datetime import timedelta
 from flask import make_response, request, current_app, url_for
 from functools import update_wrapper
 from jinja2 import escape, evalcontextfilter, Markup
+from urlparse import urlparse, urljoin
 
 
 def get_or_create(model, **kwargs):
@@ -72,3 +73,10 @@ def nl2br(eval_ctx, value):
 def nl2br_py(value):
     result = (u'%s' % escape(value)).replace('\n', '<br>')
     return result
+
+
+# from: http://flask.pocoo.org/snippets/62/
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc

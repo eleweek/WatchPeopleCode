@@ -1,5 +1,5 @@
 from wpc import db, app, socketio
-from wpc.flask_utils import url_for_other_page, nl2br, nl2br_py, get_or_create
+from wpc.flask_utils import url_for_other_page, nl2br, nl2br_py, get_or_create, is_safe_url
 from wpc.models import MozillaStreamHack  # NOQA
 from wpc.models import YoutubeStream, WPCStream, Stream, Streamer, Subscriber, Idea, ChatMessage
 from wpc.forms import SubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm, IdeaForm, RtmpRedirectForm
@@ -260,6 +260,7 @@ def _subscribe_to_streamer():
 def reddit_authorize_callback():
     r = praw.Reddit(user_agent=app.config["REDDIT_WEB_APP_USER_AGENT"])
     r.set_oauth_app_info(app.config['REDDIT_API_ID'], app.config['REDDIT_API_SECRET'], url_for('.reddit_authorize_callback', _external=True))
+    name = None
     if True:  # str(session['unique_key']) == request.args.get('state', ''):
         code = request.args.get('code', '')
         if code:
@@ -271,14 +272,22 @@ def reddit_authorize_callback():
                 db.session.commit()
                 login_user(user)
                 flash("Logged in successfully", 'success')
-                return redirect(url_for(".streamer_page", streamer_name=name))
 
-    flash("Error while trying to log in", 'error')
-    return redirect(url_for(".index"))
+    if not name:
+        flash("Error while trying to log in", 'error')
+    next_url = session.pop('next_url_after_login', url_for("streamer_page", streamer_name=name))
+
+    if next_url:
+        return redirect(next_url)
+    else:
+        return redirect(url_for(".index"))
 
 
 @app.route('/auth')
 def authorize():
+    if is_safe_url(request.referrer):
+        session['next_url_after_login'] = request.referrer
+
     r = praw.Reddit(user_agent=app.config["REDDIT_WEB_APP_USER_AGENT"])
     r.set_oauth_app_info(app.config['REDDIT_API_ID'], app.config['REDDIT_API_SECRET'], url_for('.reddit_authorize_callback', _external=True))
     session['unique_key'] = uuid4()
