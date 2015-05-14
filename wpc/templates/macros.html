@@ -16,7 +16,7 @@
   {% endif %}
 
   {% if stream.current_viewers is not none %}
-    | {{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}
+    | <span class="viewers-count-stream viewers-count-stream-{{stream.id}}">{{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}</span>
   {% endif %}
   {% if stream.streamer and with_subscribe_button %}
     | <button class="btn btn-success btn-xs subscribe-button subscribe-button-{{stream.streamer.id}}">Subscribe</button>
