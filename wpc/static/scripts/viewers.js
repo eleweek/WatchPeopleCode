@@ -7,7 +7,7 @@ $(document).ready(function() {
             console.log(count);
             cls_selector = ".viewers-count-stream-" + stream_id;
             if (count !== undefined) {
-                $(cls_selector).html(count.toString() + (count === 1 ? "viewer" : "viewers"));
+                $(cls_selector).html(count.toString() + " " + (count === 1 ? "viewer" : "viewers"));
             }
         });
     };
