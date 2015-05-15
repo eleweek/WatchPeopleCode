@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+
 {% import "macros.html" as macros with context %}
 
 {% block title %} Streamer {{ streamer.reddit_username }} {% endblock %}
@@ -93,27 +94,7 @@
 
       <div class="col-md-4">
         <br>
-        <div class="panel panel-default panel-chat">
-
-          <div class="panel-heading">
-            <h3 class="panel-title">Chat</h3>
-          </div>
-
-          <div class="panel-body">
-            <div class="chat-loading"><i>Chat is loading...</i></div>
-            <ul class="messages"></ul>
-            <form class="compose-message-form">
-              <div class="form-group">
-                <textarea class="form-control" name="message"></textarea>
-                <br>
-                <button class="btn btn-info" type="submit">Send </button>
-                {% set popout_url = url_for('streamer_popout_chat', streamer_name=streamer.reddit_username) %}
-                <a href="#" target="popup" class="popup" onclick="window.open('{{popout_url}}','name','width=350,height=650')" >Pop out</a>
-              </div>
-            </form>
-          </div>
-
-        </div>
+        {{ macros.render_chat(streamer) }}
       </div>
     {% endif %}
 

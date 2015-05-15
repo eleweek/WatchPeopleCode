@@ -19,6 +19,11 @@ class SubscribeForm(Form):
     email = StringField("Email address", [validators.DataRequired(), validators.Email(), validate_email_unique])
     submit_button = SubmitField('Subscribe')
 
+#TODO: better way
+class GLMSubscribeForm(Form):
+    email = StringField("Email address", [validators.DataRequired(), validators.Email()])
+    submit_button = SubmitField('Subscribe')
+
 
 class IdeaForm(Form):
     description = TextAreaField("Soo... Streamers need your ideas. What kind of streams would you like to see here?", [validators.DataRequired()])

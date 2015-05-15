@@ -1,0 +1,52 @@
+{% extends "streamer.html" %}
+
+{% import "macros.html" as macros with context %}
+
+{% block content %}
+<div class="container">
+  <h2 class="text-center"> GLM Programming Talk Show</h2>
+  <h3 class="text-center"> Today, I'll talk to Mike Conley, who works on Firefox web browser </h3>
+
+  <div class="row">
+    <div class="col-md-8">
+      <p>
+        We will talk about Firefox, Mozilla, opensource and programming in general.
+        <br>
+        <strong>Mike's twitter:</strong> <a href='https://twitter.com/mike_conley'>@mike_conley</a>
+        <br>
+        <strong>Mike's youtube channel:</strong> <a href='https://www.youtube.com/user/mikeconleytoronto'>mikeconleytoronto</a>
+      </p>
+        <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
+
+        <form action="" method="POST" class="form form-subscribe" role="form">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h1 class="panel-title">Get email notifications about future episodes</h1>
+            </div>
+
+            <div class="panel-body">
+              <div class="form-group">
+                {{ subscribe_form.hidden_tag() }}
+                {{ wtf.form_field(subscribe_form.email, value="") }}
+                {{ wtf.form_field(subscribe_form.submit_button, button_map={'submit_button': 'primary'}) }}
+              </div>
+            </div>
+          </div>
+        </form>
+    </div>
+  </div>
+
+  <div class="row">
+    {% if wpc_stream %}
+      <div class="col-md-8">
+          {{ macros.stream_macro(wpc_stream, true, title_form if streamer == current_user else none, not current_user.already_subscribed(streamer)) }}
+      </div>
+
+      <div class="col-md-4">
+        <br>
+        {{ macros.render_chat(streamer) }}
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

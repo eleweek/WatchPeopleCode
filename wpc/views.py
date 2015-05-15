@@ -2,7 +2,7 @@ from wpc import db, app, socketio
 from wpc.flask_utils import url_for_other_page, nl2br, nl2br_py, get_or_create, is_safe_url
 from wpc.models import MozillaStreamHack  # NOQA
 from wpc.models import YoutubeStream, WPCStream, Stream, Streamer, Subscriber, Idea, ChatMessage
-from wpc.forms import SubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm, IdeaForm, RtmpRedirectForm
+from wpc.forms import SubscribeForm, GLMSubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm, IdeaForm, RtmpRedirectForm
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session, abort
 from flask.ext.login import login_user, logout_user, login_required, current_user
@@ -176,6 +176,20 @@ def streamer_page(streamer_name, page):
     if wpc_stream:
         streams = streams.filter(Stream.id != wpc_stream.id)
     streams = streams.order_by(Stream.actual_start_time.desc().nullslast()).paginate(page, per_page=5)
+
+    # TODO: better way of customizing the page for other people
+    if streamer_name == 'glm_talkshow':
+        subscribe_form = GLMSubscribeForm(prefix='glm_subscribe')
+
+        if subscribe_form.validate_on_submit():
+            subscriber = get_or_create(Subscriber, email=subscribe_form.email.data)
+            if subscriber not in streamer.subscribers:
+                streamer.subscribers.append(subscriber)
+                db.session.commit()
+                flash("Subscribed to GLM Programming Talk Show!")
+
+        return render_template('streamers/glm_talkshow.html', streamer=streamer, wpc_stream=wpc_stream, subscribe_form=subscribe_form)
+
     info_form = EditStreamerInfoForm(prefix='info')
     title_form = EditStreamTitleForm(prefix='title')
 
@@ -215,7 +229,6 @@ def streamer_page(streamer_name, page):
                            streams=streams, info_form=info_form,
                            title_form=title_form, edit_info=False,
                            edit_title=False, wpc_stream=wpc_stream)
-
 
 @app.route('/dashboard', methods=['POST', 'GET'])
 @login_required
