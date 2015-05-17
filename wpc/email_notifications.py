@@ -26,7 +26,7 @@ def generate_email_notifications(streamer):
                            streamer=streamer, streams=streams)
     html = render_template('mails/stream_notification.html',
                            streamer=streamer, streams=streams)
-    subscribers = streamer.subscribers
+    subscribers = streamer.subscribers.all()
     subject = 'Watchpeoplecode: {} just went live'.format(streamer.reddit_username)
     return text, html, subscribers, subject
 
