@@ -39,6 +39,12 @@
                 }
             });
 
+            this.socket.on('forbidden', function(){
+                if (that.onForbidden) {
+                    that.onForbidden();
+                }
+            });
+
             this.socket.emit('initialize');
             this.socket.emit('join', streamer);
         },
@@ -149,6 +155,14 @@
             }
             msgs.animate({ scrollTop: msgs[0].scrollHeight }, "fast");
         };
+
+        chatAPI.onForbidden = function(){
+            alert(
+                "Sorry, this streamer disabled anonymous posting. " +
+                "You can login with your reddit account if you have one."
+            );
+        };
+
     };
 
     var ready = function(){
