@@ -188,8 +188,14 @@ def streamer_page(streamer_name, page):
                 db.session.commit()
                 flash("Subscribed to GLM Programming Talk Show!")
 
-        yt_recording = YoutubeStream.query.filter_by(ytid='f968E8eZmvM').one()
-        return render_template('streamers/glm_talkshow.html', streamer=streamer, wpc_stream=wpc_stream, yt_stream=yt_recording, subscribe_form=subscribe_form)
+        yt_recording_ep1 = YoutubeStream.query.filter_by(ytid='f968E8eZmvM').one()
+        yt_recording_ep2 = YoutubeStream.query.filter_by(ytid='87SfA1sw7vY').one()
+        return render_template('streamers/glm_talkshow.html',
+                               streamer=streamer,
+                               wpc_stream=wpc_stream,
+                               yt_stream_ep1=yt_recording_ep1,
+                               yt_stream_ep2=yt_recording_ep2,
+                               subscribe_form=subscribe_form)
 
     info_form = EditStreamerInfoForm(prefix='info')
     title_form = EditStreamTitleForm(prefix='title')
