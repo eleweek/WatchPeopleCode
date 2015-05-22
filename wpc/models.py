@@ -448,6 +448,7 @@ class Streamer(db.Model, UserMixin):
     subscribers = db.relationship('Subscriber', secondary=streamer_subscriptions, lazy='dynamic', backref=db.backref('subscribed_to', lazy='dynamic'))
     need_to_notify_subscribers = db.Column(db.Boolean, default=False)
     last_time_notified = db.Column(db.DateTime())
+    banned = db.Column(db.Boolean(), default=False)
 
     # XXX: this is kinda ugly, but simple
     # nginx-rtmp supports only fixed number of redirects

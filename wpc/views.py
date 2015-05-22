@@ -451,13 +451,15 @@ def chat_disconnect():
 @socketio.on('message', namespace='/chat')
 def chat_message(message_text, streamer_username):
     streamer = check_chat_access_and_get_streamer(streamer_username)
-    cm = ChatMessage(streamer=streamer, text=message_text, sender=session['username'])
-    db.session.add(cm)
-    db.session.commit()
-
     message = {"sender": session['username'],
                "text": nl2br_py(message_text)}
-    emit("message", message, room=streamer.reddit_username)
+    if current_user.is_authenticated() and current_user.banned:
+        emit("message", message)
+    else:
+        cm = ChatMessage(streamer=streamer, text=message_text, sender=session['username'])
+        db.session.add(cm)
+        db.session.commit()
+        emit("message", message, room=streamer.reddit_username)
     return True
 
 
