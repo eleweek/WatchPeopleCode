@@ -5,18 +5,32 @@
 {% block content %}
 <div class="container">
   <h2 class="text-center"> GLM Programming Talk Show</h2>
-  <h3 class="text-center"> Today, I talked to Mike Conley, who works on Firefox web browser. The recording is available below </h3>
+  <h3 class="text-center"> Episode 2. Josh Matthews, Mozilla Engineer working on Rust </h3>
+  <div class="row">
+    {% if wpc_stream %}
+      <div class="col-md-8">
+        <p>
+          We'll talk about Servo, Rust, Mozilla and programming in general.
+          <br>
+          <strong>Josh's website:</strong> <a href="http://www.joshmatthews.net/">joshmatthews.net</a>
+          <br>
+          <strong>Josh's twitter:</strong> <a href="https://twitter.com/lastontheboat">@lastontheboat</a>
+          <br>
+          <strong>Josh's github:</strong> <a href="https://github.com/jdm">jdm</a>
+        </p>
+          <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
+          {{ macros.stream_macro(wpc_stream, true, title_form if streamer == current_user else none, not current_user.already_subscribed(streamer)) }}
+      </div>
+
+      <div class="col-md-4">
+        <br>
+        {{ macros.render_chat(streamer) }}
+      </div>
+    {% endif %}
+  </div>
 
   <div class="row">
     <div class="col-md-8">
-      <p>
-        We will talk about Firefox, Mozilla, opensource and programming in general.
-        <br>
-        <strong>Mike's twitter:</strong> <a href='https://twitter.com/mike_conley'>@mike_conley</a>
-        <br>
-        <strong>Mike's youtube channel:</strong> <a href='https://www.youtube.com/user/mikeconleytoronto'>mikeconleytoronto</a>
-      </p>
-        <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
 
         <form action="" method="POST" class="form form-subscribe" role="form">
           <div class="panel panel-default">
@@ -35,20 +49,26 @@
         </form>
     </div>
   </div>
-
+  <h3> Archive </h3>
   <div class="row">
-    {% if wpc_stream %}
-      <div class="col-md-8">
-          {{ macros.stream_macro(wpc_stream, true, title_form if streamer == current_user else none, not current_user.already_subscribed(streamer)) }}
+    <div class="col-md-8">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Episode 1. Mike Conley, Mozilla Engineer working on Firefox</h3>
+        </div>
+        <div class="panel-body">
+          <p>
+            We talked about Firefox, Mozilla, opensource and programming in general.
+            <br>
+            <strong>Mike's twitter:</strong> <a href='https://twitter.com/mike_conley'>@mike_conley</a>
+            <br>
+            <strong>Mike's youtube channel:</strong> <a href='https://www.youtube.com/user/mikeconleytoronto'>mikeconleytoronto</a>
+          </p>
+          {{ macros.stream_macro(yt_stream, false, none) }}
+        </div>
       </div>
-
-      <div class="col-md-4">
-        <br>
-        {{ macros.render_chat(streamer) }}
-      </div>
-    {% elif yt_stream %}
-    {{ macros.stream_macro(yt_stream, false, none) }}:w
-    {% endif %}
+    </div>
   </div>
+
 </div>
 {% endblock %}

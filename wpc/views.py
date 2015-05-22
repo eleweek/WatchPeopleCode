@@ -189,7 +189,7 @@ def streamer_page(streamer_name, page):
                 flash("Subscribed to GLM Programming Talk Show!")
 
         yt_recording = YoutubeStream.query.filter_by(ytid='f968E8eZmvM').one()
-        return render_template('streamers/glm_talkshow.html', streamer=streamer, wpc_stream=None, yt_stream=yt_recording, subscribe_form=subscribe_form)
+        return render_template('streamers/glm_talkshow.html', streamer=streamer, wpc_stream=wpc_stream, yt_stream=yt_recording, subscribe_form=subscribe_form)
 
     info_form = EditStreamerInfoForm(prefix='info')
     title_form = EditStreamTitleForm(prefix='title')
