@@ -154,8 +154,8 @@ class WPCStream(Stream):
                                 file: "http://{3}/hls/{0}.m3u8"
                             }}]
                         }}],
-                        width: "640",
-                        height: "390",
+                        width: "100%",
+                        aspectratio: "16:10",
                         autostart: {1},
                         androidhls: true,
                         rtmp: {{

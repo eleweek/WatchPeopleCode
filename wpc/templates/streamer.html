@@ -14,7 +14,7 @@
   {{super()}}
   {# do not move the next string, it's here because it's needed before using jwplayer #}
   <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
-  <div class="container">
+  <div class="container-fluid">
     <div class="col-md-offset-2 col-md-8">
       <p class="text-center"><a href={{url_for(".index")}}>Back to main page</a></p>
     </div>
@@ -88,11 +88,11 @@
     </div>
 
     {% if wpc_stream %}
-      <div class="col-md-8">
+      <div class="col-md-9">
           {{ macros.stream_macro(wpc_stream, true, title_form if streamer == current_user else none, not current_user.already_subscribed(streamer)) }}
       </div>
 
-      <div class="col-md-4">
+      <div class="col-md-3">
         <br>
         {{ macros.render_chat(streamer) }}
       </div>
