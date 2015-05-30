@@ -16,3 +16,7 @@
     height: 400px;
     overflow-y: scroll;
 }
+
+#chat-div {
+    min-width: 200px;
+}

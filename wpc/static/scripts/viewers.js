@@ -22,6 +22,6 @@ $(document).ready(function() {
             )[0];
         var stream_id = +stream_id_class.split('-')[3];
         console.log("setInterval " + stream_id);
-        setInterval(function() { update_viewers(stream_id); }, 90000);
+        setInterval(function() { update_viewers(stream_id); }, 5000);
     });
 });
