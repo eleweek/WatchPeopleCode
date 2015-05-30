@@ -5,18 +5,16 @@
 {% block content %}
 <div class="container">
   <h2 class="text-center"> GLM Programming Talk Show</h2>
-  <h3 class="text-center"> Episode 2. Josh Matthews, Mozilla Engineer working on Servo. It is over, but the recording is available below </h3>
+  <h3 class="text-center"> Episode 3. Justin M. Keyes, neovim contributor</h3>
   <div class="row">
-    {% if false %}
+    {% if wpc_stream %}
       <div class="col-md-8">
         <p>
-          We'll talk about Servo, Rust, Mozilla and programming in general.
+          We'll talk about neovim, vim, opensource and programming in General
           <br>
-          <strong>Josh's website:</strong> <a href="http://www.joshmatthews.net/">joshmatthews.net</a>
+          <strong>Justin's twitter:</strong> <a href="https://twitter.com/justinmk">@justinmk</a>
           <br>
-          <strong>Josh's twitter:</strong> <a href="https://twitter.com/lastontheboat">@lastontheboat</a>
-          <br>
-          <strong>Josh's github:</strong> <a href="https://github.com/jdm">jdm</a>
+          <strong>Justins's github:</strong> <a href="https://github.com/justinmk">jdm</a>
         </p>
           <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
           {{ macros.stream_macro(wpc_stream, true, title_form if streamer == current_user else none, not current_user.already_subscribed(streamer)) }}
