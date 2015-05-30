@@ -187,6 +187,9 @@ def streamer_page(streamer_name, page):
                 db.session.commit()
                 flash("Subscribed!")
 
+    info_form = EditStreamerInfoForm(prefix='info')
+    title_form = EditStreamTitleForm(prefix='title')
+
     if streamer_name == 'glm_talkshow':
         subscribe_form = GLMSubscribeForm(prefix='streamer_subscribe')
 
@@ -205,10 +208,9 @@ def streamer_page(streamer_name, page):
                                streams=streams,
                                wpc_stream=wpc_stream,
                                subscribe_form=subscribe_form,
+                               info_form=info_form,
+                               title_form=title_form,
                                yt_stream_the_button=yt_stream_the_button)
-
-    info_form = EditStreamerInfoForm(prefix='info')
-    title_form = EditStreamTitleForm(prefix='title')
 
     if current_user.is_authenticated() and current_user == streamer:
         if request.method == 'POST':
