@@ -178,7 +178,8 @@ def streamer_page(streamer_name, page):
     streams = streams.order_by(Stream.actual_start_time.desc().nullslast()).paginate(page, per_page=5)
 
     # TODO: better way of customizing the page for other people
-    if streamer_name in ['glm_talkshow', 'godlikesme']:
+    # if streamer_name in ['glm_talkshow', 'godlikesme']:
+    if streamer_name in ['glm_talkshow']:
         subscribe_form = GLMSubscribeForm(prefix='streamer_subscribe')
         if subscribe_form.validate_on_submit():
             subscriber = get_or_create(Subscriber, email=subscribe_form.email.data)
@@ -203,16 +204,16 @@ def streamer_page(streamer_name, page):
                                yt_stream_ep2=yt_recording_ep2,
                                yt_stream_ep3=yt_recording_ep3,
                                subscribe_form=subscribe_form)
-    elif streamer_name == 'godlikesme':
-        yt_stream_the_button = YoutubeStream.query.filter_by(ytid='gNrFy5h2voY').one()
-        subscribe_form = GLMSubscribeForm(prefix='streamer_subscribe')
-        return render_template('streamer.html', streamer=streamer,
-                               streams=streams,
-                               wpc_stream=wpc_stream,
-                               subscribe_form=subscribe_form,
-                               info_form=info_form,
-                               title_form=title_form,
-                               yt_stream_the_button=yt_stream_the_button)
+    # elif streamer_name == 'godlikesme':
+    #    yt_stream_the_button = YoutubeStream.query.filter_by(ytid='gNrFy5h2voY').one()
+    #    subscribe_form = GLMSubscribeForm(prefix='streamer_subscribe')
+    #    return render_template('streamer.html', streamer=streamer,
+    #                           streams=streams,
+    #                           wpc_stream=wpc_stream,
+    #                           subscribe_form=subscribe_form,
+    #                           info_form=info_form,
+    #                           title_form=title_form,
+    #                           yt_stream_the_button=yt_stream_the_button)
 
     if current_user.is_authenticated() and current_user == streamer:
         if request.method == 'POST':
