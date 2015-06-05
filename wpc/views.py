@@ -197,12 +197,14 @@ def streamer_page(streamer_name, page):
         yt_recording_ep1 = YoutubeStream.query.filter_by(ytid='f968E8eZmvM').one()
         yt_recording_ep2 = YoutubeStream.query.filter_by(ytid='87SfA1sw7vY').one()
         yt_recording_ep3 = YoutubeStream.query.filter_by(ytid='R7z2GQr9-tg').one()
+        yt_recording_ep4 = YoutubeStream.query.filter_by(ytid='zU7ltY9Dmnk').one()
         return render_template('streamers/glm_talkshow.html',
                                streamer=streamer,
                                wpc_stream=wpc_stream,
                                yt_stream_ep1=yt_recording_ep1,
                                yt_stream_ep2=yt_recording_ep2,
                                yt_stream_ep3=yt_recording_ep3,
+                               yt_stream_ep4=yt_recording_ep4,
                                subscribe_form=subscribe_form)
     # elif streamer_name == 'godlikesme':
     #    yt_stream_the_button = YoutubeStream.query.filter_by(ytid='gNrFy5h2voY').one()
