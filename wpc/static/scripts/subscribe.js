@@ -11,7 +11,8 @@ var do_subscribe = function(streamer_id, email) {
         },
         success: function() {
             console.log("Successfully subscribed to streamer with id " + streamer_id);
-            $(".subscribe-button-" + streamer_id).hide();
+            bootbox.alert("Successfully subscribed to the streamer!");
+            $(".subscribe-button-" + streamer_id).not('.regular-streamer-subscribe-button').hide();
         }
     });
 };
