@@ -18,8 +18,8 @@ if app.config['REDDIT_PASSWORD']:
     r.login(app.config['REDDIT_USERNAME'], app.config['REDDIT_PASSWORD'])
 
 
-def get_stream_from_url(url, submission=None, only_new=False):
-    assert bool(submission) == bool(only_new)
+def get_stream_from_url(url, submission_id=None, only_new=False):
+    assert bool(submission_id) == bool(only_new)
     db_stream = None
 
     ytid = youtube_video_id(url)
@@ -38,13 +38,13 @@ def get_stream_from_url(url, submission=None, only_new=False):
         db_stream = TwitchStream.query.filter_by(channel=tc).first()
         if db_stream is None:
             return TwitchStream(tc)
-        if submission and submission not in db_stream.submissions:
+        if submission_id and submission_id not in [s.submission_id for s in db_stream.submissions]:
             return db_stream
 
     wc = wpc_channel(url)
     if wc is not None:
         db_stream = WPCStream.query.filter_by(channel_name=wc).first()
-        if db_stream and submission and submission not in db_stream.submissions:
+        if db_stream and submission_id and [s.submission_id for s in db_stream.submissions]:
             return db_stream
 
     return None if only_new else db_stream
@@ -84,9 +84,9 @@ def get_new_streams():
     for s in submissions:
         try:
             for url in get_submission_urls(s):
-                submission = get_or_create(Submission, submission_id=s.id)
-                stream = get_stream_from_url(url, submission, only_new=True)
+                stream = get_stream_from_url(url, s.id, only_new=True)
                 if stream:
+                    submission = get_or_create(Submission, submission_id=s.id)
                     stream.add_submission(submission)
                     reddit_username = get_reddit_username(s, url)
                     if reddit_username is not None and stream.streamer is None:

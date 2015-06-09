@@ -187,8 +187,9 @@ def streamer_page(streamer_name, page):
             subscriber = get_or_create(Subscriber, email=subscribe_form.email.data)
             if subscriber not in streamer.subscribers:
                 streamer.subscribers.append(subscriber)
-                db.session.commit()
                 flash("Subscribed!")
+
+            db.session.commit()
 
     info_form = EditStreamerInfoForm(prefix='info')
     title_form = EditStreamTitleForm(prefix='title')
