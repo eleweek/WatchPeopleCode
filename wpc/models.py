@@ -237,6 +237,11 @@ class YoutubeStream(Stream):
                 self.scheduled_start_time = item['liveStreamingDetails']['scheduledStartTime']
                 if 'concurrentViewers' in item['liveStreamingDetails']:
                     self.current_viewers = item['liveStreamingDetails']['concurrentViewers']
+
+            if item['snippet']['liveBroadcastContent'] == "none" and not self.actual_start_time:
+                # TODO: it is probably better to have a separate column for vids
+                self.actual_start_time = item['snippet'].get('publishedAt')
+
             if item['snippet']['liveBroadcastContent'] == 'live':
                 self.go_live()
                 if 'actualStartTime' in item['liveStreamingDetails']:
