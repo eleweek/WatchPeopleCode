@@ -403,10 +403,15 @@ class TwitchStream(Stream):
 
 class MozillaStreamHack(object):
     def html_code(self, autoplay=None):
-        return '''<iframe src="https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-6/video/" width="640" height="380" frameborder="0" allowfullscreen></iframe>'''  # NOQA
+        return '''<iframe src="https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-18/video/" width="640" height="380" frameborder="0" allowfullscreen></iframe>'''  # NOQA
 
     def normal_url(self):
-        return "https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-6/"
+        return "https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-18/"
+
+    def __init__(self):
+        self.id = 0
+        self.current_viewers = None
+        self.streamer = Streamer.query.filter_by(reddit_username='good_grief').one()
 
 
 class CaseInsensitiveComparator(ColumnProperty.Comparator):
