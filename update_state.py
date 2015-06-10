@@ -192,9 +192,9 @@ def update_state():
             app.logger.exception(e)
 
     app.logger.info("Updating new streams")
-
     get_new_streams()
-    if Stream.query.filter_by(status='live').count() == 0:
+
+    if not db.session.query(Stream.query.filter_by(status='live').exists()).scalar():
         get_bonus_twitch_stream()
 
 
