@@ -63,7 +63,7 @@ def process_idea_form(idea_form):
 def index():
     live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
     # Uncomment this when mozilla guys start livestreaming
-    live_streams.insert(0, MozillaStreamHack())
+    # live_streams.insert(0, MozillaStreamHack())
     idea_form = IdeaForm(prefix='idea')
     redir = process_idea_form(idea_form)
     if redir:
