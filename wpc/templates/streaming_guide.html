@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros with context %}
+
+{% block title %}Streaming guide{% endblock %}
+
+{% block content %}
+  {{super()}}
+  <div class="container">
+    <h3><p class="text-center">Watch People Code: Streaming guide</p></h3>
+    <p>
+      This guide is under development. If you need help, you can message /r/WatchPeopleCode moderators or reach to /u/godlikesme on irc.freenode.net #WatchPeopleCode.
+    </p>
+    <h3><p class="text-center">Twitch or youtube</p></h3>
+    <p>
+      If you have youtube channel or twitch channel, you can submit a link to your stream to /r/WatchPeopleCode subreddit. It will be automatically detected and put on the website within minutes
+    </p>
+    <h3><p class="text-center">"Native"</p></h3>
+    <p>
+      WatchPeopleCode has its own server dedicated to streaming. The lag here is much smaller than on youtube or twitch. 
+    </p>
+    <ol>
+      <li>Download <a href="https://obsproject.com/">OBS</a>. OBS is a great piece of software that makes streaming easy. Using OBS you can stream on WatchPeopleCode(or Youtube, or Twitch)</li>
+      <li>Login with reddit and click on "My Dashboard". </li>
+      <li>In your dashboard, click "Show private info" </li>
+      <li>Add WPC RTMP URL and WPC RTMP key to OBS: <a href="https://s3.amazonaws.com/watchpeoplecode/manual/obs-stream.png">Example screenshot</a></li>
+      <li>You can now stream on WPC just fine! If you want to further reduce lag, you can  <a href="https://s3.amazonaws.com/watchpeoplecode/manual/obs-download.png">use these settings</a></li>
+      <li>Submit your link to /r/WatchPeopleCode </li>
+    </ol>
+  </div>
+{% endblock %}

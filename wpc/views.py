@@ -59,6 +59,11 @@ def process_idea_form(idea_form):
         return redirect(url_for("idea_list"))
 
 
+@app.route('/streaming_guide')
+def streaming_guide():
+    return render_template("streaming_guide.html")
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
