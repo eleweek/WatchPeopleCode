@@ -23,11 +23,6 @@ class Anon(AnonymousUserMixin):
 
 login_manager.anonymous_user = Anon
 
-stream_tag = db.Table('stream_tag',
-                      db.Column('stream_id', db.Integer(), db.ForeignKey('stream.id')),
-                      db.Column('tag_name', db.String(256), db.ForeignKey('tag.name')))
-
-
 stream_sub = db.Table('stream_sub',
                       db.Column('stream_id', db.Integer(), db.ForeignKey('stream.id')),
                       db.Column('submission_id', db.String(6), db.ForeignKey('submission.submission_id')))
@@ -55,7 +50,6 @@ class Stream(db.Model):
     submissions = db.relationship('Submission', secondary=stream_sub, backref=db.backref('streams', lazy='dynamic'))
     streamer_id = db.Column('streamer_id', db.Integer(), db.ForeignKey('streamer.id'))
     streamer = db.relationship('Streamer', backref=db.backref('streams', lazy='dynamic'))
-    tags = db.relationship('Tag', secondary=stream_tag, backref=db.backref('streams', lazy='dynamic'))
     current_viewers = db.Column(db.Integer)
     confstream = db.Column(db.Boolean(), default=False)
     __mapper_args__ = {
@@ -538,14 +532,3 @@ class Streamer(db.Model, UserMixin):
                 self.youtube_name = item['snippet']['title']
 
         self.youtube_channel = yc if yc else None
-
-
-class Tag(db.Model):
-    __tablename__ = 'tag'
-    name = db.column_property(db.Column(db.String(256), primary_key=True), comparator_factory=CaseInsensitiveComparator)
-
-    def __init__(self, name):
-        self.name = name
-
-    def __repr__(self):
-        return '<Tag {}>'.format(self.name)
