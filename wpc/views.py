@@ -202,6 +202,7 @@ def streamer_page(streamer_name, page):
         yt_recording_ep3 = YoutubeStream.query.filter_by(ytid='R7z2GQr9-tg').one()
         yt_recording_ep4 = YoutubeStream.query.filter_by(ytid='zU7ltY9Dmnk').one()
         yt_recording_ep5 = YoutubeStream.query.filter_by(ytid='3A_oTuzGoeE').one()
+        how_to_learn_programming = YoutubeStream.query.filter_by(ytid='6XtSPvjt87w').one()
         return render_template('streamers/glm_talkshow.html',
                                streamer=streamer,
                                wpc_stream=wpc_stream,
@@ -210,6 +211,7 @@ def streamer_page(streamer_name, page):
                                yt_stream_ep3=yt_recording_ep3,
                                yt_stream_ep4=yt_recording_ep4,
                                yt_stream_ep5=yt_recording_ep5,
+                               how_to_learn_programming=how_to_learn_programming,
                                subscribe_form=subscribe_form)
     # elif streamer_name == 'godlikesme':
     #    yt_stream_the_button = YoutubeStream.query.filter_by(ytid='gNrFy5h2voY').one()
