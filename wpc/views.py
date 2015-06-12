@@ -193,7 +193,9 @@ def streamer_page(streamer_name, page):
             subscriber = get_or_create(Subscriber, email=subscribe_form.email.data)
             if subscriber not in streamer.subscribers:
                 streamer.subscribers.append(subscriber)
-                flash("Subscribed!")
+                flash("Subscribed successfully!", category='success')
+            else:
+                flash("You're already subscribed!")
 
             db.session.commit()
 
