@@ -85,6 +85,7 @@ def get_new_streams():
         try:
             for url in get_submission_urls(s):
                 stream = get_stream_from_url(url, s.id, only_new=True)
+                db.session.close()
                 if stream:
                     submission = get_or_create(Submission, submission_id=s.id)
                     stream.add_submission(submission)
@@ -123,6 +124,7 @@ def update_flairs():
                     if author.name == s.author.name and re.search("recording\s+(is)?\s*(now)?\s*available", text, flags=re.IGNORECASE):
                         db_s.recording_available = True
                         db.session.commit()
+            db.session.close()
 
             if not db_s or not db_s.recording_available:
                 new_flair_text = None
@@ -133,6 +135,7 @@ def update_flairs():
 
             for url in get_submission_urls(s):
                 stream = get_stream_from_url(url, None)
+                db.session.close()
                 if stream:
                     # set user flair
                     if not wpc_sub.get_flair(s.author)['flair_text']:
@@ -163,9 +166,9 @@ def update_flairs():
 
             if new_flair_text and new_flair_css:
                 s.set_flair(new_flair_text, new_flair_css)
+
     except Exception as e:
         app.logger.exception(e)
-    db.session.close()
 
 
 def get_bonus_twitch_stream():
@@ -191,13 +194,14 @@ def update_state():
         except Exception as e:
             db.session.rollback()
             app.logger.exception(e)
+    db.session.close()
 
     app.logger.info("Updating new streams")
     get_new_streams()
+    db.session.close()
 
     if not db.session.query(Stream.query.filter_by(status='live').exists()).scalar():
         get_bonus_twitch_stream()
-
     db.session.close()
 
 
