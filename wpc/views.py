@@ -455,6 +455,7 @@ def chat_initialize():
             if session['username'] not in chat_users:
                 break
     chat_users.append(session['username'])
+    db.session.close()
 
 
 def check_chat_access_and_get_streamer(streamer_username=None):
@@ -474,6 +475,7 @@ def join(streamer_username):
            "text": nl2br_py(msg.text)}
           for msg in reversed(ChatMessage.query.filter_by(streamer=streamer).order_by(ChatMessage.id.desc()).limit(20).all())])
     emit('join', True, session['username'])
+    db.session.close()
 
 
 @socketio.on('disconnect', namespace='/chat')
@@ -501,6 +503,7 @@ def chat_message(message_text, streamer_username):
         db.session.add(cm)
         db.session.commit()
         emit("message", message, room=streamer.reddit_username)
+    db.session.close()
     return True
 
 

@@ -165,6 +165,7 @@ def update_flairs():
                 s.set_flair(new_flair_text, new_flair_css)
     except Exception as e:
         app.logger.exception(e)
+    db.session.close()
 
 
 def get_bonus_twitch_stream():
@@ -197,6 +198,8 @@ def update_state():
     if not db.session.query(Stream.query.filter_by(status='live').exists()).scalar():
         get_bonus_twitch_stream()
 
+    db.session.close()
+
 
 @sched.scheduled_job('interval', seconds=100)
 def send_notifications():
@@ -215,6 +218,7 @@ def send_notifications():
             except Exception as e:
                 db.session.rollback()
                 app.logger.exception(e)
+    db.session.close()
 
 
 if __name__ == '__main__':
