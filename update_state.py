@@ -77,15 +77,15 @@ def get_new_streams():
         if moditem and datetime.datetime.now() - datetime.datetime.utcfromtimestamp(moditem[0].created_utc) < datetime.timedelta(hours=2):
             if Streamer.query.filter_by(reddit_username=moditem[0].author.name).first() is not None:
                 moditem[0].approve()
+    db.session.close()
 
     submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
     # TODO : don't forget about http vs https
     # TODO better way of caching api requests
     for s in submissions:
-        try:
-            for url in get_submission_urls(s):
+        for url in get_submission_urls(s):
+            try:
                 stream = get_stream_from_url(url, s.id, only_new=True)
-                db.session.close()
                 if stream:
                     submission = get_or_create(Submission, submission_id=s.id)
                     stream.add_submission(submission)
@@ -97,9 +97,10 @@ def get_new_streams():
 
                     db.session.add(stream)
                     db.session.commit()
-        except Exception as e:
-            app.logger.exception(e)
-            db.session.rollback()
+                db.session.close()
+            except Exception as e:
+                app.logger.exception(e)
+                db.session.rollback()
 
 
 sched = BlockingScheduler()
@@ -139,7 +140,6 @@ def update_flairs():
 
             for url in get_submission_urls(s):
                 stream = get_stream_from_url(url, None)
-                db.session.close()
                 if stream:
                     # set user flair
                     if not wpc_sub.get_flair(s.author)['flair_text']:
@@ -167,6 +167,8 @@ def update_flairs():
 
                     if stream.type == 'youtube':
                         db_s.recording_available = True
+
+                db.session.close()
 
             if new_flair_text and new_flair_css:
                 s.set_flair(new_flair_text, new_flair_css)
@@ -202,7 +204,6 @@ def update_state():
 
     app.logger.info("Updating new streams")
     get_new_streams()
-    db.session.close()
 
     if not db.session.query(Stream.query.filter_by(status='live').exists()).scalar():
         get_bonus_twitch_stream()
@@ -226,7 +227,8 @@ def send_notifications():
             except Exception as e:
                 db.session.rollback()
                 app.logger.exception(e)
-    db.session.close()
+
+        db.session.close()
 
 
 if __name__ == '__main__':
