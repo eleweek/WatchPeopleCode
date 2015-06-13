@@ -118,20 +118,24 @@ def update_flairs():
                 continue
 
             db_s = Submission.query.filter_by(submission_id=s.id).first()
-            if db_s and not db_s.recording_available:
+
+            if db_s is None:
+                db.session.close()
+                continue
+
+            if not db_s.recording_available:
                 s.replace_more_comments()
                 for author, text in map(lambda c: (c.author, c.body), s.comments) + [(s.author, s.selftext)]:
                     if author.name == s.author.name and re.search("recording\s+(is)?\s*(now)?\s*available", text, flags=re.IGNORECASE):
                         db_s.recording_available = True
                         db.session.commit()
-            db.session.close()
-
-            if not db_s or not db_s.recording_available:
                 new_flair_text = None
                 new_flair_css = None
             else:
                 new_flair_text = u"Recording Available"
                 new_flair_css = u"four"
+
+            db.session.close()
 
             for url in get_submission_urls(s):
                 stream = get_stream_from_url(url, None)
