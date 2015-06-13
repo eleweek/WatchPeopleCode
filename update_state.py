@@ -44,7 +44,8 @@ def get_stream_from_url(url, submission_id=None, only_new=False):
     wc = wpc_channel(url)
     if wc is not None:
         db_stream = WPCStream.query.filter_by(channel_name=wc).first()
-        if db_stream and submission_id and [s.submission_id for s in db_stream.submissions]:
+        if db_stream and submission_id and\
+                submission_id not in [s.submission_id for s in db_stream.submissions]:
             return db_stream
 
     return None if only_new else db_stream
