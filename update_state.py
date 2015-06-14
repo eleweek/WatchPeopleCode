@@ -177,6 +177,7 @@ def update_flairs():
                 s.set_flair(new_flair_text, new_flair_css)
 
     except Exception as e:
+        db.session.rollback()
         app.logger.exception(e)
 
 
