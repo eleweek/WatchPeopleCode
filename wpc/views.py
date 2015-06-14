@@ -459,6 +459,9 @@ def chat_initialize():
 
 
 def check_chat_access_and_get_streamer(streamer_username=None):
+    app.logger.info("Checking access. Streamer username is {},\
+            'username' in session is {}".format(
+        streamer_username, 'username' in session))
     if 'username' not in session:
         abort(403)
     if streamer_username is not None:
