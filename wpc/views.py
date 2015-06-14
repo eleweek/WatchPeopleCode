@@ -459,12 +459,10 @@ def chat_initialize():
 
 
 def check_chat_access_and_get_streamer(streamer_username=None):
+    # maybe abort isn't work for socketio
     if 'username' not in session:
         abort(403)
     if streamer_username is None:
-        app.logger.info('''Checking access.
-        Streamer usernamer is None. Referrer is {}.'''.format(
-            request.referrer))
         abort(404)
 
     streamer = Streamer.query.filter_by(reddit_username=streamer_username.strip()).first_or_404()

@@ -134,7 +134,9 @@
   {{ super() }}
   <script src="{{ url_for('static', filename='scripts/socket.io.min.js') }}"></script>
   <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
-  <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
+  {% if wpc_stream %}
+    <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
+  {% endif %}
   <script src="http://malsup.github.com/jquery.form.js"></script>
 
   <script>
