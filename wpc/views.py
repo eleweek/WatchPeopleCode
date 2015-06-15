@@ -327,10 +327,7 @@ def reddit_authorize_callback():
         flash("Error while trying to log in", 'error')
     next_url = session.pop('next_url_after_login', url_for("streamer_page", streamer_name=name))
 
-    if next_url:
-        return redirect(next_url)
-    else:
-        return redirect(url_for(".index"))
+    return redirect(next_url)
 
 
 @app.route('/auth')
