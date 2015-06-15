@@ -210,7 +210,7 @@ def streamer_page(streamer_name, page):
         how_to_learn_programming = YoutubeStream.query.filter_by(ytid='6XtSPvjt87w').one()
         return render_template('streamers/glm_talkshow.html',
                                streamer=streamer,
-                               wpc_stream=wpc_stream,
+                               wpc_stream=None,
                                yt_stream_ep1=yt_recording_ep1,
                                yt_stream_ep2=yt_recording_ep2,
                                yt_stream_ep3=yt_recording_ep3,
