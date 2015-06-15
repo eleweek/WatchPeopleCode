@@ -183,6 +183,7 @@ def streamer_page(streamer_name, page):
     if wpc_stream:
         streams = streams.filter(Stream.id != wpc_stream.id)
     streams = streams.order_by(Stream.actual_start_time.desc().nullslast()).paginate(page, per_page=5)
+    check_profile_alert = False
 
     # TODO: better way of customizing the page for other people
     # if streamer_name in ['glm_talkshow', 'godlikesme']:
@@ -217,7 +218,8 @@ def streamer_page(streamer_name, page):
                                yt_stream_ep4=yt_recording_ep4,
                                yt_stream_ep5=yt_recording_ep5,
                                how_to_learn_programming=how_to_learn_programming,
-                               subscribe_form=subscribe_form)
+                               subscribe_form=subscribe_form,
+                               check_profile_alert=check_profile_alert)
     # elif streamer_name == 'godlikesme':
     #    yt_stream_the_button = YoutubeStream.query.filter_by(ytid='gNrFy5h2voY').one()
     #    subscribe_form = GLMSubscribeForm(prefix='streamer_subscribe')
@@ -227,6 +229,7 @@ def streamer_page(streamer_name, page):
     #                           subscribe_form=subscribe_form,
     #                           info_form=info_form,
     #                           title_form=title_form,
+    #                           check_profile_alert = check_profile_alert
     #                           yt_stream_the_button=yt_stream_the_button)
 
     if current_user.is_authenticated() and current_user == streamer:
@@ -241,7 +244,8 @@ def streamer_page(streamer_name, page):
                     return render_template('streamer.html', streamer=streamer,
                                            streams=streams, info_form=info_form,
                                            title_form=title_form, edit_info=True,
-                                           edit_title=False, wpc_stream=wpc_stream)
+                                           edit_title=False, wpc_stream=wpc_stream,
+                                           check_profile_alert=check_profile_alert)
 
             elif title_form.submit_button.data:
                 if title_form.validate_on_submit():
@@ -253,8 +257,14 @@ def streamer_page(streamer_name, page):
                     return render_template('streamer.html', streamer=streamer,
                                            streams=streams, info_form=info_form,
                                            title_form=title_form, edit_info=False,
-                                           edit_title=True, wpc_stream=wpc_stream)
+                                           edit_title=True, wpc_stream=wpc_stream,
+                                           check_profile_alert=check_profile_alert)
         else:
+            if not streamer.checked:
+                streamer.checked = True
+                db.session.commit()
+                if (streamer.youtube_channel or streamer.twitch_channel):
+                    check_profile_alert = True
             info_form.youtube_channel.data = current_user.youtube_channel
             info_form.twitch_channel.data = current_user.twitch_channel
             info_form.info.data = current_user.info
@@ -264,7 +274,8 @@ def streamer_page(streamer_name, page):
     return render_template('streamer.html', streamer=streamer,
                            streams=streams, info_form=info_form,
                            title_form=title_form, edit_info=False,
-                           edit_title=False, wpc_stream=wpc_stream)
+                           edit_title=False, wpc_stream=wpc_stream,
+                           check_profile_alert=check_profile_alert)
 
 
 @app.route('/dashboard', methods=['POST', 'GET'])
@@ -318,7 +329,6 @@ def reddit_authorize_callback():
             name = r.get_me().name
             if name:
                 user = get_or_create(Streamer, reddit_username=name)
-                user.checked = True
                 db.session.commit()
                 login_user(user)
                 flash("Logged in successfully", 'success')
@@ -334,7 +344,6 @@ def reddit_authorize_callback():
 def authorize():
     if is_safe_url(request.referrer):
         session['next_url_after_login'] = request.referrer
-
     r = praw.Reddit(user_agent=app.config["REDDIT_WEB_APP_USER_AGENT"])
     r.set_oauth_app_info(app.config['REDDIT_API_ID'], app.config['REDDIT_API_SECRET'], url_for('.reddit_authorize_callback', _external=True))
     session['unique_key'] = uuid4()

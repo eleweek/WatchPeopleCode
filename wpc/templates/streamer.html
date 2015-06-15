@@ -139,6 +139,12 @@
   {% endif %}
   <script src="http://malsup.github.com/jquery.form.js"></script>
 
+  {% if check_profile_alert %}
+    <script>
+      bootbox.alert("Please check your profile, some info there was filled based on your submissions in /r/WatchPeopleCode.");
+    </script>
+  {% endif %}
+
   <script>
     (function($, window, undefined){
       $(".edit-info-button").click(function() {
