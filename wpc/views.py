@@ -332,7 +332,7 @@ def reddit_authorize_callback():
             if name:
                 user = get_or_create(Streamer, reddit_username=name)
                 db.session.commit()
-                login_user(user)
+                login_user(user, remember=True)
                 flash("Logged in successfully", 'success')
 
     if not name:
