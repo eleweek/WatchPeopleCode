@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head><title>Newsletter</title></head>
+  <body>
+  Hey everyone! This is Alexander Putilin. <br><br>
+
+  We're working on a number of interesting features on <a href="http://watchpeoplecode.com">WatchPeopleCode.com</a>, and one of them is streaming with virtually no lag. We set up our own streaming server, and have been testing this semi-publicly through the last few of weeks. If you're interested in starting streaming, check this <a href='http://watchpeoplecode.com/streaming_guide'>guide</a>. We aren't going to disable adding your own twitch or youtube streams, so if you want to, you can still stream using Twitch or Youtube. <br>
+  If you need help with streaming, email me at <a href="mailto:avp-13@yandex.ru">avp-13@yandex.ru</a>. <br><br>
+
+  Also, if you have some time this evening, these 7 livestreams that are available at the time of sending this email.
+
+    {% if live_streams %}
+      <p><strong>Live right now:</strong><br>
+        {% for stream in live_streams %}
+          <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+          <br><br>
+        {% endfor %}
+      </p>
+    {% endif %}
+
+    {% if upcoming_streams %}
+      <p><strong>Upcoming today:</strong><br>
+        {% for stream in upcoming_streams %}
+          {% if stream.scheduled_start_time %}<b>{{stream.format_start_time(countdown=False)}}</b><br>{% endif %}
+          <a href={{ stream.normal_url() }}> {{ stream.title if stream.title else stream.normal_url() }}</a>
+          <br><br>
+        {% endfor %}
+      </p>
+    {% endif %}
+  </body>
+</html>

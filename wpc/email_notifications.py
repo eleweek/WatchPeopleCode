@@ -1,4 +1,5 @@
 from wpc import app
+from wpc.models import Subscriber, Stream
 
 from flask import render_template
 
@@ -39,3 +40,14 @@ def send_email_notifications(text, html, subscribers, subject="WatchPeopleCode: 
         recipient_vars = {subscriber.email: {}
                           for subscriber in subscribers[b * batch_size: (b + 1) * batch_size]}
         print b, send_message(recipient_vars, subject, text, html)
+
+
+def generate_stream_list():
+    # fix before use
+    live = Stream.query.filter_by(status='live').order_by(Stream.scheduled_start_time).all()
+    upcoming = Stream.query.filter_by(status='upcoming').order_by(Stream.scheduled_start_time).all()
+    text = render_template('mails/stream_list.txt', live_streams=live, upcoming_streams=upcoming)
+    html = render_template('mails/stream_list.html', live_streams=live, upcoming_streams=upcoming)
+    subscribers = Subscriber.query.all()
+    subject = 'WatchPeopleCode: newsletter'
+    return text, html, subscribers, subject

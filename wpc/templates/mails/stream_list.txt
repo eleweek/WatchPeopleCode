@@ -1,0 +1,26 @@
+{# FIX THIS TEXT -#}
+Hey everyone! This is Alexander Putilin.
+
+We're working on a number of interesting features on http://watchpeoplecode.com, and one of them is streaming with virtually no lag. We set up our own streaming server, and have been testing this semi-publicly through the last few of weeks. If you're interested in starting streaming, check this guide: http://watchpeoplecode.com/streaming_guide. We aren't going to disable adding your own twitch or youtube streams, so if you want to, you can still stream using Twitch or Youtube.
+If you need help with streaming, email me at avp-13@yandex.ru.
+
+Also, if you have some time this evening, these 7 livestreams that are available at the time of sending this email.
+
+{% if live_streams -%}
+  Live right now:
+
+  {% for stream in live_streams %}
+    {%- if stream.title -%} {{ stream.title }}: {% endif -%} {{ stream.normal_url() }}
+
+  {% endfor %}
+{% endif %}
+
+{% if upcoming_streams -%}
+  Upcoming today:
+
+  {% for stream in upcoming_streams %}
+    {%- if stream.scheduled_start_time -%} {{stream.format_start_time(countdown=False)}} {% endif %}
+    {% if stream.title -%} {{ stream.title }}: {% endif -%} {{ stream.normal_url() }}
+
+  {% endfor %}
+{% endif %}
