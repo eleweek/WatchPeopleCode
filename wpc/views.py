@@ -513,10 +513,17 @@ def chat_message(message_text, streamer_username):
     elif current_user.is_authenticated() and current_user.banned:
         emit("message", message)
     else:
-        cm = ChatMessage(streamer=streamer, text=message_text, sender=session['username'])
-        db.session.add(cm)
-        db.session.commit()
-        emit("message", message, room=streamer.reddit_username)
+        if message.startswith("/clear"):
+            if current_user.is_authenticated() and session["username"] == streamer.reddit_username:
+                emit("clear", room=streamer.reddit_username) #Clear for all viewers
+            else:
+                emit("clear") #Clear for one user
+        else:
+            #Normal chat message
+            cm = ChatMessage(streamer=streamer, text=message_text, sender=session['username'])
+            db.session.add(cm)
+            db.session.commit()
+            emit("message", message, room=streamer.reddit_username)
     db.session.close()
     return True
 
