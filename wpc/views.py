@@ -482,7 +482,8 @@ def check_chat_access_and_get_streamer(streamer_username=None):
 def join(streamer_username):
     streamer = check_chat_access_and_get_streamer(streamer_username)
     join_room(streamer.reddit_username)
-    emit('join', False, session['username']) #Sending the username before actual join.
+    if current_user.is_authenticated():
+        emit('join', False, session['username']) #Sending the username before actual join.
     emit('last_messages',
          [{"sender": msg.sender,
            "text": nl2br_py(msg.text)}
