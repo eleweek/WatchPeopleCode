@@ -124,6 +124,8 @@
                     )
                 );
                 $(".form-group").children().removeAttr("disabled");
+            }else{
+                myUsername = my_username;
             }
         };
 
