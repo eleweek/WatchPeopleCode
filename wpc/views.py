@@ -127,7 +127,7 @@ def onlineconf():
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if g.search_form.validate_on_submit():
-        return redirect(url_for("past_streams", query=g.search_form.query.data))
+        return redirect(url_for("past_streams", query=g.search_form.query.data.strip()))
     else:
         # Should never happen, unless user requested /search manually
         return redirect(url_for("past_streams"))
