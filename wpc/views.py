@@ -158,7 +158,8 @@ def streamers_list(page):
 @app.route('/streamer/<streamer_name>/popout_chat', methods=["GET", "POST"])
 def streamer_popout_chat(streamer_name):
     streamer = Streamer.query.filter_by(reddit_username=streamer_name).first_or_404()
-    return render_template("streamer_popout_chat.html", streamer=streamer)
+    stream = WPCStream.query.filter_by(channel_name=streamer_name).first_or_404()
+    return render_template("streamer_popout_chat.html", streamer=streamer, stream=stream)
 
 
 @app.route('/admin/streamer/<streamer_name>/rtmp_redirect/<int:redirect_id>')

@@ -1,6 +1,5 @@
 $(document).ready(function() {
     var update_viewers = function(stream_id) {
-        console.log("upd viewers");
         $.ajax("/api/v1/streams/" + stream_id).done(function(data){
             count = data.data.viewers;
             console.log(data);
@@ -12,7 +11,6 @@ $(document).ready(function() {
         });
     };
 
-    console.log("ajax viewers");
     $('.viewers-count-stream').each(function(){
         var that = this;
         var stream_id_class = $(that).attr("class").split(' ').filter(

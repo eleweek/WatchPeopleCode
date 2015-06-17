@@ -1,7 +1,7 @@
 {% extends "bootstrap/base.html" %}
 
 {% block title %} {{ streamer.reddit_username }}'s chat {% endblock %}
-tchStream.query.filter_by(channel='liveoverflow').one().status = 'live'
+
 {% block styles %}
   {{super()}}
   <link rel="stylesheet" href="{{url_for('static', filename='chat.css')}}">
@@ -23,6 +23,7 @@ tchStream.query.filter_by(channel='liveoverflow').one().status = 'live'
           <textarea class="form-control" name="message"></textarea>
           <br>
           <button class="btn btn-info" type="submit">Send </button>
+          <span class="viewers-count-stream viewers-count-stream-{{stream.id}} pull-right">{{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}</span>
         </div>
       </form>
     </div>
@@ -34,4 +35,5 @@ tchStream.query.filter_by(channel='liveoverflow').one().status = 'live'
   <script src="{{ url_for('static', filename='scripts/socket.io.min.js') }}"></script>
   <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
   <script src="{{ url_for('static', filename='scripts/chat.js') }}"></script>
+  <script src="{{ url_for('static', filename='scripts/viewers.js') }}"></script>
 {% endblock scripts %}
