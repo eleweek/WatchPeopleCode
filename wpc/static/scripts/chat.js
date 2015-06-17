@@ -45,6 +45,12 @@
                 }
             });
 
+            this.socket.on("clear", function{
+                if (that.onClear){
+                    that.onClear();
+                }
+            });
+
             this.socket.emit('initialize');
             this.socket.emit('join', streamer);
         },
@@ -124,6 +130,8 @@
                     )
                 );
                 $(".form-group").children().removeAttr("disabled");
+            }else{
+                myUsername = my_username;
             }
         };
 
@@ -161,6 +169,10 @@
                 "Sorry, this streamer disabled anonymous posting. " +
                 "You can login with your reddit account if you have one."
             );
+        };
+
+        chatAPI.onClear = function(){
+            $(".messages").html("<li><i>The chatroom has been cleared.</i></li>");
         };
 
     };
