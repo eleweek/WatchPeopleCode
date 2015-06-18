@@ -483,7 +483,7 @@ def join(streamer_username):
     streamer = check_chat_access_and_get_streamer(streamer_username)
     join_room(streamer.reddit_username)
     if current_user.is_authenticated():
-        emit('join', False, session['username']) #Sending the username before actual join.
+        emit('join', False, session['username'])  # Sending the username before actual join.
     emit('last_messages',
          [{"sender": msg.sender,
            "text": nl2br_py(msg.text)}
@@ -513,13 +513,13 @@ def chat_message(message_text, streamer_username):
     elif current_user.is_authenticated() and current_user.banned:
         emit("message", message)
     else:
-        if message.startswith("/clear"):
-            if current_user.is_authenticated() and session["username"] == streamer.reddit_username:
-                emit("clear", room=streamer.reddit_username) #Clear for all viewers
+        if message_text.startswith("/clear"):
+            if current_user.is_authenticated() and current_user.reddit_username == streamer.reddit_username:
+                emit("clear", room=streamer.reddit_username)  # Clear for all viewers
             else:
-                emit("clear") #Clear for one user
+                emit("clear")  # Clear for one user
         else:
-            #Normal chat message
+            # Normal chat message
             cm = ChatMessage(streamer=streamer, text=message_text, sender=session['username'])
             db.session.add(cm)
             db.session.commit()

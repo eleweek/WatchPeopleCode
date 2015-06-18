@@ -45,7 +45,7 @@
                 }
             });
 
-            this.socket.on("clear", function{
+            this.socket.on("clear", function(){
                 if (that.onClear){
                     that.onClear();
                 }
