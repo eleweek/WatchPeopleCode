@@ -468,35 +468,33 @@ def chat_initialize():
 
 
 def check_chat_access_and_get_streamer(streamer_username=None):
-    # maybe abort isn't work for socketio
-    if 'username' not in session:
-        abort(403)
-    if streamer_username is None:
-        abort(404)
-
-    streamer = Streamer.query.filter_by(reddit_username=streamer_username.strip()).first_or_404()
+    if 'username' not in session or streamer_username is None:
+        return None
+    streamer = Streamer.query.filter_by(reddit_username=streamer_username.strip()).first()
     return streamer
 
 
 @socketio.on('join', namespace='/chat')
 def join(streamer_username):
     streamer = check_chat_access_and_get_streamer(streamer_username)
-    join_room(streamer.reddit_username)
-    if current_user.is_authenticated():
-        emit('join', False, session['username'])  # Sending the username before actual join.
-    emit('last_messages',
-         [{"sender": msg.sender,
-           "text": nl2br_py(msg.text)}
-          for msg in reversed(ChatMessage.query.filter_by(streamer=streamer).order_by(ChatMessage.id.desc()).limit(20).all())])
-    emit('join', True, session['username'])
+    if streamer is None:
+        request.namespace.disconnect()
+    else:
+        join_room(streamer.reddit_username)
+        if current_user.is_authenticated():
+            emit('join', False, session['username'])  # Sending the username before actual join.
+        emit('last_messages',
+             [{"sender": msg.sender,
+               "text": nl2br_py(msg.text)}
+              for msg in reversed(ChatMessage.query.filter_by(streamer=streamer).order_by(ChatMessage.id.desc()).limit(20).all())])
+        emit('join', True, session['username'])
     db.session.close()
 
 
 @socketio.on('disconnect', namespace='/chat')
 def chat_disconnect():
-    if 'username' not in session:
-        abort(403)
-    chat_users.remove(session['username'])
+    if 'username' in session:
+        chat_users.remove(session['username'])
 
 
 @socketio.on('message', namespace='/chat')
