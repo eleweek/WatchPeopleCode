@@ -57,8 +57,15 @@ def crossdomain(origin=None, methods=None, headers=None,
 
 
 def url_for_other_page(page):
-    args = request.view_args.copy()
+    args = dict(request.view_args, **request.args)
     args['page'] = page
+    return url_for(request.endpoint, **args)
+
+
+def url_change_args(**kwargs):
+    args = dict(request.view_args, **request.args)
+    for key in kwargs.keys():
+        args[key] = kwargs[key]
     return url_for(request.endpoint, **args)
 
 

@@ -1,5 +1,5 @@
 from wpc import db, app, socketio
-from wpc.flask_utils import url_for_other_page, nl2br, nl2br_py, get_or_create, is_safe_url
+from wpc.flask_utils import url_for_other_page, url_change_args, nl2br, nl2br_py, get_or_create, is_safe_url
 from wpc.models import MozillaStreamHack  # NOQA
 from wpc.models import YoutubeStream, WPCStream, Stream, Streamer, Subscriber, Idea, ChatMessage
 from wpc.forms import SubscribeForm, GLMSubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm, IdeaForm, RtmpRedirectForm
@@ -18,6 +18,7 @@ import pytz
 import uuid
 
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
+app.jinja_env.globals['url_change_args'] = url_change_args
 app.add_template_filter(nl2br)
 
 
@@ -144,7 +145,12 @@ def past_streams(query, page):
         terms = [t.strip() for t in query.split(" ")]
         streams = streams.filter(YoutubeStream.title.match(" & ".join(terms)))
 
-    streams = streams.order_by(YoutubeStream.scheduled_start_time.desc().nullslast()).paginate(page, per_page=5)
+    sort_by = request.args.get('sort_by', 'views')
+    if sort_by == 'time':
+        streams = streams.order_by(YoutubeStream.scheduled_start_time.desc().nullslast())
+    else:
+        streams = streams.order_by(YoutubeStream.vod_views.desc().nullslast())
+    streams = streams.paginate(page, per_page=5)
     return render_template('past_streams.html', streams=streams, page=page, query=query)
 
 

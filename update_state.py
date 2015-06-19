@@ -236,5 +236,18 @@ def send_notifications():
         db.session.close()
 
 
+@sched.scheduled_job('interval', hours=10)
+def update_vod_views():
+    app.logger.info("Update view count")
+    for ys in YoutubeStream.query:
+        try:
+            ys._update_vod_views()
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            app.logger.exception(e)
+    db.session.close()
+
+
 if __name__ == '__main__':
     sched.start()

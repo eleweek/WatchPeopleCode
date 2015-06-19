@@ -166,6 +166,7 @@ class WPCStream(Stream):
 
 class YoutubeStream(Stream):
     ytid = db.Column(db.String(11), unique=True)
+    vod_views = db.Column(db.Integer)
 
     def __init__(self, id):
         self.ytid = id
@@ -179,6 +180,21 @@ class YoutubeStream(Stream):
 
     def __repr__(self):
         return '<YoutubeStream {} {}>'.format(self.id, self.ytid)
+
+    def _update_vod_views(self):
+        app.logger.info("Updating view count for {}".format(self))
+        try:
+            r = requests_get_with_retries(
+                "https://www.googleapis.com/youtube/v3/videos?id={}&part=statistics&key={}".format(
+                    self.ytid, app.config['YOUTUBE_KEY']), retries_num=15)
+
+            r.raise_for_status()
+        except Exception as e:
+            app.logger.error("Error while update view count for {}".format(self))
+            app.logger.exception(e)
+            raise
+        for item in r.json()['items']:
+            self.vod_views = item['statistics']['viewCount']
 
     def _update_status(self):
         app.logger.info("Updating status for {}".format(self))
