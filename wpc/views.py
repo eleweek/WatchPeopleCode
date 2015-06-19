@@ -142,7 +142,7 @@ def past_streams(query, page):
     streams = YoutubeStream.query.filter_by(status='completed')
 
     if query:
-        terms = [t.strip() for t in query.split(" ")]
+        terms = [t for t in query.split()]
         streams = streams.filter(YoutubeStream.title.match(" & ".join(terms)))
 
     sort_by = request.args.get('sort_by', 'views')
