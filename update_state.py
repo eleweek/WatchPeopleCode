@@ -61,6 +61,8 @@ def get_submission_urls(submission):
 
 
 def get_reddit_username(submission, url):
+    if submission.author is None:
+        return None
     if submission.author.name != 'godlikesme' or not submission.selftext_html or submission.selftext_html.find('<table>') == -1:
         return submission.author.name
     else:
