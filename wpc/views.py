@@ -133,10 +133,10 @@ def search():
         return redirect(url_for("past_streams"))
 
 
-@app.route('/past_streams', defaults={'page': 1, 'query': None}, methods=["GET", "POST"])
-@app.route('/past_streams/query/<query>', defaults={'page': 1}, methods=["GET", "POST"])
-@app.route('/past_streams/page/<int:page>', defaults={'query': None}, methods=["GET", "POST"])
-@app.route('/past_streams/query/<query>/page/<int:page>', methods=["GET", "POST"])
+@app.route('/past_streams', defaults={'page': 1, 'query': None})
+@app.route('/past_streams/query/<query>', defaults={'page': 1})
+@app.route('/past_streams/page/<int:page>', defaults={'query': None})
+@app.route('/past_streams/query/<query>/page/<int:page>')
 def past_streams(query, page):
     streams = YoutubeStream.query.filter_by(status='completed')
 
