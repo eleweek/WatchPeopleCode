@@ -19,7 +19,7 @@
     </div>
 
     <div class="col-xs-8">
-      <strong>Reddit username:</strong> <a href='http://www.reddit.com/user/{{ streamer.reddit_username }}'><span class="streamer-name"> {{ streamer.reddit_username }}</span></a>
+      <strong>Reddit username:</strong> <a href='http://www.reddit.com/user/{{ streamer.reddit_username }}'>{{ streamer.reddit_username }}</a>
         <div class="info-block" {% if edit %} style="display:none;" {% endif %}>
 
           {% if streamer.youtube_channel %}
