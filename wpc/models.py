@@ -475,6 +475,9 @@ class Streamer(db.Model, UserMixin):
     def already_subscribed(self, another_streamer):
         return another_streamer and (another_streamer == self or (self.as_subscriber and self.as_subscriber.already_subscribed(another_streamer)))
 
+    def streaming_key(self):
+        return self.reddit_username + '?pass=' + self.rtmp_secret
+
     def populate(self, form):
         self.info = form.info.data
         tc = form.twitch_channel_extract()

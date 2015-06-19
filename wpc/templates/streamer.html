@@ -21,18 +21,6 @@
 
     <div class="col-xs-8">
       <strong>Reddit username:</strong> <a href='http://www.reddit.com/user/{{ streamer.reddit_username }}'><span class="streamer-name"> {{ streamer.reddit_username }}</span></a>
-
-      {% if streamer == current_user and streamer.rtmp_secret %}
-        <br>
-        <strong>WPC streaming key:</strong>
-        <div class="streaming-info" style="display:none;">
-          URL: <input type="text" class="streaming-info-data" readonly value="rtmp://{{config['RTMP_SERVER']}}/live" onclick="this.select()">
-          <br>
-          Stream Key: <input type="text" class="streaming-info-data" readonly value="{{ streamer.reddit_username + '?pass=' + streamer.rtmp_secret }}" onclick="this.select()">
-        </div>
-        <button type="button" class="btn btn-default streaming-info-button">Show</button>
-      {% endif %}
-
         <div class="info-block" {% if edit %} style="display:none;" {% endif %}>
 
           {% if streamer.youtube_channel %}
