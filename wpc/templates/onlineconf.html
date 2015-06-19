@@ -68,26 +68,6 @@
         </table>
       </div>
     </div>
-      <div class="col-md-4"> 
-        <form action="" method="POST" class="form form-subscribe" role="form">
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h1 class="panel-title">Get notifications about upcoming streams</h1>
-            </div>
-
-            <div class="panel-body">
-              <div class="form-group">
-                {{ form.hidden_tag() }}
-                {{ wtf.form_field(form.email, value="") }}
-                {{ wtf.form_field(form.submit_button, button_map={'submit_button': 'primary'}) }}
-              </div>
-            </div>
-          </div>
-          <p><b> Get notifications in twitter </b></p>
-          <a href="https://twitter.com/WatchPeopleCode" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @WatchPeopleCode</a>
-          <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-        </form>
-    </div>
   </div>
 
 {% endblock %}
