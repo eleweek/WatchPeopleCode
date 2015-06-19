@@ -4,7 +4,7 @@ from wpc.flask_utils import get_or_create
 
 from flask.ext.login import UserMixin, AnonymousUserMixin, current_user
 from sqlalchemy.orm.properties import ColumnProperty
-from flask import url_for, request
+from flask import url_for, request, render_template
 
 import humanize
 from datetime import datetime, timedelta
@@ -136,38 +136,11 @@ class WPCStream(Stream):
         return url_for('streamer_page', streamer_name=self.streamer.reddit_username, _external=True)
 
     def html_code(self, autoplay=False):
-        return """
-                <div id="{0}">Loading the player...</div>
-
-                <script type="text/javascript">
-                    jwplayer("{0}").setup({{
-                        playlist: [{{
-                            sources: [{{
-                                file: 'rtmp://{3}/live/flv:{0}'
-                            }},{{
-                                file: "http://{3}/hls/{0}.m3u8"
-                            }}]
-                        }}],
-                        width: "100%",
-                        aspectratio: "16:10",
-                        autostart: {1},
-                        androidhls: true,
-                        rtmp: {{
-                            bufferlength: 0.4
-                        }}
-                    }});
-                    jwplayer("{0}").onBuffer(function(){{
-                        theTimeout{0} = setTimeout(function(){{
-                            var playlistItem = jwplayer("{0}").getPlaylistItem(0);
-                            playlistItem.image = "{2}";
-                            jwplayer("{0}").load([playlistItem]);
-                        }},7000);
-                    }});
-                    jwplayer("{0}").onPlay(function(){{
-                        clearTimeout(theTimeout{0});
-                    }});
-                </script>
-            """.format(self.channel_name, "true" if autoplay else "false", url_for("static", filename="dragon_is_offline.png"), app.config['RTMP_SERVER'])
+        return render_template("jwplayer.html",
+                               channel_name=self.channel_name,
+                               autostart=("true" if autoplay else "false"),
+                               offline_image_url=url_for("static", filename="dragon_is_offline.png"),
+                               rtmp_server=app.config['RTMP_SERVER'])
 
     def _get_flair(self):
         fst = self.format_start_time(start_time=False)

@@ -1,0 +1,30 @@
+<div id="{{channel_name}}">Loading the player...</div>
+
+<script type="text/javascript">
+  jwplayer("{{channel_name}}").setup({
+        playlist: [{
+            sources: [{
+                file: 'rtmp://{{rtmp_server}}/live/flv:{{channel_name}}'
+            },{
+                file: "http://{{rtmp_server}}/hls/{{channel_name}}.m3u8"
+            }]
+        }],
+        width: "100%",
+        aspectratio: "16:10",
+        autostart: {{autostart}},
+        androidhls: true,
+        rtmp: {
+            bufferlength: 0.4
+        }
+    });
+    jwplayer("{{channel_name}}").onBuffer(function(){
+      theTimeout{{channel_name}} = setTimeout(function(){
+            var playlistItem = jwplayer("{{channel_name}}").getPlaylistItem(0);
+            playlistItem.image = "{{offline_image_url}}";
+            jwplayer("{{channel_name}}").load([playlistItem]);
+        },7000);
+    });
+    jwplayer("{{channel_name}}").onPlay(function(){
+        clearTimeout(theTimeout{{channel_name}});
+    });
+</script>
