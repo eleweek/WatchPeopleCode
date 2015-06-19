@@ -3,6 +3,11 @@
 
 {% block title %}Watch people code: past streams{% endblock %}
 
+{% block styles %}
+  {{super()}}
+  <link rel="stylesheet" href="{{url_for('static', filename='past_streams.css')}}">
+{% endblock %}
+
 {% block content %}
   {{super()}}
 
@@ -13,8 +18,18 @@
         <h3 class="text-center">Past streams that match query "{{query}}"</h3>
       {% endif %}
 
-
       <div class="col-md-offset-2 col-md-8 text-center">
+
+        <ul class="nav nav-pills center-pills">
+            <li {% if request.args['sort_by'] != 'time' %}class="active"{% endif %}>
+              <a href={{ url_change_args(sort_by='views', page=1) }}>Sort by views</a>
+            </li>
+            <li {% if request.args['sort_by'] == 'time' %}class="active"{% endif %}>
+              <a href={{ url_change_args(sort_by='time', page=1) }}>Sort by time</a>
+            </li>
+        </ul>
+        <br>
+
         {{ macros.render_pagination(streams) }}
         <br>
         {% if streams.items %}
