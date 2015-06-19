@@ -365,7 +365,7 @@ def authenticate_streamer():
     rtmp_secret = request.values.get('pass', '')
     streamer = Streamer.query.filter_by(reddit_username=streamer_username).first()
     if not streamer or not streamer.rtmp_secret or streamer.rtmp_secret != rtmp_secret:
-        app.logger.info("Fail to check credentials for streamer {}", streamer_username)
+        app.logger.info(u"Fail to check credentials for streamer {}", streamer_username)
         return None, None
     return get_or_create(WPCStream, channel_name=streamer_username), streamer
 
@@ -376,7 +376,7 @@ def rtmp_auth():
     if stream is None:
         abort(403)
 
-    app.logger.info("{} went live".format(stream))
+    app.logger.info(u"{} went live".format(stream))
     stream.streamer = streamer
 
     # test stream
@@ -394,7 +394,7 @@ def rtmp_auth():
 def rtmp_done():
     stream, streamer = authenticate_streamer()
     if stream is not None:
-        app.logger.info("{} done".format(stream))
+        app.logger.info(u"{} done".format(stream))
         stream.status = 'completed'
         stream.actual_start_time = None
         stream.current_viewers = None
