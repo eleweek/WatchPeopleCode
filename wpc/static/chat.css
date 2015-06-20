@@ -15,6 +15,7 @@
 .panel-chat .messages {
     height: 400px;
     overflow-y: scroll;
+    word-wrap: break-word;
 }
 
 #chat-div {
