@@ -112,8 +112,8 @@
         });
         
         var format_message = function(message) {
-            message.text = message.text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>"); //Markdown bold
-            message.text = message.text.replace(/_(.*?)_/g, "<i>$1</i>"); //Markdown italic
+            message.text = message.text.replace(/(\*\*|__)(.*?)\1/g, "<b>$2</b>"); //Markdown bold
+            message.text = message.text.replace(/(\*|_)(.*?)\1/g, "<i>$2</i>"); //Markdown italic
 
             if (message.sender === myUsername) { 
                 return '<b style="color: orangered">' + message.sender + '</b>: ' + message.text;
