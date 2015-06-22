@@ -8,6 +8,7 @@ from flask import render_template, request, redirect, url_for, flash, jsonify, g
 from flask.ext.login import login_user, logout_user, login_required, current_user
 from flask.ext.socketio import emit, join_room
 from jinja2 import Markup
+from flask.views import View
 
 from uuid import uuid4
 import praw
@@ -181,110 +182,117 @@ def streamer_rtmp_redirect(streamer_name, redirect_id):
     return redirect_url
 
 
-@app.route('/streamer/<streamer_name>', defaults={'page': 1}, methods=["GET", "POST"])
-@app.route('/streamer/<streamer_name>/<int:page>', methods=["GET", "POST"])
-def streamer_page(streamer_name, page):
-    streamer = Streamer.query.filter_by(reddit_username=streamer_name).first_or_404()
-    wpc_stream = streamer.streams.filter_by(type='wpc_stream').first()
-    streams = streamer.streams
-    if wpc_stream:
-        streams = streams.filter(Stream.id != wpc_stream.id)
-    streams = streams.order_by(Stream.actual_start_time.desc().nullslast()).paginate(page, per_page=5)
-    check_profile_alert = False
+class StreamerPage(View):
+    methods = ['GET', 'POST']
 
-    # TODO: better way of customizing the page for other people
-    # if streamer_name in ['glm_talkshow', 'godlikesme']:
-    if streamer_name in ['glm_talkshow']:
-        subscribe_form = GLMSubscribeForm(prefix='streamer_subscribe')
-        if subscribe_form.validate_on_submit():
-            subscriber = get_or_create(Subscriber, email=subscribe_form.email.data)
-            if subscriber not in streamer.subscribers:
-                streamer.subscribers.append(subscriber)
-                flash("Subscribed successfully!", category='success')
-            else:
-                flash("You're already subscribed!")
+    def dispatch_request(streamer_name, page):
+        streamer = Streamer.query.filter_by(reddit_username=streamer_name).first_or_404()
+        wpc_stream = streamer.streams.filter_by(type='wpc_stream').first()
+        streams = streamer.streams
+        if wpc_stream:
+            streams = streams.filter(Stream.id != wpc_stream.id)
+        streams = streams.order_by(Stream.actual_start_time.desc().nullslast()).paginate(page, per_page=5)
+        check_profile_alert = False
 
-            db.session.commit()
-
-    info_form = EditStreamerInfoForm(prefix='info')
-    title_form = EditStreamTitleForm(prefix='title')
-
-    if streamer_name == 'glm_talkshow':
-        subscribe_form = GLMSubscribeForm(prefix='streamer_subscribe')
-
-        yt_recording_ep1 = YoutubeStream.query.filter_by(ytid='f968E8eZmvM').one()
-        yt_recording_ep2 = YoutubeStream.query.filter_by(ytid='87SfA1sw7vY').one()
-        yt_recording_ep3 = YoutubeStream.query.filter_by(ytid='R7z2GQr9-tg').one()
-        yt_recording_ep4 = YoutubeStream.query.filter_by(ytid='zU7ltY9Dmnk').one()
-        yt_recording_ep5 = YoutubeStream.query.filter_by(ytid='3A_oTuzGoeE').one()
-        how_to_learn_programming = YoutubeStream.query.filter_by(ytid='6XtSPvjt87w').one()
-        return render_template('streamers/glm_talkshow.html',
-                               streamer=streamer,
-                               wpc_stream=None,
-                               yt_stream_ep1=yt_recording_ep1,
-                               yt_stream_ep2=yt_recording_ep2,
-                               yt_stream_ep3=yt_recording_ep3,
-                               yt_stream_ep4=yt_recording_ep4,
-                               yt_stream_ep5=yt_recording_ep5,
-                               how_to_learn_programming=how_to_learn_programming,
-                               subscribe_form=subscribe_form,
-                               check_profile_alert=check_profile_alert)
-    # elif streamer_name == 'godlikesme':
-    #    yt_stream_the_button = YoutubeStream.query.filter_by(ytid='gNrFy5h2voY').one()
-    #    subscribe_form = GLMSubscribeForm(prefix='streamer_subscribe')
-    #    return render_template('streamer.html', streamer=streamer,
-    #                           streams=streams,
-    #                           wpc_stream=wpc_stream,
-    #                           subscribe_form=subscribe_form,
-    #                           info_form=info_form,
-    #                           title_form=title_form,
-    #                           check_profile_alert = check_profile_alert
-    #                           yt_stream_the_button=yt_stream_the_button)
-
-    if current_user.is_authenticated() and current_user == streamer:
-        if request.method == 'POST':
-            if info_form.submit_button.data:
-                if info_form.validate_on_submit():
-                    current_user.populate(info_form)
-                    db.session.commit()
-                    flash("Updated successfully", category='success')
-                    return redirect(url_for('.streamer_page', streamer_name=streamer_name, page=page))
+        # TODO: better way of customizing the page for other people
+        # if streamer_name in ['glm_talkshow', 'godlikesme']:
+        if streamer_name in ['glm_talkshow']:
+            subscribe_form = GLMSubscribeForm(prefix='streamer_subscribe')
+            if subscribe_form.validate_on_submit():
+                subscriber = get_or_create(Subscriber, email=subscribe_form.email.data)
+                if subscriber not in streamer.subscribers:
+                    streamer.subscribers.append(subscriber)
+                    flash("Subscribed successfully!", category='success')
                 else:
-                    return render_template('streamer.html', streamer=streamer,
-                                           streams=streams, info_form=info_form,
-                                           title_form=title_form, edit_info=True,
-                                           edit_title=False, wpc_stream=wpc_stream,
-                                           check_profile_alert=check_profile_alert)
+                    flash("You're already subscribed!")
 
-            elif title_form.submit_button.data:
-                if title_form.validate_on_submit():
-                    wpc_stream.title = title_form.title.data
-                    db.session.commit()
-                    return jsonify(newTitle=Markup.escape(title_form.title.data))
-
-                else:
-                    return render_template('streamer.html', streamer=streamer,
-                                           streams=streams, info_form=info_form,
-                                           title_form=title_form, edit_info=False,
-                                           edit_title=True, wpc_stream=wpc_stream,
-                                           check_profile_alert=check_profile_alert)
-        else:
-            if not streamer.checked:
-                streamer.checked = True
                 db.session.commit()
-                if (streamer.youtube_channel or streamer.twitch_channel):
-                    check_profile_alert = True
-            info_form.youtube_channel.data = current_user.youtube_channel
-            info_form.twitch_channel.data = current_user.twitch_channel
-            info_form.info.data = current_user.info
-            if wpc_stream:
-                title_form.title.data = wpc_stream.title
 
-    return render_template('streamer.html', streamer=streamer,
-                           streams=streams, info_form=info_form,
-                           title_form=title_form, edit_info=False,
-                           edit_title=False, wpc_stream=wpc_stream,
-                           check_profile_alert=check_profile_alert)
+        info_form = EditStreamerInfoForm(prefix='info')
+        title_form = EditStreamTitleForm(prefix='title')
+
+        if streamer_name == 'glm_talkshow':
+            subscribe_form = GLMSubscribeForm(prefix='streamer_subscribe')
+
+            yt_recording_ep1 = YoutubeStream.query.filter_by(ytid='f968E8eZmvM').one()
+            yt_recording_ep2 = YoutubeStream.query.filter_by(ytid='87SfA1sw7vY').one()
+            yt_recording_ep3 = YoutubeStream.query.filter_by(ytid='R7z2GQr9-tg').one()
+            yt_recording_ep4 = YoutubeStream.query.filter_by(ytid='zU7ltY9Dmnk').one()
+            yt_recording_ep5 = YoutubeStream.query.filter_by(ytid='3A_oTuzGoeE').one()
+            how_to_learn_programming = YoutubeStream.query.filter_by(ytid='6XtSPvjt87w').one()
+            return render_template('streamers/glm_talkshow.html',
+                                   streamer=streamer,
+                                   wpc_stream=None,
+                                   yt_stream_ep1=yt_recording_ep1,
+                                   yt_stream_ep2=yt_recording_ep2,
+                                   yt_stream_ep3=yt_recording_ep3,
+                                   yt_stream_ep4=yt_recording_ep4,
+                                   yt_stream_ep5=yt_recording_ep5,
+                                   how_to_learn_programming=how_to_learn_programming,
+                                   subscribe_form=subscribe_form,
+                                   check_profile_alert=check_profile_alert)
+        # elif streamer_name == 'godlikesme':
+        #    yt_stream_the_button = YoutubeStream.query.filter_by(ytid='gNrFy5h2voY').one()
+        #    subscribe_form = GLMSubscribeForm(prefix='streamer_subscribe')
+        #    return render_template('streamer.html', streamer=streamer,
+        #                           streams=streams,
+        #                           wpc_stream=wpc_stream,
+        #                           subscribe_form=subscribe_form,
+        #                           info_form=info_form,
+        #                           title_form=title_form,
+        #                           check_profile_alert = check_profile_alert
+        #                           yt_stream_the_button=yt_stream_the_button)
+
+        if current_user.is_authenticated() and current_user == streamer:
+            if request.method == 'POST':
+                if info_form.submit_button.data:
+                    if info_form.validate_on_submit():
+                        current_user.populate(info_form)
+                        db.session.commit()
+                        flash("Updated successfully", category='success')
+                        return redirect(url_for('.streamer_page', streamer_name=streamer_name, page=page))
+                    else:
+                        return render_template('streamer.html', streamer=streamer,
+                                               streams=streams, info_form=info_form,
+                                               title_form=title_form, edit_info=True,
+                                               edit_title=False, wpc_stream=wpc_stream,
+                                               check_profile_alert=check_profile_alert)
+
+                elif title_form.submit_button.data:
+                    if title_form.validate_on_submit():
+                        wpc_stream.title = title_form.title.data
+                        db.session.commit()
+                        return jsonify(newTitle=Markup.escape(title_form.title.data))
+
+                    else:
+                        return render_template('streamer.html', streamer=streamer,
+                                               streams=streams, info_form=info_form,
+                                               title_form=title_form, edit_info=False,
+                                               edit_title=True, wpc_stream=wpc_stream,
+                                               check_profile_alert=check_profile_alert)
+            else:
+                if not streamer.checked:
+                    streamer.checked = True
+                    db.session.commit()
+                    if (streamer.youtube_channel or streamer.twitch_channel):
+                        check_profile_alert = True
+                info_form.youtube_channel.data = current_user.youtube_channel
+                info_form.twitch_channel.data = current_user.twitch_channel
+                info_form.info.data = current_user.info
+                if wpc_stream:
+                    title_form.title.data = wpc_stream.title
+
+        return render_template('streamer.html', streamer=streamer,
+                               streams=streams, info_form=info_form,
+                               title_form=title_form, edit_info=False,
+                               edit_title=False, wpc_stream=wpc_stream,
+                               check_profile_alert=check_profile_alert)
+
+
+app.add_url_rule('/streamer/<streamer_name>', defaults={'page': 1},
+                 view_func=StreamerPage.as_view('streamer_page'))
+app.add_url_rule('/streamer/<streamer_name>/<int:page>',
+                 view_func=StreamerPage.as_view('streamer_page'))
 
 
 @app.route('/dashboard', methods=['POST', 'GET'])
