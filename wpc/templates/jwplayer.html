@@ -17,14 +17,15 @@
             bufferlength: 0.4
         }
     });
+    var theTimeout = {};
     jwplayer("{{channel_name}}").onBuffer(function(){
-      theTimeout{{channel_name}} = setTimeout(function(){
+      theTimeout["{{channel_name}}"] = setTimeout(function(){
             var playlistItem = jwplayer("{{channel_name}}").getPlaylistItem(0);
             playlistItem.image = "{{offline_image_url}}";
             jwplayer("{{channel_name}}").load([playlistItem]);
         },7000);
     });
     jwplayer("{{channel_name}}").onPlay(function(){
-        clearTimeout(theTimeout{{channel_name}});
+        clearTimeout(theTimeout["{{channel_name}}"]);
     });
 </script>
