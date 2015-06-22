@@ -115,8 +115,8 @@ def update_flairs():
         return
 
     try:
-        wpc_sub = r.get_subreddit('watchpeoplecode')
-        submissions = wpc_sub.get_new(limit=25)
+        wpc_subreddit = r.get_subreddit('watchpeoplecode')
+        submissions = wpc_subreddit.get_new(limit=25)
         for s in submissions:
             if s.id == '2v1bnt' or s.id == '2v70uo':  # ignore LCS threads TODO
                 continue
@@ -147,8 +147,8 @@ def update_flairs():
                 stream = get_stream_from_url(url, None)
                 if stream:
                     # set user flair
-                    if not wpc_sub.get_flair(s.author)['flair_text']:
-                        wpc_sub.set_flair(s.author, flair_text='Streamer', flair_css_class='text-white background-blue')
+                    if s.author and not wpc_subreddit.get_flair(s.author)['flair_text'] and stream.streamer.reddit_username == s.author:
+                        wpc_subreddit.set_flair(s.author, flair_text='Streamer', flair_css_class='text-white background-blue')
 
                     # set link flairs
 
