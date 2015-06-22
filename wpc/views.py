@@ -185,7 +185,7 @@ def streamer_rtmp_redirect(streamer_name, redirect_id):
 class StreamerPage(View):
     methods = ['GET', 'POST']
 
-    def dispatch_request(streamer_name, page):
+    def dispatch_request(self, streamer_name, page):
         streamer = Streamer.query.filter_by(reddit_username=streamer_name).first_or_404()
         wpc_stream = streamer.streams.filter_by(type='wpc_stream').first()
         streams = streamer.streams
@@ -289,10 +289,11 @@ class StreamerPage(View):
                                check_profile_alert=check_profile_alert)
 
 
+streamer_page = StreamerPage.as_view('streamer_page')
 app.add_url_rule('/streamer/<streamer_name>', defaults={'page': 1},
-                 view_func=StreamerPage.as_view('streamer_page'))
+                 view_func=streamer_page)
 app.add_url_rule('/streamer/<streamer_name>/<int:page>',
-                 view_func=StreamerPage.as_view('streamer_page'))
+                 view_func=streamer_page)
 
 
 @app.route('/dashboard', methods=['POST', 'GET'])
