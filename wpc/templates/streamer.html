@@ -110,7 +110,7 @@
     <div class="col-xs-8">
       {{ macros.render_pagination(streams) }}
       <br>
-      {{ macros.streams(streams.items, title_form if streamer == current_user else none) }}
+      {{ macros.streams(streams.items, status=none) }}
       {{ macros.render_pagination(streams) }}
     </div>
 

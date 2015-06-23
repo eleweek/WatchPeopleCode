@@ -44,7 +44,7 @@
 
 {% macro streams(streams, status, with_subscribe_button=false) %}
   {% for stream in streams %}
-    {{ stream_macro(stream, true if status == 'live' and loop.index == 1 else false, title_form if stream.type == 'wpc_stream' else none, with_subscribe_button if not current_user.already_subscribed(stream.streamer) else false) }}
+    {{ stream_macro(stream, true if status == 'live' and loop.index == 1 else false, none, with_subscribe_button if not current_user.already_subscribed(stream.streamer) else false) }}
   {% endfor %}
 {% endmacro %}
 
