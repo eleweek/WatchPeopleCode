@@ -176,10 +176,8 @@
             clearForm: false,
             resetForm: false
         }
-        $('.form-edit-title').ajaxForm();
+        $('.form-edit-title').ajaxForm(options);
         $('.form-edit-title').submit(function() {
-            console.log("Submitted form");
-            $(this).ajaxSubmit(options);
             return false;
         });
     });
