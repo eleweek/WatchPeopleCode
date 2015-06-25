@@ -73,7 +73,7 @@ def index():
     # live_streams.insert(0, MozillaStreamHack())
 
     # Uncomment this when github conf starts
-    # live_streams.insert(0, GitHubStreamHack())
+    live_streams.append(GitHubStreamHack())
 
     idea_form = IdeaForm(prefix='idea')
     redir = process_idea_form(idea_form)
