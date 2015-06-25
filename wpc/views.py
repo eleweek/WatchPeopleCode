@@ -502,10 +502,16 @@ def join(streamer_username):
         join_room(streamer.reddit_username)
         if current_user.is_authenticated():
             emit('join', False, session['username'])  # Sending the username before actual join.
+        old_messages = []
+        for msg in ChatMessage.query.filter_by(streamer=streamer).order_by(ChatMessage.id.asc()).limit(20).all():
+            if msg.text == "/clear":
+                old_messages = []
+            else:
+                old_messages.append(msg)
         emit('last_messages',
              [{"sender": msg.sender,
                "text": nl2br_py(msg.text)}
-              for msg in reversed(ChatMessage.query.filter_by(streamer=streamer).order_by(ChatMessage.id.desc()).limit(20).all())])
+              for msg in old_messages])
         emit('join', True, session['username'])
     db.session.close()
 
@@ -533,6 +539,9 @@ def chat_message(message_text, streamer_username):
         if message_text.startswith("/clear"):
             if current_user.is_authenticated() and current_user.reddit_username == streamer.reddit_username:
                 emit("clear", room=streamer.reddit_username)  # Clear for all viewers
+                clear_message = ChatMessage(streamer=streamer, text="/clear", sender=session["username"])
+                db.session.add(clear_message)
+                db.session.commit()
             else:
                 emit("clear")  # Clear for one user
         else:
