@@ -1,6 +1,6 @@
 from wpc import db, app, socketio
 from wpc.flask_utils import url_for_other_page, url_change_args, nl2br, nl2br_py, get_or_create, is_safe_url
-from wpc.models import MozillaStreamHack  # NOQA
+from wpc.models import MozillaStreamHack, GitHubStreamHack  # NOQA
 from wpc.models import YoutubeStream, WPCStream, Stream, Streamer, Subscriber, Idea, ChatMessage
 from wpc.forms import SubscribeForm, GLMSubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm, IdeaForm, RtmpRedirectForm
 
@@ -71,6 +71,10 @@ def index():
     live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
     # Uncomment this when mozilla guys start livestreaming
     # live_streams.insert(0, MozillaStreamHack())
+
+    # Uncomment this when github conf starts
+    # live_streams.insert(0, GitHubStreamHack())
+
     idea_form = IdeaForm(prefix='idea')
     redir = process_idea_form(idea_form)
     if redir:
