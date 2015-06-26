@@ -503,7 +503,7 @@ def join(streamer_username):
         if current_user.is_authenticated():
             emit('join', False, session['username'])  # Sending the username before actual join.
         old_messages = []
-        for msg in ChatMessage.query.filter_by(streamer=streamer).order_by(ChatMessage.id.asc()).limit(20).all():
+        for msg in reversed(ChatMessage.query.filter_by(streamer=streamer).order_by(ChatMessage.id.desc()).limit(20).all()):
             if msg.text == "/clear":
                 old_messages = []
             else:
