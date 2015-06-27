@@ -186,13 +186,17 @@ def update_flairs():
 
 def get_bonus_twitch_stream():
     app.logger.info("Getting bonus twitch stream")
-    r = requests_get_with_retries("https://api.twitch.tv/kraken/streams?game=Programming")
-    streams = sorted([s for s in r.json()['streams']], key=lambda s: s['viewers'], reverse=True)
-    if streams:
-        ts = get_or_create(TwitchStream, channel=streams[0]['channel']['name'])
-        ts._update_status()
-        db.session.add(ts)
-        db.session.commit()
+    try:
+        r = requests_get_with_retries("https://api.twitch.tv/kraken/streams?game=Programming")
+        streams = sorted([s for s in r.json()['streams']], key=lambda s: s['viewers'], reverse=True)
+        if streams:
+            ts = get_or_create(TwitchStream, channel=streams[0]['channel']['name'])
+            ts._update_status()
+            db.session.add(ts)
+            db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        app.logger.exception(e)
 
 
 @sched.scheduled_job('interval', seconds=30)
