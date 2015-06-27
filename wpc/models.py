@@ -6,6 +6,7 @@ from flask.ext.login import UserMixin, AnonymousUserMixin, current_user
 from sqlalchemy.orm.properties import ColumnProperty
 from flask import url_for, request, render_template
 
+from requests.exceptions import HTTPError
 import humanize
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
@@ -307,7 +308,11 @@ class TwitchStream(Stream):
         except Exception as e:
             app.logger.error("Error while updating {}".format(self))
             app.logger.exception(e)
-            raise
+            if type(e) == HTTPError and e.response.status_code == 404:
+                self.status = 'completed'
+                return
+            else:
+                raise
 
         stream = r.json()['stream']
         if stream is not None:
