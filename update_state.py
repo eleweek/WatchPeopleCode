@@ -3,6 +3,7 @@ from wpc.models import Stream, YoutubeStream, TwitchStream, WPCStream, Streamer,
 from wpc.utils import youtube_video_id, twitch_channel, wpc_channel, requests_get_with_retries
 from wpc.email_notifications import generate_email_notifications, send_email_notifications
 
+from requests.exceptions import HTTPError
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 import praw
@@ -90,16 +91,19 @@ def get_new_streams():
             try:
                 stream = get_stream_from_url(url, s.id, only_new=True)
                 if stream:
-                    submission = get_or_create(Submission, submission_id=s.id)
-                    stream.add_submission(submission)
-                    reddit_username = get_reddit_username(s, url)
-                    if reddit_username is not None and stream.streamer is None:
-                        stream.streamer = get_or_create(Streamer, reddit_username=reddit_username)
+                    try:
+                        submission = get_or_create(Submission, submission_id=s.id)
+                        stream.add_submission(submission)
+                        reddit_username = get_reddit_username(s, url)
+                        if reddit_username is not None and stream.streamer is None:
+                            stream.streamer = get_or_create(Streamer, reddit_username=reddit_username)
 
-                    stream._update_status()
+                        stream._update_status()
 
-                    db.session.add(stream)
-                    db.session.commit()
+                        db.session.add(stream)
+                        db.session.commit()
+                    except Exception as e:
+                        handle_update_stream_exception(stream, e)
                 db.session.close()
             except Exception as e:
                 app.logger.exception(e)
@@ -208,8 +212,7 @@ def update_state():
             app.logger.info("Status of {} is {}".format(ls, ls.status))
             db.session.commit()
         except Exception as e:
-            db.session.rollback()
-            app.logger.exception(e)
+            handle_update_stream_exception(ls, e)
     db.session.close()
 
     app.logger.info("Updating new streams")
@@ -249,9 +252,17 @@ def update_vod_views():
             ys._update_vod_views()
             db.session.commit()
         except Exception as e:
-            db.session.rollback()
-            app.logger.exception(e)
+            handle_update_stream_exception(ys, e)
     db.session.close()
+
+
+def handle_update_stream_exception(stream, e):
+    app.logger.error("Error while updating {} with exception: {}".format(stream, e))
+    if type(e) == HTTPError and e.response.status_code == 404:
+        stream.status = 'completed'
+        db.session.commit()
+    else:
+        db.session.rollback()
 
 
 if __name__ == '__main__':

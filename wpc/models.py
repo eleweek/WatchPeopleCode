@@ -6,7 +6,6 @@ from flask.ext.login import UserMixin, AnonymousUserMixin, current_user
 from sqlalchemy.orm.properties import ColumnProperty
 from flask import url_for, request, render_template
 
-from requests.exceptions import HTTPError
 import humanize
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
@@ -100,15 +99,10 @@ class WPCStream(Stream):
 
     def _update_status(self):
         app.logger.info("Updating status for {}".format(self))
-        try:
-            r = requests_get_with_retries(
-                "http://{}:{}@{}/stat".format(
-                    app.config['RTMP_LOGIN'], app.config['RTMP_PASSWORD'], app.config['RTMP_SERVER']))
-            r.raise_for_status()
-        except Exception as e:
-            app.logger.error("Error while updating {}".format(self))
-            app.logger.exception(e)
-            raise
+        r = requests_get_with_retries(
+            "http://{}:{}@{}/stat".format(
+                app.config['RTMP_LOGIN'], app.config['RTMP_PASSWORD'], app.config['RTMP_SERVER']))
+        r.raise_for_status()
 
         soup = BeautifulSoup(r.content, 'xml')
         for stream in soup.find_all('stream'):
@@ -184,32 +178,21 @@ class YoutubeStream(Stream):
 
     def _update_vod_views(self):
         app.logger.info("Updating view count for {}".format(self))
-        try:
-            r = requests_get_with_retries(
-                "https://www.googleapis.com/youtube/v3/videos?id={}&part=statistics&key={}".format(
-                    self.ytid, app.config['YOUTUBE_KEY']), retries_num=15)
+        r = requests_get_with_retries(
+            "https://www.googleapis.com/youtube/v3/videos?id={}&part=statistics&key={}".format(
+                self.ytid, app.config['YOUTUBE_KEY']), retries_num=15)
 
-            r.raise_for_status()
-        except Exception as e:
-            app.logger.error("Error while update view count for {}".format(self))
-            app.logger.exception(e)
-            raise
+        r.raise_for_status()
         for item in r.json()['items']:
             self.vod_views = item['statistics']['viewCount']
 
     def _update_status(self):
         app.logger.info("Updating status for {}".format(self))
-        try:
-            r = requests_get_with_retries(
-                "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(
-                    self.ytid, app.config['YOUTUBE_KEY']), retries_num=15)
+        r = requests_get_with_retries(
+            "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(
+                self.ytid, app.config['YOUTUBE_KEY']), retries_num=15)
 
-            r.raise_for_status()
-        except Exception as e:
-            app.logger.error("Error while updating {}".format(self))
-            app.logger.exception(e)
-            raise
-
+        r.raise_for_status()
         if not r.json()['items']:
             self.status = 'completed'
             self.current_viewers = None
@@ -302,17 +285,8 @@ class TwitchStream(Stream):
 
     def _update_status(self):
         app.logger.info("Updating status for {}".format(self))
-        try:
-            r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
-            r.raise_for_status()
-        except Exception as e:
-            app.logger.error("Error while updating {}".format(self))
-            app.logger.exception(e)
-            if type(e) == HTTPError and e.response.status_code == 404:
-                self.status = 'completed'
-                return
-            else:
-                raise
+        r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
+        r.raise_for_status()
 
         stream = r.json()['stream']
         if stream is not None:
@@ -528,16 +502,11 @@ class Streamer(db.Model, UserMixin):
 
         # get yc name
         if yc and (yc != self.youtube_channel or self.youtube_name is None):
-            try:
-                r = requests_get_with_retries(
-                    "https://www.googleapis.com/youtube/v3/channels?id={}&part=snippet&key={}".format(
-                        yc, app.config['YOUTUBE_KEY']), retries_num=15)
+            r = requests_get_with_retries(
+                "https://www.googleapis.com/youtube/v3/channels?id={}&part=snippet&key={}".format(
+                    yc, app.config['YOUTUBE_KEY']), retries_num=15)
 
-                r.raise_for_status()
-            except Exception as e:
-                app.logger.error("Error while updating {}".format(self))
-                app.logger.exception(e)
-                raise
+            r.raise_for_status()
 
             for item in r.json()['items']:
                 self.youtube_name = item['snippet']['title']
