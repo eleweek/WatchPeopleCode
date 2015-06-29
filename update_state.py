@@ -188,8 +188,8 @@ def update_flairs():
         app.logger.exception(e)
 
 
-def get_bonus_twitch_stream():
-    app.logger.info("Getting bonus twitch stream")
+def get_random_bonus_twitch_stream():
+    app.logger.info("Getting random bonus twitch stream")
     try:
         r = requests_get_with_retries("https://api.twitch.tv/kraken/streams?game=Programming")
         streams = sorted([s for s in r.json()['streams']], key=lambda s: s['viewers'], reverse=True)
@@ -202,6 +202,12 @@ def get_bonus_twitch_stream():
         db.session.rollback()
         app.logger.exception(e)
 
+def get_fixed_bonus_twitch_streams():
+    app.logger.info("Checking fixed bonus twitch streams")
+    # TODO: larger selection of streams
+    # also make sure they stay lower than streams from subreddit
+    for ts in TwitchStream.query.filter_by(channel='handmade_hero').all():
+        ts._update_status()
 
 @sched.scheduled_job('interval', seconds=30)
 def update_state():
@@ -219,7 +225,8 @@ def update_state():
     get_new_streams()
 
     if not db.session.query(Stream.query.filter_by(status='live').exists()).scalar():
-        get_bonus_twitch_stream()
+        get_random_bonus_twitch_stream()
+    get_fixed_bonus_twitch_streams()
     db.session.close()
 
 
