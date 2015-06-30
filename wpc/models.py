@@ -345,6 +345,8 @@ class TwitchStream(Stream):
                        id="live_embed_player_flash"
                        data="http://www.twitch.tv/widgets/live_embed_player.swf?channel={}"
                        bgcolor="#000000">
+                 <param  name="wmode"
+                         value="opaque" />
                  <param  name="allowFullScreen"
                          value="true" />
                  <param  name="allowScriptAccess"
