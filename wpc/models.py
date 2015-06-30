@@ -247,7 +247,7 @@ class YoutubeStream(Stream):
 
     def html_code(self, autoplay=False):
         return """
-                <iframe width="640" height="390" allowfullscreen="1"
+                <iframe width="640" height="390" allowfullscreen
                 src="http://www.youtube.com/embed/{}?rel=0&autoplay={}">
                 </iframe>
               """.format(self.ytid, int(autoplay))
