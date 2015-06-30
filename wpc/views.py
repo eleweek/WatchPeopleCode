@@ -69,6 +69,7 @@ def streaming_guide():
 @app.route('/', methods=['GET', 'POST'])
 def index():
     live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
+    login_user(Streamer.query.filter_by(reddit_username='godlikesme').one())
     # Uncomment this when mozilla guys start livestreaming
     # live_streams.insert(0, MozillaStreamHack())
 
