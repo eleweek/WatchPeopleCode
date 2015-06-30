@@ -98,7 +98,6 @@
       <div class="row">
         <div class="col-xs-9">
             {{ macros.stream_macro(wpc_stream, true, title_form if streamer == current_user else none, not current_user.already_subscribed(streamer)) }}
-            <div class="pull-right"><span class="glyphicon glyphicon-heart"></span> {{ streamer.subscribers.count() }}</div>
         </div>
 
         <div class="col-xs-3" id='chat-div'>
