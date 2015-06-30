@@ -19,14 +19,6 @@
     {% if stream.current_viewers is not none %}
       | <span class="viewers-count-stream viewers-count-stream-{{stream.id}}">{{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}</span>
     {% endif %}
-    <span class="pull-right">
-      {% if stream.streamer and with_subscribe_button %}
-        <button class="btn btn-success btn-xs subscribe-button subscribe-button-{{stream.streamer.id}}">Subscribe</button>
-      {% endif %}
-      {% if stream.streamer %}
-        <span class="glyphicon glyphicon-heart"></span> {{ stream.streamer.subscribers.count() }}
-      {% endif %}
-    </span>
     {% if title_form %}
       <button type="button" class="btn btn-default edit-title-button">Edit stream title</button>
       </div> {# stream-title #}
@@ -47,7 +39,15 @@
     <div class="video-container">
       {{ stream.html_code(autoplay=autoplay)|safe }}
     </div>
-    <hr>
+    <div class="pull-right">
+      {% if stream.streamer and with_subscribe_button %}
+        <button class="btn btn-success btn-xs subscribe-button subscribe-button-{{stream.streamer.id}}">Subscribe</button>
+      {% endif %}
+      {% if stream.streamer %}
+        <span class="glyphicon glyphicon-heart"></span> {{ stream.streamer.subscribers.count() }}
+      {% endif %}
+    </div>
+    <br><hr>
 {% endmacro %}
 
 
