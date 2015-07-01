@@ -49,26 +49,22 @@
       </div>
 
       <div class="col-md-4"> 
-        <br>
-        <form action="" method="POST" class="form form-subscribe" role="form">
+          <br>
           <div class="panel panel-default">
-            <div class="panel-heading">
-              <h1 class="panel-title"> Subscribe to WatchPeopleCode news</h1>
-            </div>
-
-            <div class="panel-body">
-              <div class="form-group">
-                {{ subscribe_form.hidden_tag() }}
-                {{ wtf.form_field(subscribe_form.email, value="") }}
-                {{ wtf.form_field(subscribe_form.submit_button, button_map={'submit_button': 'primary'}) }}
+              <div class="panel-heading"><span style="font-size: 18px;">Subscribe to our newsletter</span></div>
+              <div class="panel-body">
+                  <form class="form-inline" action="" method="POST">
+                      <div class="input-group">
+                          <input type="text" class="form-control" name="subscribe-email" placeholder="Your e-mail">
+                      </div>
+                      <button type="submit" class="btn btn-default">Subscribe!</button>
+                  </form>
               </div>
-            </div>
           </div>
           <p><b> Get notifications in twitter </b></p>
           <a href="https://twitter.com/WatchPeopleCode" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @WatchPeopleCode</a>
-        </form>
       </div>
-    </div>
+  </div>
 
   </div>
 
