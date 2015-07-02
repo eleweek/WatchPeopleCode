@@ -372,7 +372,7 @@ def authenticate_streamer():
     rtmp_secret = request.values.get('pass', '')
     streamer = Streamer.query.filter_by(reddit_username=streamer_username).first()
     if not streamer or not streamer.rtmp_secret or streamer.rtmp_secret != rtmp_secret:
-        app.logger.info(u"Fail to check credentials for streamer {}".streamer_username)
+        app.logger.info(u"Fail to check credentials for streamer {}".format(streamer_username))
         return None, None
     return get_or_create(WPCStream, channel_name=streamer_username), streamer
 
