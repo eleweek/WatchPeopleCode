@@ -200,6 +200,19 @@ class YoutubeStream(Stream):
             return
 
         for item in r.json()['items']:
+
+            # add channel to streamer table if it's needed and fix if it's needed
+            if self.streamer is not None:
+                yc = item['snippet']['channelId']
+                streamer = Streamer.query.filter_by(youtube_channel=yc).first()
+                # if there is streamer with that channel
+                if streamer:
+                    self.streamer = streamer
+                # there is no streamer with that channel
+                elif not self.streamer.checked:
+                    self.streamer.youtube_channel = yc
+                    self.streamer.youtube_name = item['snippet']['channelTitle']
+
             self.title = item['snippet']['title']
             if 'liveStreamingDetails' in item:
                 self.scheduled_start_time = item['liveStreamingDetails']['scheduledStartTime']
@@ -221,18 +234,6 @@ class YoutubeStream(Stream):
             else:
                 self.status = 'completed'
                 self.current_viewers = None
-
-            # add channel to streamer table if it's needed and fix if it's needed
-            if self.streamer is not None:
-                yc = item['snippet']['channelId']
-                streamer = Streamer.query.filter_by(youtube_channel=yc).first()
-                # if there is streamer with that channel
-                if streamer:
-                    self.streamer = streamer
-                # there is no streamer with that channel
-                elif not self.streamer.checked:
-                    self.streamer.youtube_channel = yc
-                    self.streamer.youtube_name = item['snippet']['channelTitle']
 
     def _get_flair(self):
         fst = self.format_start_time(start_time=False)
@@ -286,6 +287,17 @@ class TwitchStream(Stream):
 
     def _update_status(self):
         app.logger.info("Updating status for {}".format(self))
+
+        # add channel to streamer table if it's needed and fix if it's needed
+        if self.streamer is not None:
+            streamer = Streamer.query.filter_by(twitch_channel=self.channel).first()
+            # if there is streamer with that channel
+            if streamer:
+                self.streamer = streamer
+            # there is no streamer with that channel
+            elif not self.streamer.checked:
+                self.streamer.twitch_channel = self.channel
+
         r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
         r.raise_for_status()
 
@@ -307,16 +319,6 @@ class TwitchStream(Stream):
 
             if self.status == 'upcoming':
                 self._update_title_from_channel()
-
-        # add channel to streamer table if it's needed and fix if it's needed
-        if self.streamer is not None:
-            streamer = Streamer.query.filter_by(twitch_channel=self.channel).first()
-            # if there is streamer with that channel
-            if streamer:
-                self.streamer = streamer
-            # there is no streamer with that channel
-            elif not self.streamer.checked:
-                self.streamer.twitch_channel = self.channel
 
     def _get_flair(self):
         fst = self.format_start_time(start_time=False)
