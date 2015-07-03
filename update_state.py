@@ -206,6 +206,7 @@ def get_fixed_bonus_twitch_streams():
     for ts in TwitchStream.query.filter_by(channel='handmade_hero').all():
         ts._update_status()
 
+
 @sched.scheduled_job('interval', seconds=30)
 def update_state():
     app.logger.info("Updating old streams")
