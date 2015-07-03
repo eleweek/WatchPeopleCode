@@ -186,6 +186,19 @@ def streamer_rtmp_redirect(streamer_name, redirect_id):
     return redirect_url
 
 
+# TODO: maybe make this a blueprint?
+def force_test_login():
+    if request.remote_addr != '127.0.0.1':
+        abort(403)
+    test_account = Streamer.query.filter_by(reddit_username='if').first_or_404()
+    login_user(test_account)
+    return redirect(url_for('index'))
+
+
+def add_force_test_login(app):
+    app.add_url_rule('/force_test_login', 'force_test_login', force_test_login)
+
+
 class StreamerPage(View):
     methods = ['GET', 'POST']
 
