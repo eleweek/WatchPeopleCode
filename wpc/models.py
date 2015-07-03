@@ -71,7 +71,7 @@ class Stream(db.Model):
         if submission not in self.submissions:
             self.submissions.append(submission)
 
-    def go_live(self):
+    def _go_live(self):
         if self.status != 'live' and self.streamer and\
             self.streamer.checked and\
             (self.streamer.last_time_notified is None or
@@ -211,7 +211,7 @@ class YoutubeStream(Stream):
                 self.actual_start_time = item['snippet'].get('publishedAt')
 
             if item['snippet']['liveBroadcastContent'] == 'live':
-                self.go_live()
+                self._go_live()
                 if 'actualStartTime' in item['liveStreamingDetails']:
                     self.actual_start_time = item['liveStreamingDetails']['actualStartTime']
                 else:  # Youtube is weird, and sometimes this happens. If there is no actual start time, then we fall back to scheduledStartTime
@@ -291,7 +291,7 @@ class TwitchStream(Stream):
 
         stream = r.json()['stream']
         if stream is not None:
-            self.go_live()
+            self._go_live()
             if 'status' in stream['channel']:
                 self.title = stream['channel']['status']
             self.current_viewers = stream['viewers']

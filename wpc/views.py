@@ -392,7 +392,7 @@ def rtmp_auth():
         return "OK"
 
     stream.actual_start_time = datetime.utcnow()
-    stream.go_live()
+    stream._go_live()
     db.session.commit()
     return "OK"
 
