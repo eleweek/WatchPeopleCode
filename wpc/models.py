@@ -73,6 +73,7 @@ class Stream(db.Model):
 
     def go_live(self):
         if self.status != 'live' and self.streamer and\
+            self.streamer.checked and\
             (self.streamer.last_time_notified is None or
                 (datetime.utcnow() - self.streamer.last_time_notified) > timedelta(hours=1)):
             self.streamer.need_to_notify_subscribers = True
