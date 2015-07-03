@@ -205,13 +205,17 @@ class YoutubeStream(Stream):
             if self.streamer is not None:
                 yc = item['snippet']['channelId']
                 streamer = Streamer.query.filter_by(youtube_channel=yc).first()
-                # if there is streamer with that channel
+                # if there is streamer with this channel
                 if streamer:
                     self.streamer = streamer
-                # there is no streamer with that channel
-                elif not self.streamer.checked:
+                # if streamer has no yc and didn't ever checked profile
+                elif self.streamer.youtube_channel is None and\
+                        not self.streamer.checked:
                     self.streamer.youtube_channel = yc
                     self.streamer.youtube_name = item['snippet']['channelTitle']
+                # otherwise
+                else:
+                    self.streamer = None
 
             self.title = item['snippet']['title']
             if 'liveStreamingDetails' in item:
@@ -291,12 +295,15 @@ class TwitchStream(Stream):
         # add channel to streamer table if it's needed and fix if it's needed
         if self.streamer is not None:
             streamer = Streamer.query.filter_by(twitch_channel=self.channel).first()
-            # if there is streamer with that channel
+            # if there is streamer with this channel
             if streamer:
                 self.streamer = streamer
-            # there is no streamer with that channel
-            elif not self.streamer.checked:
+            # if streamer has no tc and didn't ever checked profile
+            elif self.streamer.twitch_channel is None and\
+                    not self.streamer.checked:
                 self.streamer.twitch_channel = self.channel
+            else:
+                self.streamer = None
 
         r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
         r.raise_for_status()
