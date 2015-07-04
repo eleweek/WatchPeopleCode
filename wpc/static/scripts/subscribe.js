@@ -11,6 +11,8 @@ var do_subscribe = function(streamer_id, email) {
         },
         success: function() {
             console.log("Successfully subscribed to streamer with id " + streamer_id);
+            subscribers_count = $(".streamer-subscribers-count-" + streamer_id);
+            subscribers_count.html(+subscribers_count.html() + 1);
             bootbox.alert("Successfully subscribed to the streamer!");
             $(".subscribe-button-" + streamer_id).not('.regular-streamer-subscribe-button').hide();
         }
