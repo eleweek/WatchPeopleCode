@@ -12,7 +12,6 @@
   {{super()}}
 
   <div class="container">
-      <p class="text-center"><a href={{url_for(".index")}}>Back to main page</a></p>
       {% if query %}
         <p class="text-center"><a href={{url_for(".past_streams")}}>All past streams</a></p>
         <h3 class="text-center">Past streams that match query "{{query}}"</h3>
