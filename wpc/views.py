@@ -1,6 +1,6 @@
 from wpc import db, app, socketio
 from wpc.flask_utils import url_for_other_page, url_change_args, nl2br, nl2br_py, get_or_create, is_safe_url
-from wpc.models import MozillaStreamHack, GitHubStreamHack  # NOQA
+from wpc.models import MozillaStreamHack  # NOQA
 from wpc.models import YoutubeStream, WPCStream, Stream, Streamer, Subscriber, Idea, ChatMessage
 from wpc.forms import SubscribeForm, GLMSubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm, IdeaForm, RtmpRedirectForm
 
