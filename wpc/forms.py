@@ -110,4 +110,4 @@ class EditStreamerInfoForm(Form):
 
 class SearchForm(Form):
     query = StringField("Query")
-    search_button = SubmitField('Search past streams')
+    search_button = SubmitField('Search video archive')
