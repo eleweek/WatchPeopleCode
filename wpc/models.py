@@ -388,20 +388,6 @@ class MozillaStreamHack(object):
         self.streamer = Streamer.query.filter_by(reddit_username='good_grief').one()
 
 
-class GitHubStreamHack(object):
-    def html_code(self, autoplay=None):
-        return '''<iframe width="640" height="392" src="http://www.ustream.tv/embed/18841580?v=3&amp;wmode=direct" scrolling="no" frameborder="0" style="border: 0px none transparent;">    </iframe>'''  # NOQA
-
-    def normal_url(self):
-        return "https://live-stream.github.com/"
-
-    def __init__(self):
-        self.id = -1
-        self.current_viewers = None
-        self.streamer = None
-        self.title = "GitHub CodeConf"
-
-
 class CaseInsensitiveComparator(ColumnProperty.Comparator):
     def __eq__(self, other):
         return db.func.lower(self.__clause_element__()) == db.func.lower(other)

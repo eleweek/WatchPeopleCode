@@ -72,9 +72,6 @@ def index():
     # Uncomment this when mozilla guys start livestreaming
     # live_streams.insert(0, MozillaStreamHack())
 
-    # Uncomment this when github conf starts
-    # live_streams.append(GitHubStreamHack())
-
     idea_form = IdeaForm(prefix='idea')
     redir = process_idea_form(idea_form)
     if redir:
@@ -213,9 +210,7 @@ class StreamerPage(View):
         edit_info = False
         edit_title = False
 
-        # TODO: better way of customizing the page for other people
-        # if streamer_name in ['glm_talkshow', 'godlikesme']:
-        if streamer_name in ['glm_talkshow']:
+        if streamer_name == 'glm_talkshow':
             subscribe_form = GLMSubscribeForm(prefix='streamer_subscribe')
             if subscribe_form.validate_on_submit():
                 subscriber = get_or_create(Subscriber, email=subscribe_form.email.data)
@@ -250,17 +245,6 @@ class StreamerPage(View):
                                    how_to_learn_programming=how_to_learn_programming,
                                    subscribe_form=subscribe_form,
                                    check_profile_alert=check_profile_alert)
-        # elif streamer_name == 'godlikesme':
-        #    yt_stream_the_button = YoutubeStream.query.filter_by(ytid='gNrFy5h2voY').one()
-        #    subscribe_form = GLMSubscribeForm(prefix='streamer_subscribe')
-        #    return render_template('streamer.html', streamer=streamer,
-        #                           streams=streams,
-        #                           wpc_stream=wpc_stream,
-        #                           subscribe_form=subscribe_form,
-        #                           info_form=info_form,
-        #                           title_form=title_form,
-        #                           check_profile_alert = check_profile_alert
-        #                           yt_stream_the_button=yt_stream_the_button)
 
         if current_user.is_authenticated() and current_user == streamer:
             if request.method == 'POST':

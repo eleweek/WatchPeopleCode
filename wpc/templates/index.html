@@ -19,11 +19,7 @@
   </div>
   <div class="container">
     <h1 class="text-center"> Watch People Code </h1>
-    {% if live_streams is not none %}
-        <h2 class="text-center"> Livestreams right now: {{ live_streams|length }}</h2>
-    {% else %}
-        <h2 class="text-center"> Error getting live streams. :( Maybe try refreshing the page? </h2>
-    {% endif %}
+    <h2 class="text-center"> Livestreams right now: {{ live_streams|length }}</h2>
     <p class="text-center"> The app automatically gets live stream from /r/WatchPeopleCode subreddit, so if you want to start live streaming, submit a link to your youtube stream or twitch channel to <a href="http://www.reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode </a></p>
     <div class="row">
 

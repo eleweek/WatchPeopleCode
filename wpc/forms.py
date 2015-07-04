@@ -19,7 +19,8 @@ class SubscribeForm(Form):
     email = StringField("Email address", [validators.DataRequired(), validators.Email(), validate_email_unique])
     submit_button = SubmitField('Subscribe')
 
-#TODO: better way
+
+# TODO: better way
 class GLMSubscribeForm(Form):
     email = StringField("Email address", [validators.DataRequired(), validators.Email()])
     submit_button = SubmitField('Subscribe')
