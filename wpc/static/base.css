@@ -45,3 +45,7 @@
 .viewers-and-subscribers {
     margin-top: 5px;
 }
+
+#dashboard_rtmp_url,#dashboard_rtmp_key {
+    cursor: auto;
+}
