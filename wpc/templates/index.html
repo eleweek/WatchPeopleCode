@@ -54,8 +54,9 @@
               <div class="panel-heading"><span style="font-size: 18px;">Subscribe to our newsletter</span></div>
               <div class="panel-body">
                   <form class="form-inline" action="" method="POST">
-                      <input type="text" class="form-control" name="subscribe-email" placeholder="Your e-mail">
-                      <button type="submit" class="btn btn-default">Subscribe!</button>
+                      {{ subscribe_form.hidden_tag() }}
+                      {{ subscribe_form.email(placeholder="Your e-mail", class_="form-control") }}
+                      {{ subscribe_form.submit_button(class_="btn btn-default") }}
                   </form>
               </div>
           </div>
