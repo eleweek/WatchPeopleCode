@@ -71,8 +71,9 @@ class Stream(db.Model):
         if submission not in self.submissions:
             self.submissions.append(submission)
 
-    def go_live(self):
+    def _go_live(self):
         if self.status != 'live' and self.streamer and\
+            self.streamer.checked and\
             (self.streamer.last_time_notified is None or
                 (datetime.utcnow() - self.streamer.last_time_notified) > timedelta(hours=1)):
             self.streamer.need_to_notify_subscribers = True
@@ -199,6 +200,23 @@ class YoutubeStream(Stream):
             return
 
         for item in r.json()['items']:
+
+            # add channel to streamer table if it's needed and fix if it's needed
+            if self.streamer is not None:
+                yc = item['snippet']['channelId']
+                streamer = Streamer.query.filter_by(youtube_channel=yc).first()
+                # if there is streamer with this channel
+                if streamer:
+                    self.streamer = streamer
+                # if streamer has no yc and didn't ever checked profile
+                elif self.streamer.youtube_channel is None and\
+                        not self.streamer.checked:
+                    self.streamer.youtube_channel = yc
+                    self.streamer.youtube_name = item['snippet']['channelTitle']
+                # otherwise
+                else:
+                    self.streamer = None
+
             self.title = item['snippet']['title']
             if 'liveStreamingDetails' in item:
                 self.scheduled_start_time = item['liveStreamingDetails']['scheduledStartTime']
@@ -210,7 +228,7 @@ class YoutubeStream(Stream):
                 self.actual_start_time = item['snippet'].get('publishedAt')
 
             if item['snippet']['liveBroadcastContent'] == 'live':
-                self.go_live()
+                self._go_live()
                 if 'actualStartTime' in item['liveStreamingDetails']:
                     self.actual_start_time = item['liveStreamingDetails']['actualStartTime']
                 else:  # Youtube is weird, and sometimes this happens. If there is no actual start time, then we fall back to scheduledStartTime
@@ -220,18 +238,6 @@ class YoutubeStream(Stream):
             else:
                 self.status = 'completed'
                 self.current_viewers = None
-
-            # add channel to streamer table if it's needed and fix if it's needed
-            if self.streamer is not None:
-                yc = item['snippet']['channelId']
-                streamer = Streamer.query.filter_by(youtube_channel=yc).first()
-                # if there is streamer with that channel
-                if streamer:
-                    self.streamer = streamer
-                # there is no streamer with that channel
-                elif not self.streamer.checked:
-                    self.streamer.youtube_channel = yc
-                    self.streamer.youtube_name = item['snippet']['channelTitle']
 
     def _get_flair(self):
         fst = self.format_start_time(start_time=False)
@@ -285,12 +291,26 @@ class TwitchStream(Stream):
 
     def _update_status(self):
         app.logger.info("Updating status for {}".format(self))
+
+        # add channel to streamer table if it's needed and fix if it's needed
+        if self.streamer is not None:
+            streamer = Streamer.query.filter_by(twitch_channel=self.channel).first()
+            # if there is streamer with this channel
+            if streamer:
+                self.streamer = streamer
+            # if streamer has no tc and didn't ever checked profile
+            elif self.streamer.twitch_channel is None and\
+                    not self.streamer.checked:
+                self.streamer.twitch_channel = self.channel
+            else:
+                self.streamer = None
+
         r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
         r.raise_for_status()
 
         stream = r.json()['stream']
         if stream is not None:
-            self.go_live()
+            self._go_live()
             if 'status' in stream['channel']:
                 self.title = stream['channel']['status']
             self.current_viewers = stream['viewers']
@@ -306,16 +326,6 @@ class TwitchStream(Stream):
 
             if self.status == 'upcoming':
                 self._update_title_from_channel()
-
-        # add channel to streamer table if it's needed and fix if it's needed
-        if self.streamer is not None:
-            streamer = Streamer.query.filter_by(twitch_channel=self.channel).first()
-            # if there is streamer with that channel
-            if streamer:
-                self.streamer = streamer
-            # there is no streamer with that channel
-            elif not self.streamer.checked:
-                self.streamer.twitch_channel = self.channel
 
     def _get_flair(self):
         fst = self.format_start_time(start_time=False)

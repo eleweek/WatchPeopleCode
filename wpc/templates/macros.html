@@ -1,44 +1,58 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% macro stream_macro(stream, autoplay=false, title_form=none, with_subscribe_button=false) %}
-  {# time #}
-  {% if stream.status == 'upcoming' and stream.scheduled_start_time %}
-    <p><b>{{stream.format_start_time()}}</b></p>
-  {% endif %}
-  
-  {# title & #}
-  <div class="stream-title">
+  <div>
+    {# time #}
+    {% if stream.status == 'upcoming' and stream.scheduled_start_time %}
+      <p><b>{{stream.format_start_time()}}</b></p>
+    {% endif %}
+    
+    {# title & #}
+    <div class="stream-title">
 
-  <a href={{ stream.normal_url() }}><span class="stream-title-name">{{ stream.title if stream.title else stream.normal_url() }}</span></a>
+    <a href={{ stream.normal_url() }}><span class="stream-title-name">{{ stream.title if stream.title else stream.normal_url() }}</span></a>
 
-  {% if stream.streamer %}
-  by <a href={{ url_for('.streamer_page', streamer_name=stream.streamer.reddit_username) }}>{{ stream.streamer.reddit_username }}</a>
-  {% endif %}
+    {% if stream.streamer %}
+    by <a href={{ url_for('.streamer_page', streamer_name=stream.streamer.reddit_username) }}>{{ stream.streamer.reddit_username }}</a>
+    {% endif %}
 
-  {% if stream.current_viewers is not none %}
-    | <span class="viewers-count-stream viewers-count-stream-{{stream.id}}">{{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}</span>
-  {% endif %}
-  {% if stream.streamer and with_subscribe_button %}
-    | <button class="btn btn-success btn-xs subscribe-button subscribe-button-{{stream.streamer.id}}">Subscribe</button>
-  {% endif %}
-  {% if title_form %}
-    <button type="button" class="btn btn-default edit-title-button">Edit stream title</button>
-    </div> {# stream-title #}
-    <form action="" method="POST" class="form form-edit-title" role="form" {% if not edit_title %} style="display:none;" {% endif %}>
-      <br>
-      <div class="form-group">
-        {{ title_form.hidden_tag() }}
-        {{ wtf.form_field(title_form.title) }}
-        {{ wtf.form_field(title_form.submit_button, button_map={'submit_button': 'default'}) }}
-      </div>
-    </form>
-  {% else %}
-    </div> {# stream-title #}
-  {% endif %}
+    {% if title_form %}
+      <button type="button" class="btn btn-default edit-title-button">Edit stream title</button>
+      </div> {# stream-title #}
+      <form action="" method="POST" class="form form-edit-title" role="form" {% if not edit_title %} style="display:none;" {% endif %}>
+        <br>
+        <div class="form-group">
+          {{ title_form.hidden_tag() }}
+          {{ wtf.form_field(title_form.title) }}
+          {{ wtf.form_field(title_form.submit_button, button_map={'submit_button': 'default'}) }}
+        </div>
+      </form>
+    {% else %}
+      </div> {# stream-title #}
+    {% endif %}
+  </div>
 
   {# video #}
-  {{ stream.html_code(autoplay=autoplay)|safe }}
-  <hr>
+  <div class="video-container">
+    {{ stream.html_code(autoplay=autoplay)|safe }}
+  </div>
+
+  {# viewers and subscribers #}
+  <div class="pull-right viewers-and-subscribers">
+    {% if stream.current_viewers is not none %}
+      <span class="viewers-count-stream viewers-count-stream-{{stream.id}}">{{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}</span>
+    {% endif %}
+    <span>
+      {% if stream.streamer %}
+          <span class="glyphicon glyphicon-heart"></span> {{ stream.streamer.subscribers.count() }}
+      {% endif %}
+    </span>
+    {% if stream.streamer and with_subscribe_button %}
+      <button class="btn btn-success btn-xs subscribe-button subscribe-button-{{stream.streamer.id}}">Subscribe</button>
+    {% endif %}
+  </div>
+
+  <br><hr>
 {% endmacro %}
 
 
