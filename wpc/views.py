@@ -201,15 +201,8 @@ class StreamerPage(View):
 
     def dispatch_request(self, streamer_name, page):
         streamer = Streamer.query.filter_by(reddit_username=streamer_name).first_or_404()
-        wpc_stream = streamer.streams.filter_by(type='wpc_stream').first()
-        streams = streamer.streams
-        if wpc_stream:
-            streams = streams.filter(Stream.id != wpc_stream.id)
-        streams = streams.order_by(Stream.actual_start_time.desc().nullslast()).paginate(page, per_page=5)
-        check_profile_alert = False
-        edit_info = False
-        edit_title = False
 
+        # glm_talkshow stuff
         if streamer_name == 'glm_talkshow':
             subscribe_form = GLMSubscribeForm(prefix='streamer_subscribe')
             if subscribe_form.validate_on_submit():
@@ -221,12 +214,6 @@ class StreamerPage(View):
                     flash("You're already subscribed!")
 
                 db.session.commit()
-
-        info_form = EditStreamerInfoForm(prefix='info')
-        title_form = EditStreamTitleForm(prefix='title')
-
-        if streamer_name == 'glm_talkshow':
-            subscribe_form = GLMSubscribeForm(prefix='streamer_subscribe')
 
             yt_recording_ep1 = YoutubeStream.query.filter_by(ytid='f968E8eZmvM').one()
             yt_recording_ep2 = YoutubeStream.query.filter_by(ytid='87SfA1sw7vY').one()
@@ -243,8 +230,20 @@ class StreamerPage(View):
                                    yt_stream_ep4=yt_recording_ep4,
                                    yt_stream_ep5=yt_recording_ep5,
                                    how_to_learn_programming=how_to_learn_programming,
-                                   subscribe_form=subscribe_form,
-                                   check_profile_alert=check_profile_alert)
+                                   subscribe_form=subscribe_form)
+
+        # all stuff
+        wpc_stream = streamer.streams.filter_by(type='wpc_stream').first()
+        streams = streamer.streams
+        if wpc_stream:
+            streams = streams.filter(Stream.id != wpc_stream.id)
+        streams = streams.order_by(Stream.actual_start_time.desc().nullslast()).paginate(page, per_page=5)
+        check_profile_alert = False
+        edit_info = False
+        edit_title = False
+
+        info_form = EditStreamerInfoForm(prefix='info')
+        title_form = EditStreamTitleForm(prefix='title')
 
         if current_user.is_authenticated() and current_user == streamer:
             if request.method == 'POST':
