@@ -57,27 +57,7 @@
             <div class="text-left"><button type="button" class="btn btn-default edit-info-button">Edit info</button></div>
           {% endif %}
         </div>
-      {#{% if streamer.reddit_username == "godlikesme" and wpc_stream and wpc_stream.status == "completed" %}
-      <br><br>
-        <form action="" method="POST" class="form form-subscribe" role="form">
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h1 class="panel-title">Get email notifications about future episodes</h1>
-            </div>
 
-            <div class="panel-body">
-              <div class="form-group">
-                {{ subscribe_form.hidden_tag() }}
-                {{ wtf.form_field(subscribe_form.email, value="") }}
-                {{ wtf.form_field(subscribe_form.submit_button, button_map={'submit_button': 'primary'}) }}
-              </div>
-            </div>
-          </div>
-        </form>
-        <h3> /r/thebutton filthy presser bot recording </h3>
-        {{ macros.stream_macro(yt_stream_the_button, false, none) }}
-      {% endif %}#}
-        
       {% if streamer == current_user %}
         <form action="" method="POST" class="form form-edit-info" role="form" {% if not edit_info %} style="display:none;" {% endif %}>
           <br>
