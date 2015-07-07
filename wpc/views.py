@@ -201,6 +201,7 @@ class StreamerPage(View):
 
     def dispatch_request(self, streamer_name, page):
         streamer = Streamer.query.filter_by(reddit_username=streamer_name).first_or_404()
+        wpc_stream = streamer.streams.filter_by(type='wpc_stream').first()
 
         # glm_talkshow stuff
         if streamer_name == 'glm_talkshow':
@@ -223,7 +224,7 @@ class StreamerPage(View):
             how_to_learn_programming = YoutubeStream.query.filter_by(ytid='6XtSPvjt87w').one()
             return render_template('streamers/glm_talkshow.html',
                                    streamer=streamer,
-                                   wpc_stream=None,
+                                   wpc_stream=wpc_stream,
                                    yt_stream_ep1=yt_recording_ep1,
                                    yt_stream_ep2=yt_recording_ep2,
                                    yt_stream_ep3=yt_recording_ep3,
@@ -233,7 +234,6 @@ class StreamerPage(View):
                                    subscribe_form=subscribe_form)
 
         # all stuff
-        wpc_stream = streamer.streams.filter_by(type='wpc_stream').first()
         streams = streamer.streams
         if wpc_stream:
             streams = streams.filter(Stream.id != wpc_stream.id)
