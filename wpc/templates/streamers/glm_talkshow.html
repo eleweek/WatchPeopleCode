@@ -5,10 +5,9 @@
 {% block content %}
 <div class="container">
   <h2 class="text-center"> GLM Programming Talk Show</h2>
-  <h3 class="text-center"> Episode 5. Geoff Greer. The silver searcher, Floobits. </h3>
-  <div class="row">
-    <div class="col-md-8">
-      {% if wpc_stream.status == 'live' %}
+    {% if wpc_stream.status != 'completed' %}
+      <div class="row">
+        <div class="col-xs-9">
           <p>
             We'll talk about ag, floobits, opensource and programming in general.  
             <br>
@@ -20,11 +19,26 @@
             <br>
             <a href="https://floobits.com/"><strong>Floobits:</strong> Cross-editor real-time collaboration</a>
           </p>
-            <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
-            {{ macros.stream_macro(wpc_stream, true, title_form if streamer == current_user else none, not current_user.already_subscribed(streamer)) }}
-      {% endif %}
+        </div>
+      </div>
 
-        <form action="" method="POST" class="form form-subscribe" role="form" style="margin-bottom: 40px">
+      <div class="row">
+        <div class="col-xs-9">
+          <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
+          {{ macros.stream_macro(wpc_stream, true, title_form if streamer == current_user else none, not current_user.already_subscribed(streamer)) }}
+        </div>
+        
+        <div class="col-xs-3">
+          <br>
+          {{ macros.render_chat(streamer) }}
+        </div>
+
+      </div>
+    {% endif %}
+
+  <div class="row">
+    <div class="col-xs-8 {% if wpc_stream.status == 'completed' %}col-md-offset-2{% endif %}">
+        <form action="" method="POST" class="form form-subscribe" role="form" style="margin-top: 10px; margin-bottom: 40px;">
           <div class="panel panel-default">
             <div class="panel-heading">
               <h1 class="panel-title">Get email notifications about future episodes</h1>
@@ -138,14 +152,7 @@
         </div>
       </div>
 
-    </div> <!-- col-md-8  -->
-    {% if wpc_stream.status == 'live' %}
-      <div class="col-md-4">
-        <br>
-        {{ macros.render_chat(streamer) }}
-      </div>
-    {% endif %}
-
+    </div> <!-- col-xs-8  -->
   </div> <!-- row -->
 
 </div>
