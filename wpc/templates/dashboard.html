@@ -26,6 +26,7 @@
               <input type="text" class="form-control" id="dashboard_rtmp_key" readonly value="{{current_user.streaming_key()}}" onclick="this.select();">
             </div>
           </form>
+          <button class="btn btn-default btn-xs" id="regenerate-rtmp-key">Generate new key</button>
         </div>
       </div>
       <hr>
@@ -51,6 +52,11 @@
         $(".show-private-info-button").show();
         $(".hide-private-info-button").hide();
         $(".private-info").hide();
+      });
+      $("#regenerate-rtmp-key").click(function() {
+        $.ajax("/_regenerate_rtmp_key").done(function(data){
+            $('#dashboard_rtmp_key').val(data.rtmp_key);
+        });
       });
     }($, window));
   </script>

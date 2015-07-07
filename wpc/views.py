@@ -16,7 +16,6 @@ import random
 from feedgen.feed import FeedGenerator
 from datetime import datetime
 import pytz
-import uuid
 
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
 app.jinja_env.globals['url_change_args'] = url_change_args
@@ -36,12 +35,7 @@ def create_search_form():
 @app.before_request
 def add_rtmp_secret():
     if current_user.is_authenticated() and not current_user.rtmp_secret:
-        current_user.rtmp_secret = str(uuid.uuid4())
-        wpcs = get_or_create(WPCStream, channel_name=current_user.reddit_username)
-        current_user.streams.append(wpcs)
-        db.session.add(wpcs)
-        wpcs.status = 'completed'
-        db.session.commit()
+        current_user.generate_rtmp_stuff()
 
 
 @app.after_request
@@ -403,6 +397,14 @@ def rtmp_done():
         stream.current_viewers = None
         db.session.commit()
     return "OK"
+
+
+@app.route('/_regenerate_rtmp_key')
+def regenerate_rtmp_key():
+    if not current_user.is_authenticated():
+        abort(403)
+    current_user.generate_rtmp_stuff()
+    return jsonify(rtmp_key=current_user.streaming_key())
 
 
 @app.route("/logout")

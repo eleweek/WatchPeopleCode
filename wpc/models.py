@@ -9,6 +9,7 @@ from flask import url_for, request, render_template
 import humanize
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
+import uuid
 
 
 @login_manager.user_loader
@@ -457,6 +458,14 @@ class Streamer(db.Model, UserMixin):
 
     def streaming_key(self):
         return self.reddit_username + '?pass=' + self.rtmp_secret
+
+    def generate_rtmp_stuff(self):
+        self.rtmp_secret = str(uuid.uuid4())
+        wpcs = get_or_create(WPCStream, channel_name=current_user.reddit_username)
+        current_user.streams.append(wpcs)
+        db.session.add(wpcs)
+        wpcs.status = 'completed' if not wpcs.status else wpcs.status
+        db.session.commit()
 
     def populate(self, form):
         self.info = form.info.data
