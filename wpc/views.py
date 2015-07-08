@@ -525,7 +525,7 @@ def chat_message(message_text, streamer_username):
     if current_user.is_anonymous() and\
             streamer.streams.filter_by(type='wpc_stream').one().chat_anon_forbidden:
         emit("forbidden")
-    elif current_user.is_authenticated() and current_user.banned:
+    elif current_user.is_authenticated() and current_user.is_banned:
         emit("message", message)
     else:
         if message_text.startswith("/clear"):
