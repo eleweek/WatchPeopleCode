@@ -86,7 +86,7 @@ class WPCStream(Stream):
     chat_anon_forbidden = db.Column(db.Boolean, default=False)
 
     def __init__(self, channel_name):
-        self.status = 'upcoming'
+        self.status = 'completed'
         self.channel_name = channel_name
         self.submissions = []
 
