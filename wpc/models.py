@@ -294,13 +294,13 @@ class TwitchStream(Stream):
         app.logger.info("Updating status for {}".format(self))
 
         # add channel to streamer table if it's needed and fix if it's needed
-        if self.streamer is not None:
-            streamer = Streamer.query.filter_by(twitch_channel=self.channel).first()
-            # if there is streamer with this channel
-            if streamer:
-                self.streamer = streamer
-            # if streamer has no tc and didn't ever checked profile
-            elif self.streamer.twitch_channel is None and\
+        streamer = Streamer.query.filter_by(twitch_channel=self.channel).first()
+        # if there is streamer with this channel
+        if streamer:
+            self.streamer = streamer
+        elif self.streamer is not None:
+            # if self.streamer has no tc and didn't ever checked profile
+            if self.streamer.twitch_channel is None and\
                     not self.streamer.checked:
                 self.streamer.twitch_channel = self.channel
             else:
