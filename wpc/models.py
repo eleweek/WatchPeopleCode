@@ -86,7 +86,7 @@ class WPCStream(Stream):
     chat_anon_forbidden = db.Column(db.Boolean, default=False)
 
     def __init__(self, channel_name):
-        self.status = 'upcoming'
+        self.status = 'completed'
         self.channel_name = channel_name
         self.submissions = []
 
@@ -434,7 +434,7 @@ class Streamer(db.Model, UserMixin):
     subscribers = db.relationship('Subscriber', secondary=streamer_subscriptions, lazy='dynamic', backref=db.backref('subscribed_to', lazy='dynamic'))
     need_to_notify_subscribers = db.Column(db.Boolean, default=False)
     last_time_notified = db.Column(db.DateTime())
-    banned = db.Column(db.Boolean(), default=False)
+    is_banned = db.Column(db.Boolean(), default=False)
 
     # XXX: this is kinda ugly, but simple
     # nginx-rtmp supports only fixed number of redirects
