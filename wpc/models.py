@@ -161,9 +161,41 @@ class WPCStream(Stream):
     }
 
 
+class YoutubeChannel(db.Model):
+    channel_id = db.Column(db.String(24), primary_key=True)
+    title = db.Column(db.String(30))
+    streams = db.relationship("YoutubeStream", backref="youtube_channel")
+    streamer_id = db.Column('streamer_id', db.Integer(), db.ForeignKey('streamer.id'))
+    streamer = db.relationship('Streamer', uselist=False, backref=db.backref('youtube_channel_class', uselist=False))
+
+    def __init__(self, channel_id, title=None):
+        self.channel_id = channel_id
+        if title:
+            self.title = title
+        else:
+            r = requests_get_with_retries(
+                "https://www.googleapis.com/youtube/v3/channels?id={}&part=snippet&key={}".format(
+                    channel_id, app.config['YOUTUBE_KEY']), retries_num=15)
+
+            r.raise_for_status()
+
+            for item in r.json()['items']:
+                self.title = item['snippet']['title']
+
+    def __eq__(self, other):
+        return type(self) == type(other) and self.channel_id == other.channel_id
+
+    def __hash__(self):
+        return hash(self.channel_id)
+
+    def __repr__(self):
+        return '<YoutubeChannel {} with title {}>'.format(self.channel_id, self.title)
+
+
 class YoutubeStream(Stream):
     ytid = db.Column(db.String(11), unique=True)
     vod_views = db.Column(db.Integer)
+    youtube_channel_id = db.Column(db.String(24), db.ForeignKey('youtube_channel.channel_id'))
 
     def __init__(self, id):
         self.ytid = id
@@ -202,18 +234,17 @@ class YoutubeStream(Stream):
 
         for item in r.json()['items']:
 
-            # add channel to streamer table if it's needed and fix if it's needed
-            if self.streamer is not None:
-                yc = item['snippet']['channelId']
-                streamer = Streamer.query.filter_by(youtube_channel=yc).first()
-                # if there is streamer with this channel
-                if streamer:
-                    self.streamer = streamer
+            self.youtube_channel = get_or_create(YoutubeChannel,
+                                                 channel_id=item['snippet']['channelId'],
+                                                 title=item['snippet']['channelTitle'])
+
+            # if there is streamer with this channel
+            if self.youtube_channel.streamer is not None:
+                self.streamer = self.youtube_channel.streamer
+            elif self.streamer is not None:
                 # if streamer has no yc and didn't ever checked profile
-                elif self.streamer.youtube_channel is None and\
-                        not self.streamer.checked:
-                    self.streamer.youtube_channel = yc
-                    self.streamer.youtube_name = item['snippet']['channelTitle']
+                if not self.streamer.checked:
+                    self.streamer.yc = self.youtube_channel
                 # otherwise
                 else:
                     self.streamer = None
@@ -436,6 +467,22 @@ class Streamer(db.Model, UserMixin):
     last_time_notified = db.Column(db.DateTime())
     is_banned = db.Column(db.Boolean(), default=False)
 
+    '''
+    @property
+    def youtube_channel(self):
+        if self.youtube_channel_class is None:
+            return None
+        return self.youtube_channel_class.channel_id
+
+    @youtube_channel.setter
+    def youtube_channel(self, channel_id):
+        self.youtube_channel_class = get_or_create(YoutubeChannel, channel_id=channel_id)
+
+    @youtube_channel.deleter
+    def youtube_channel(self, channel_id):
+        del self.youtube_channel_class
+    '''
+
     # XXX: this is kinda ugly, but simple
     # nginx-rtmp supports only fixed number of redirects
     # TODO: This should be fixed later
@@ -486,36 +533,18 @@ class Streamer(db.Model, UserMixin):
 
         self.twitch_channel = tc if tc else None
 
-        yc = form.youtube_channel_extract()
+        yc = get_or_create(YoutubeChannel, channel_id=form.youtube_channel_extract())
 
         # delete inapropriate ystreams
-        if yc != self.youtube_channel:
+        if yc != self.youtube_channel_class:
             for ys in self.streams.filter_by(type='youtube_stream'):
                 ys.streamer = None
 
         # rebind ystreams
-        streamer = Streamer.query.filter_by(youtube_channel=yc).first()
+        streamer = yc.streamer
         if streamer and streamer != current_user:
-            # to not make api-requests
-            yn = streamer.youtube_name
-            if yn is not None:
-                self.youtube_name = yn
-                self.youtube_channel = streamer.youtube_channel
-                streamer.youtube_name = None
-
-            streamer.youtube_channel = None
-            for ys in streamer.streams.filter_by(type='youtube_stream'):
+            del streamer.youtube_channel
+            for ys in yc.streams:
                 ys.streamer = self
-
-        # get yc name
-        if yc and (yc != self.youtube_channel or self.youtube_name is None):
-            r = requests_get_with_retries(
-                "https://www.googleapis.com/youtube/v3/channels?id={}&part=snippet&key={}".format(
-                    yc, app.config['YOUTUBE_KEY']), retries_num=15)
-
-            r.raise_for_status()
-
-            for item in r.json()['items']:
-                self.youtube_name = item['snippet']['title']
 
         self.youtube_channel = yc if yc else None
