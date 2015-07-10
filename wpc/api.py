@@ -1,5 +1,5 @@
 from wpc import app
-from wpc.models import Stream, Streamer, ChatMessage, YoutubeStream
+from wpc.models import Stream, Streamer, ChatMessage
 from flask import abort, jsonify
 
 from wpc.flask_utils import crossdomain
@@ -155,4 +155,3 @@ def api_streamers_past(name):
     except Exception as e:
         app.logger.exception(e)
         abort(500)
-
