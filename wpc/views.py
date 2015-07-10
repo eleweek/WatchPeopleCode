@@ -517,9 +517,8 @@ def chat_disconnect():
 @socketio.on('message', namespace='/chat')
 def chat_message(message_text, streamer_username):
     streamer = check_chat_access_and_get_streamer(streamer_username)
-    # TODO: this is quickfix
     if len(message_text) > 2048:
-        message_text = u"{}...".format(message_text[:2045])
+        message_text = u"{}... <message is too big>".format(message_text[:2048])
     message = {"sender": session['username'],
                "text": nl2br_py(message_text)}
     if current_user.is_anonymous() and\
