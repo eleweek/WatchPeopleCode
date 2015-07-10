@@ -448,7 +448,7 @@ def podcast_feed():
                     mimetype='application/rss+xml')
 
 
-chat_users = list()
+chat_users = set()
 
 
 @socketio.on('connect', namespace='/chat')
@@ -473,8 +473,8 @@ def chat_initialize():
         while True:
             session['username'] = random.choice(first_words) + ' ' + random.choice(second_words)
             if session['username'] not in chat_users:
+                chat_users.add(session['username'])
                 break
-    chat_users.append(session['username'])
     db.session.close()
 
 
@@ -510,7 +510,7 @@ def join(streamer_username):
 
 @socketio.on('disconnect', namespace='/chat')
 def chat_disconnect():
-    if 'username' in session:
+    if 'username' in session and not current_user.is_authenticated:
         chat_users.remove(session['username'])
 
 
