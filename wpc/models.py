@@ -454,8 +454,6 @@ class Streamer(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     reddit_username = db.column_property(db.Column(db.String(20), unique=True), comparator_factory=CaseInsensitiveComparator)
     twitch_channel = db.column_property(db.Column(db.String(25), unique=True), comparator_factory=CaseInsensitiveComparator)
-    youtube_channel = db.Column(db.String(24), unique=True)
-    youtube_name = db.Column(db.String(30))
     info = db.Column(db.Text())
     checked = db.Column(db.Boolean(), default=False)
     rtmp_secret = db.Column(db.String(50))
@@ -467,7 +465,6 @@ class Streamer(db.Model, UserMixin):
     last_time_notified = db.Column(db.DateTime())
     is_banned = db.Column(db.Boolean(), default=False)
 
-    '''
     @property
     def youtube_channel(self):
         if self.youtube_channel_class is None:
@@ -481,7 +478,6 @@ class Streamer(db.Model, UserMixin):
     @youtube_channel.deleter
     def youtube_channel(self, channel_id):
         del self.youtube_channel_class
-    '''
 
     # XXX: this is kinda ugly, but simple
     # nginx-rtmp supports only fixed number of redirects
