@@ -543,4 +543,4 @@ class Streamer(db.Model, UserMixin):
             for ys in yc.streams:
                 ys.streamer = self
 
-        self.youtube_channel = yc if yc else None
+        self.youtube_channel_class = yc if yc else None
