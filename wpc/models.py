@@ -244,7 +244,7 @@ class YoutubeStream(Stream):
             elif self.streamer is not None:
                 # if streamer has no yc and didn't ever checked profile
                 if not self.streamer.checked:
-                    self.streamer.yc = self.youtube_channel
+                    self.streamer.youtube_channel_class = self.youtube_channel
                 # otherwise
                 else:
                     self.streamer = None
