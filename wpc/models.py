@@ -235,8 +235,8 @@ class YoutubeStream(Stream):
         for item in r.json()['items']:
 
             self.youtube_channel = get_or_create(YoutubeChannel,
-                                                 channel_id=item['snippet']['channelId'],
-                                                 title=item['snippet']['channelTitle'])
+                                                 channel_id=item['snippet']['channelId'])
+            self.youtube_channel.title = item['snippet']['channelTitle']
 
             # if there is streamer with this channel
             if self.youtube_channel.streamer is not None:
