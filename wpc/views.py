@@ -328,16 +328,16 @@ def reddit_authorize_callback():
     r = praw.Reddit(user_agent=app.config["REDDIT_WEB_APP_USER_AGENT"])
     r.set_oauth_app_info(app.config['REDDIT_API_ID'], app.config['REDDIT_API_SECRET'], url_for('.reddit_authorize_callback', _external=True))
     name = None
-    if True:  # str(session['unique_key']) == request.args.get('state', ''):
-        code = request.args.get('code', '')
-        if code:
-            r.get_access_information(code)
-            name = r.get_me().name
-            if name:
-                user = get_or_create(Streamer, reddit_username=name)
-                db.session.commit()
-                login_user(user, remember=True)
-                flash("Logged in successfully", 'success')
+
+    code = request.args.get('code', '')
+    if code:
+        r.get_access_information(code)
+        name = r.get_me().name
+        if name:
+            user = get_or_create(Streamer, reddit_username=name)
+            db.session.commit()
+            login_user(user, remember=True)
+            flash("Logged in successfully", 'success')
 
     if not name:
         flash("Error while trying to log in", 'error')
@@ -448,7 +448,7 @@ def podcast_feed():
                     mimetype='application/rss+xml')
 
 
-chat_users = list()
+chat_users = set()
 
 
 @socketio.on('connect', namespace='/chat')
@@ -473,8 +473,8 @@ def chat_initialize():
         while True:
             session['username'] = random.choice(first_words) + ' ' + random.choice(second_words)
             if session['username'] not in chat_users:
+                chat_users.add(session['username'])
                 break
-    chat_users.append(session['username'])
     db.session.close()
 
 
@@ -510,16 +510,15 @@ def join(streamer_username):
 
 @socketio.on('disconnect', namespace='/chat')
 def chat_disconnect():
-    if 'username' in session:
+    if 'username' in session and not current_user.is_authenticated:
         chat_users.remove(session['username'])
 
 
 @socketio.on('message', namespace='/chat')
 def chat_message(message_text, streamer_username):
     streamer = check_chat_access_and_get_streamer(streamer_username)
-    # TODO: this is quickfix
     if len(message_text) > 2048:
-        message_text = u"{}...".format(message_text[:2045])
+        message_text = u"{}... <message is too big>".format(message_text[:2048])
     message = {"sender": session['username'],
                "text": nl2br_py(message_text)}
     if current_user.is_anonymous() and\

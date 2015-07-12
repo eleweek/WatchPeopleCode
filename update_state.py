@@ -152,7 +152,7 @@ def update_flairs():
                 if stream:
                     # set user flair
                     if s.author and not wpc_subreddit.get_flair(s.author)['flair_text'] and\
-                            stream.streamer and stream.streamer.reddit_username == s.author:
+                            stream.streamer and stream.streamer.reddit_username == s.author.name:
                         wpc_subreddit.set_flair(s.author, flair_text='Streamer', flair_css_class='text-white background-blue')
 
                     # set link flairs
