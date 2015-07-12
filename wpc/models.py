@@ -476,7 +476,7 @@ class Streamer(db.Model, UserMixin):
         self.youtube_channel_class = get_or_create(YoutubeChannel, channel_id=channel_id)
 
     @youtube_channel.deleter
-    def youtube_channel(self, channel_id):
+    def youtube_channel(self):
         del self.youtube_channel_class
 
     # XXX: this is kinda ugly, but simple
