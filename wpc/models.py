@@ -189,7 +189,7 @@ class YoutubeChannel(db.Model):
         return hash(self.channel_id)
 
     def __repr__(self):
-        return '<YoutubeChannel {} with title {}>'.format(self.channel_id, self.title)
+        return u'<YoutubeChannel {} with title {}>'.format(self.channel_id, self.title)
 
 
 class YoutubeStream(Stream):
