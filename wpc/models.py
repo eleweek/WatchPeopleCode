@@ -477,7 +477,7 @@ class Streamer(db.Model, UserMixin):
 
     @youtube_channel.deleter
     def youtube_channel(self):
-        del self.youtube_channel_class
+        self.youtube_channel_class = None
 
     # XXX: this is kinda ugly, but simple
     # nginx-rtmp supports only fixed number of redirects
