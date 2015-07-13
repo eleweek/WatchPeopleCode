@@ -14,10 +14,6 @@
   {# do not move the next string, it's here because it's needed before using jwplayer #}
   <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
   <div class="container-fluid">
-    <div class="col-xs-offset-2 col-xs-8">
-      <p class="text-center"><a href={{url_for(".index")}}>Back to main page</a></p>
-    </div>
-
     <div class="col-xs-8">
       <strong>Reddit username:</strong> <a href='http://www.reddit.com/user/{{ streamer.reddit_username }}'>{{ streamer.reddit_username }}</a>
         <div class="info-block" {% if edit %} style="display:none;" {% endif %}>
