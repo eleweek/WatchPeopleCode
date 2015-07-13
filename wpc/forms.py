@@ -1,4 +1,5 @@
-from wpc.models import Subscriber, Streamer
+from wpc.models import Subscriber, Streamer, YoutubeChannel
+from wpc.flask_utils import get_or_create
 
 from flask_wtf import Form
 from wtforms import StringField, SubmitField, validators, TextAreaField
@@ -104,7 +105,7 @@ class EditStreamerInfoForm(Form):
             # FIXME: add explanation here or hint to page
             raise ValidationError("This field should contain valid youtube channel.")
 
-        streamer = Streamer.query.filter_by(youtube_channel=yc).first()
+        streamer = get_or_create(YoutubeChannel, channel_id=yc).streamer
         if streamer and streamer.checked and streamer != current_user:
             raise ValidationError("There is another user with this channel. If it is your channel, please message about that to r/WatchPeoplecode moderators.")
 
