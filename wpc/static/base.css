@@ -49,3 +49,7 @@
 #dashboard_rtmp_url,#dashboard_rtmp_key {
     cursor: auto;
 }
+
+.navbar {
+    border-radius: 0px;
+}
