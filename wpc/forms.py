@@ -26,6 +26,15 @@ class GLMSubscribeForm(Form):
     submit_button = SubmitField('Subscribe')
 
 
+class DashboardEmailForm(Form):
+    email = StringField("Email address", [validators.DataRequired(), validators.Email()])
+    submit_button = SubmitField('Update')
+
+    def prepopulate(self, streamer):
+        if streamer.as_subscriber:
+            self.email.data = streamer.as_subscriber.email
+
+
 class IdeaForm(Form):
     description = TextAreaField("Soo... Streamers need your ideas. What kind of streams would you like to see here?", [validators.DataRequired()])
     submit_button = SubmitField('Submit your idea')

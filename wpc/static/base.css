@@ -49,3 +49,11 @@
 #dashboard_rtmp_url,#dashboard_rtmp_key {
     cursor: auto;
 }
+
+div.email-info {
+    max-width: 400px;
+}
+
+div.private-info {
+    padding-top: 20px;
+}

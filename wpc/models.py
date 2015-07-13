@@ -510,6 +510,17 @@ class Streamer(db.Model, UserMixin):
         wpcs.status = 'completed' if not wpcs.status else wpcs.status
         db.session.commit()
 
+    def populate_email(self, email):
+        if not self.as_subscriber or len(self.as_subscriber.as_streamer) > 1:
+            self.as_subscriber = get_or_create(Subscriber, email=email)
+        else:
+            alredy_existing_subscriber = Subscriber.query.filter_by(email=email).first()
+            if alredy_existing_subscriber:
+                db.session.delete(self.as_subscriber)
+                self.as_subscriber = alredy_existing_subscriber
+            else:
+                self.as_subscriber.email = email
+
     def populate(self, form):
         self.info = form.info.data
         tc = form.twitch_channel_extract()

@@ -2,7 +2,7 @@ from wpc import db, app, socketio
 from wpc.flask_utils import url_for_other_page, url_change_args, nl2br, nl2br_py, get_or_create, is_safe_url
 from wpc.models import MozillaStreamHack  # NOQA
 from wpc.models import YoutubeStream, WPCStream, Stream, Streamer, Subscriber, Idea, ChatMessage
-from wpc.forms import SubscribeForm, GLMSubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm, IdeaForm, RtmpRedirectForm
+from wpc.forms import SubscribeForm, GLMSubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm, IdeaForm, RtmpRedirectForm, DashboardEmailForm
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session, abort
 from flask.ext.login import login_user, logout_user, login_required, current_user
@@ -287,15 +287,26 @@ app.add_url_rule('/streamer/<streamer_name>/<int:page>',
 @app.route('/dashboard', methods=['POST', 'GET'])
 @login_required
 def dashboard():
-    rtmp_redirect_form = RtmpRedirectForm()
+    rtmp_redirect_form = RtmpRedirectForm(prefix='rtmpform')
+    email_form = DashboardEmailForm(prefix='emailform')
+
     if request.method == "GET":
         rtmp_redirect_form.prepopulate(current_user)
+        email_form.prepopulate(current_user)
+
     if rtmp_redirect_form.validate_on_submit():
         rtmp_redirect_form.populate_obj(current_user)
         db.session.commit()
         flash('Successfully updated RTMP redirects!', 'success')
         return redirect(url_for("dashboard"))
-    return render_template("dashboard.html", rtmp_redirect_form=rtmp_redirect_form)
+
+    if email_form.validate_on_submit():
+        current_user.populate_email(email_form.email.data)
+        db.session.commit()
+        flash('Successfully updated your email address!', 'success')
+        return redirect(url_for("dashboard"))
+
+    return render_template("dashboard.html", rtmp_redirect_form=rtmp_redirect_form, email_form=email_form)
 
 
 @app.route('/_subscribe_to_streamer', methods=["POST"])

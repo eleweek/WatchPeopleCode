@@ -5,14 +5,24 @@
 
 {% block content %}
   <div class="container">
-    <h2> Welcome to your dashboard, {{current_user.reddit_username}}!</h2>
-    {% if current_user.subscribers.count() %}
-      <h3> You have {{current_user.subscribers.count()}} subscribers!</h3>
-    {% endif %}
-    <p>
-      <button type="button" class="btn btn-default btn-primary show-private-info-button">Show private info</button>
-      <button type="button" class="btn btn-default btn-primary hide-private-info-button" style="display:none;">Hide private info</button>
-    </p>
+    <div class="row">
+      <div class="col-md-12">
+        <h2> Welcome to your dashboard, {{current_user.reddit_username}}!</h2>
+        {% if current_user.subscribers.count() %}
+          <h3> You have {{current_user.subscribers.count()}} subscribers!</h3>
+        {% endif %}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="email-info">
+          {{ wtf.quick_form(email_form) }}
+        </div>
+      </div>
+    </div>
+    <hr>
+    <button type="button" class="btn btn-default btn-primary show-private-info-button">Show private info</button>
+    <button type="button" class="btn btn-default btn-primary hide-private-info-button" style="display:none;">Hide private info</button>
     <div class="private-info" style="display:none;">
       <div class="row">
         <div class="col-md-8">
@@ -36,7 +46,7 @@
         </div>
       </div>
     </div>
-  <div>
+  </div>
 {% endblock %}
 
 {% block scripts %}
