@@ -4,7 +4,7 @@
 {% block html_attribs %} lang="en"{% endblock html_attribs %}
 
 {% block styles %}
-  {{super()}}
+  <link rel="stylesheet" href="{{url_for('static', filename='flatly.min.css')}}">
   <link rel="stylesheet" href="{{url_for('static', filename='base.css')}}">
 {% endblock %}
 
