@@ -205,6 +205,7 @@ def get_fixed_bonus_twitch_streams():
     # also make sure they stay lower than streams from subreddit
     for ts in TwitchStream.query.filter_by(channel='handmade_hero').all():
         ts._update_status()
+        db.session.commit()
 
 
 @sched.scheduled_job('interval', seconds=30)
