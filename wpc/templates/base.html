@@ -51,12 +51,12 @@
           {% if current_user.is_authenticated() %}
             <li {% if request.endpoint == "streamer_page" and request.view_args['streamer_name'] == current_user.reddit_username %} class="active" {% endif %}>
               <a href="{{ url_for("streamer_page", streamer_name=current_user.reddit_username) }}">
-                My Profile
+                Profile
               </a>
             </li>
             <li {% if request.endpoint == "dashboard" %} class="active" {% endif %}>
               <a href="{{ url_for("dashboard") }}">
-                My Dashboard
+                Dashboard
               </a>
             </li>
           {% endif %}
@@ -79,9 +79,9 @@
           </form>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-          <a href={{url_for(".streaming_guide")}} class="btn navbar-btn btn-primary">How to stream here</a>
+          <a href={{url_for(".streaming_guide")}} class="btn navbar-btn btn-primary">Streaming Guide</a>
           {% if current_user.is_anonymous() %}
-            <a href={{url_for(".authorize")}} class="btn navbar-btn btn-success"><i class="fa fa-reddit"></i> Sign in with reddit</a>
+            <a href={{url_for(".authorize")}} class="btn navbar-btn btn-success"><i class="fa fa-reddit"></i>Sign in with reddit</a>
           {% else %}
             <a href={{url_for(".logout")}} class="btn navbar-btn ">Logout</a>
           {% endif %}
