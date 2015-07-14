@@ -109,16 +109,7 @@ def onlineconf():
         Stream.actual_start_time.desc().nullsfirst(),
         Stream.id.desc()).all()
 
-    form = SubscribeForm()
-    if request.method == "POST" and form.validate_on_submit():
-        subscriber = Subscriber()
-        form.populate_obj(subscriber)
-        db.session.add(subscriber)
-        db.session.commit()
-        flash("you've subscribed successfully", "success")
-        return redirect(url_for('.index'))
-
-    return render_template('onlineconf.html', form=form, streams=streams)
+    return render_template('onlineconf.html', streams=streams)
 
 
 @app.route('/search', methods=['GET', 'POST'])
