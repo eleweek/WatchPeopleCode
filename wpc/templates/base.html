@@ -4,7 +4,8 @@
 {% block html_attribs %} lang="en"{% endblock html_attribs %}
 
 {% block styles %}
-  {{super()}}
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.5/flatly/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="{{url_for('static', filename='base.css')}}">
 {% endblock %}
 
@@ -80,7 +81,7 @@
         <ul class="nav navbar-nav navbar-right">
           <a href={{url_for(".streaming_guide")}} class="btn navbar-btn btn-primary">How to stream here</a>
           {% if current_user.is_anonymous() %}
-            <a href={{url_for(".authorize")}} class="btn navbar-btn btn-success">Sign in with reddit</a>
+            <a href={{url_for(".authorize")}} class="btn navbar-btn btn-success"><i class="fa fa-reddit"></i> Sign in with reddit</a>
           {% else %}
             <a href={{url_for(".logout")}} class="btn navbar-btn ">Logout</a>
           {% endif %}
