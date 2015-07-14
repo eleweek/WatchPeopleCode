@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% import "macros.html" as macros with context %}
 
-{% block title %} WatchPeopleCode: dashboard {% endblock %}
+{% block title %}WatchPeopleCode - Dashboard{% endblock %}
 
 {% block content %}
   <div class="container">
     <div class="row">
       <div class="col-md-12">
-        <h2> Welcome to your dashboard, {{current_user.reddit_username}}!</h2>
+        <h2>Welcome to your dashboard, {{current_user.reddit_username}}!</h2>
         {% if current_user.subscribers.count() %}
           <h3> You have {{current_user.subscribers.count()}} subscriber{% if current_user.subscribers.count() > 1 %}s{% endif %}!</h3>
         {% endif %}
