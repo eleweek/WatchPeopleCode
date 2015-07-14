@@ -18,7 +18,7 @@
   {% endif %}
   </div>
   <div class="container">
-    <h2 class="text-center"> Livestreams right now: {{ live_streams|length }}</h2>
+    <h2 class="text-center">Livestreams right now: {{ live_streams|length }}</h2>
     <div class="row">
 
       <div class="col-md-8">
@@ -28,14 +28,14 @@
           <p>
             {{ wtf.quick_form(idea_form) }}
           </p>
-          <h4> How about watching a random recorded stream? </h4>
+          <h4>How about watching a random recorded stream?</h4>
           {{ macros.stream_macro(random_stream, false, with_subscribe_button=true) }}
           <hr>
         {% endif %}
 
 
         {% if upcoming_streams %}
-          <h4> Upcoming streams </h4><br>
+          <h4>Upcoming streams</h4><br>
           {{ macros.streams(upcoming_streams, 'upcoming', true) }}
         {% endif %}
       </div>
@@ -45,7 +45,7 @@
         <form action="" method="POST" class="form form-subscribe" role="form">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h1 class="panel-title"> Subscribe to WatchPeopleCode news</h1>
+              <h1 class="panel-title">Subscribe to WatchPeopleCode news</h1>
             </div>
 
             <div class="panel-body">
@@ -56,7 +56,7 @@
               </div>
             </div>
           </div>
-          <p><b> Get notifications in twitter </b></p>
+          <p><b>Get notifications via Twitter</b></p>
           <a href="https://twitter.com/WatchPeopleCode" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @WatchPeopleCode</a>
         </form>
       </div>
