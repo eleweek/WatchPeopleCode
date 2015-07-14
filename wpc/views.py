@@ -10,6 +10,8 @@ from flask.ext.socketio import emit, join_room
 from jinja2 import Markup
 from flask.views import View
 
+from sqlalchemy import case
+
 from uuid import uuid4
 import praw
 import random
@@ -62,7 +64,16 @@ def streaming_guide():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    live_streams = Stream.query.filter_by(status='live').order_by(Stream.actual_start_time.desc().nullslast(), Stream.id.desc()).all()
+    live_streams = Stream.query.filter_by(status='live').order_by(
+        case(
+            [
+                (Stream.streamer_id == None, None),  # NOQA
+                (Stream.actual_start_time == None, None)
+            ],
+            else_=Stream.actual_start_time
+        )
+    ).all()
+
     # Uncomment this when mozilla guys start livestreaming
     # live_streams.insert(0, MozillaStreamHack())
 

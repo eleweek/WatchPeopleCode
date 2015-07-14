@@ -188,12 +188,12 @@ def update_flairs():
         app.logger.exception(e)
 
 
-def get_random_bonus_twitch_stream():
+def get_random_bonus_twitch_streams():
     app.logger.info("Getting random bonus twitch stream")
     r = requests_get_with_retries("https://api.twitch.tv/kraken/streams?game=Programming")
     streams = sorted([s for s in r.json()['streams']], key=lambda s: s['viewers'], reverse=True)
-    if streams:
-        ts = get_or_create(TwitchStream, channel=streams[0]['channel']['name'])
+    for stream in streams[:2]:
+        ts = get_or_create(TwitchStream, channel=stream['channel']['name'])
         ts._update_status()
         db.session.add(ts)
         db.session.commit()
@@ -224,8 +224,8 @@ def update_state():
     get_new_streams()
 
     try:
-        if not db.session.query(Stream.query.filter_by(status='live').exists()).scalar():
-            get_random_bonus_twitch_stream()
+        if Stream.query.filter_by(status='live').count() < 3:
+            get_random_bonus_twitch_streams()
         get_fixed_bonus_twitch_streams()
     except Exception as e:
         db.session.rollback()
