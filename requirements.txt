@@ -28,6 +28,7 @@ gunicorn==19.1.1
 humanize==0.5.1
 itsdangerous==0.24
 lxml==3.4.2
+newrelic==2.52.0.40
 praw==3.1.0
 psycopg2==2.5.4
 python-dateutil==2.4.1
