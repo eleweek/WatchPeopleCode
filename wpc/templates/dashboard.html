@@ -26,17 +26,19 @@
     <div class="private-info" style="display:none;">
       <div class="row">
         <div class="col-md-8">
-          <form>
-            <div class="form-group">
-              <label for="dashboard-rtmp-url">WatchPeopleCode RTMP URL</label>
-              <input type="text" class="form-control dashboard-rtmp-info" id="dashboard-rtmp-url" readonly value="rtmp://{{config['RTMP_SERVER']}}/live" onclick="this.select();">
-            </div>
-            <div class="form-group">
-              <label for="dashboard-rtmp-key">WatchPeopleCode RTMP Key</label>
+          <div class="form-group">
+            <label for="dashboard-rtmp-url">WatchPeopleCode RTMP URL</label>
+            <input type="text" class="form-control dashboard-rtmp-info" id="dashboard-rtmp-url" readonly value="rtmp://{{config['RTMP_SERVER']}}/live" onclick="this.select();">
+          </div>
+          <div class="form-group">
+            <label for="dashboard-rtmp-key">WatchPeopleCode RTMP Key</label>
+            <div class="input-group">
               <input type="text" class="form-control dashboard-rtmp-info dashboard-rtmp-key" id="dashboard-rtmp-key" readonly value="{{current_user.streaming_key()}}" onclick="this.select();">
+              <span class="input-group-btn">
+                <button class="btn btn-default regenerate-rtmp-key">Generate new key</button>
+              </span>
             </div>
-          </form>
-          <button class="btn btn-default btn-xs regenerate-rtmp-key">Generate new key</button>
+          </div>
         </div>
       </div>
       <hr>

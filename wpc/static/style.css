@@ -48,6 +48,10 @@
     cursor: auto;
 }
 
+.dashboard-rtmp-key {
+    width: 100%;
+}
+
 div.email-info {
     max-width: 400px;
 }
