@@ -3,14 +3,11 @@
     z-index: 10;
 }
 
-.btn-sign {
-  border-radius: 0;
-}
-
 .stream-title {
     padding-bottom: 5px;
 }
 
+/* Fixes for scrollbar in chat */
 ::-webkit-scrollbar {
     -webkit-appearance: none;
     width: 7px;
@@ -22,6 +19,7 @@
     -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
 }
 
+/* Responsive YT/Twitch video players */
 .video-container {
     position: relative;
     padding-bottom: 62.5%;
@@ -58,6 +56,7 @@ div.private-info {
     padding-top: 20px;
 }
 
+/* Flatly navbar is no longer rounded */
 .navbar {
     border-radius: 0px;
 }
