@@ -409,10 +409,10 @@ class TwitchStream(Stream):
 
 class MozillaStreamHack(object):
     def html_code(self, autoplay=None):
-        return '''<iframe src="https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-18/video/" width="640" height="380" frameborder="0" allowfullscreen></iframe>'''  # NOQA
+        return '''<iframe src="https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-21/video/" width="640" height="380" frameborder="0" allowfullscreen></iframe>'''  # NOQA
 
     def normal_url(self):
-        return "https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-18/"
+        return "https://air.mozilla.org/the-joy-of-coding-mconley-livehacks-on-firefox-episode-21/"
 
     def __init__(self):
         self.id = 0
