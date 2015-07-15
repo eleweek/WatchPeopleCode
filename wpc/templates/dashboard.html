@@ -28,15 +28,15 @@
         <div class="col-md-8">
           <form>
             <div class="form-group">
-              <label for="rtmp_url">WatchPeopleCode RTMP URL</label>
-              <input type="text" class="form-control" id="dashboard_rtmp_url" readonly value="rtmp://{{config['RTMP_SERVER']}}/live" onclick="this.select();">
+              <label for="dashboard-rtmp-url">WatchPeopleCode RTMP URL</label>
+              <input type="text" class="form-control dashboard-rtmp-info" id="dashboard-rtmp-url" readonly value="rtmp://{{config['RTMP_SERVER']}}/live" onclick="this.select();">
             </div>
             <div class="form-group">
-              <label for="rtmp_key">WatchPeopleCode RTMP Key</label>
-              <input type="text" class="form-control" id="dashboard_rtmp_key" readonly value="{{current_user.streaming_key()}}" onclick="this.select();">
+              <label for="dashboard-rtmp-key">WatchPeopleCode RTMP Key</label>
+              <input type="text" class="form-control dashboard-rtmp-info dashboard-rtmp-key" id="dashboard-rtmp-key" readonly value="{{current_user.streaming_key()}}" onclick="this.select();">
             </div>
           </form>
-          <button class="btn btn-default btn-xs" id="regenerate-rtmp-key">Generate new key</button>
+          <button class="btn btn-default btn-xs regenerate-rtmp-key">Generate new key</button>
         </div>
       </div>
       <hr>
@@ -63,9 +63,9 @@
         $(".hide-private-info-button").hide();
         $(".private-info").hide();
       });
-      $("#regenerate-rtmp-key").click(function() {
+      $(".regenerate-rtmp-key").click(function() {
         $.ajax("/_regenerate_rtmp_key").done(function(data){
-            $('#dashboard_rtmp_key').val(data.rtmp_key);
+            $('.dashboard-rtmp-key').val(data.rtmp_key);
         });
       });
     }($, window));

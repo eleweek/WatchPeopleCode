@@ -44,7 +44,7 @@
     margin-top: 5px;
 }
 
-#dashboard_rtmp_url,#dashboard_rtmp_key {
+.dashboard-rtmp-info {
     cursor: auto;
 }
 
