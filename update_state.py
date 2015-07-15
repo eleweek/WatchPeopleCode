@@ -201,9 +201,8 @@ def get_random_bonus_twitch_streams():
 
 def get_fixed_bonus_twitch_streams():
     app.logger.info("Checking fixed bonus twitch streams")
-    # TODO: larger selection of streams
-    # also make sure they stay lower than streams from subreddit
-    for ts in TwitchStream.query.filter_by(channel='handmade_hero').all():
+    channels = ['handmade_hero', '317070', 'apostolique']
+    for ts in TwitchStream.query.filter(TwitchStream.channel.in_(channels)).all():
         ts._update_status()
         db.session.commit()
 
