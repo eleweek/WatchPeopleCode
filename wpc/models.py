@@ -22,6 +22,11 @@ class Anon(AnonymousUserMixin):
         email = request.cookies.get("email")
         return email and streamer and get_or_create(Subscriber, email=email) in streamer.subscribers
 
+
+class CaseInsensitiveComparator(ColumnProperty.Comparator):
+    def __eq__(self, other):
+        return db.func.lower(self.__clause_element__()) == db.func.lower(other)
+
 login_manager.anonymous_user = Anon
 
 stream_submission = db.Table('stream_submission',
@@ -296,7 +301,7 @@ class YoutubeStream(Stream):
 
 
 class TwitchStream(Stream):
-    channel = db.Column(db.String(25), unique=True)
+    channel = db.column_property(db.Column(db.String(25), unique=True), comparator_factory=CaseInsensitiveComparator)
     last_time_live = db.Column(db.DateTime())
 
     def __init__(self, channel):
@@ -418,11 +423,6 @@ class MozillaStreamHack(object):
         self.id = 0
         self.current_viewers = None
         self.streamer = Streamer.query.filter_by(reddit_username='good_grief').one()
-
-
-class CaseInsensitiveComparator(ColumnProperty.Comparator):
-    def __eq__(self, other):
-        return db.func.lower(self.__clause_element__()) == db.func.lower(other)
 
 
 class Subscriber(db.Model):
