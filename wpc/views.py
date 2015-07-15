@@ -71,7 +71,7 @@ def index():
                 (Stream.actual_start_time == None, None)
             ],
             else_=Stream.actual_start_time
-        )
+        ).desc().nullslast()
     ).all()
 
     # Uncomment this when mozilla guys start livestreaming
