@@ -44,8 +44,12 @@
     margin-top: 5px;
 }
 
-#dashboard_rtmp_url,#dashboard_rtmp_key {
+.dashboard-rtmp-info {
     cursor: auto;
+}
+
+.dashboard-rtmp-key {
+    width: 100%;
 }
 
 div.email-info {
@@ -63,6 +67,10 @@ div.private-info {
 
 .edit-title-button {
     margin-left: 10px;
+}
+
+.edit-info-button {
+    margin-top: 10px;
 }
 
 /* Fix modals with flatly theme */
