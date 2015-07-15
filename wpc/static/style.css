@@ -69,6 +69,10 @@ div.private-info {
     margin-left: 10px;
 }
 
+.edit-info-button {
+    margin-top: 10px;
+}
+
 /* Fix modals with flatly theme */
 .modal-dialog {
     z-index: 1050;
