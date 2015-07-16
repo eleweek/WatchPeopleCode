@@ -10,7 +10,7 @@
     {# title & #}
     <div class="stream-title">
 
-    <a href={{ stream.normal_url() }}><span class="stream-title-name">{{ stream.title if stream.title else stream.normal_url() }}</span></a>
+      <a href={{ stream.normal_url() }}><span class="stream-title-name {% if title_form %} editable-stream-title-name {% endif %}">{{ stream.title if stream.title else stream.normal_url() }}</span></a>
 
     {% if stream.streamer %}
     by <a href={{ url_for('.streamer_page', streamer_name=stream.streamer.reddit_username) }}>{{ stream.streamer.reddit_username }}</a>
