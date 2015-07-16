@@ -93,10 +93,11 @@
       <form class="compose-message-form">
         <div class="form-group">
           <textarea class="form-control" name="message"></textarea>
-          <br>
-          <button class="btn btn-success btn-sm" type="submit">Send </button>
-          {% set popout_url = url_for('streamer_popout_chat', streamer_name=streamer.reddit_username) %}
-          <a href="#" target="popup" class="btn btn-sm popup" onclick="window.open('{{popout_url}}','name','width=350,height=650')" >Pop out</a>
+          <div class="chat-buttons">
+            <button class="btn btn-success btn-send" type="submit">Send</button>
+            {% set popout_url = url_for('streamer_popout_chat', streamer_name=streamer.reddit_username) %}
+            <a href="#" target="popup" class="btn popup" onclick="window.open('{{popout_url}}','name','width=350,height=650')" >Pop out</a>
+          </div>
         </div>
       </form>
     </div>

@@ -18,6 +18,23 @@
     word-wrap: break-word;
 }
 
+.chat-buttons {
+    margin-top: 15px;
+}
+
+.panel-chat .btn-send {
+    margin-left: 1px;
+    padding: 5px 10px;
+}
+
+.panel-chat .popup {
+    padding: 5px 2px;
+}
+
+.panel-chat .popup:hover {
+    color: #128f76;
+}
+
 #chat-div {
     min-width: 200px;
 }
