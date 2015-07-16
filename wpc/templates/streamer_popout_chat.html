@@ -23,7 +23,9 @@
           <textarea class="form-control" name="message"></textarea>
           <br>
           <button class="btn btn-info btn-sm" type="submit">Send </button>
-          <span class="viewers-count-stream viewers-count-stream-{{stream.id}} pull-right">{{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}</span>
+          {% if stream.current_viewers is not none %}
+            <span class="viewers-count-stream viewers-count-stream-{{stream.id}} pull-right">{{ stream.current_viewers }} {{ 'viewers' if stream.current_viewers != 1 else 'viewer' }}</span>
+          {% endif %}
         </div>
       </form>
     </div>
