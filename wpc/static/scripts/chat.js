@@ -154,6 +154,7 @@
 
         chatAPI.onLastMessages = function(messages){
             var msgs = $(".messages");
+            msgs.empty();
             for (i = 0; i < messages.length; i++ ) {
                 msgs.append(
                     jQuery("<li>").html(
