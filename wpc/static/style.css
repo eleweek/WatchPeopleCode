@@ -77,3 +77,22 @@ div.private-info {
 .modal-dialog {
     z-index: 1050;
 }
+
+.form-subscribe .form-control {
+    border-top-left-radius: 4px !important;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 4px !important;
+}
+
+.form-subscribe .input-group {
+    margin-bottom: 5px;
+}
+
+.form-subscribe .panel-body {
+    height: 100px;
+}
+
+.form-subscribe p.error {
+    color: #E74C3C;
+}

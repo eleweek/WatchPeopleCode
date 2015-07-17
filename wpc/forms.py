@@ -18,7 +18,7 @@ def validate_email_unique(form, field):
 
 class SubscribeForm(Form):
     email = StringField("Email address", [validators.DataRequired(), validators.Email(), validate_email_unique])
-    submit_button = SubmitField('Subscribe')
+    submit_button = SubmitField('Subscribe!')
 
 
 # TODO: better way

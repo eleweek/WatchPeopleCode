@@ -40,20 +40,23 @@
         <form action="" method="POST" class="form form-subscribe" role="form">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h1 class="panel-title">Subscribe to WatchPeopleCode news</h1>
+              <h1 class="panel-title">Subscribe to our newsletters</h1>
             </div>
 
             <div class="panel-body">
-              <div class="form-group">
-                {{ subscribe_form.hidden_tag() }}
-                {{ wtf.form_field(subscribe_form.email, value="") }}
-                {{ wtf.form_field(subscribe_form.submit_button, button_map={'submit_button': 'primary'}) }}
+              {{ subscribe_form.hidden_tag() }}
+              <div class="input-group">
+                {{ wtf.form_field(subscribe_form.email, form_type="inline", value="", placeholder="Your e-mail") }}
+                <span class="input-group-btn">
+                  {{ wtf.form_field(subscribe_form.submit_button, button_map={'submit_button': 'primary'}) }}
+                </span>
               </div>
+              {{ wtf.form_errors(subscribe_form) }}
             </div>
           </div>
-          <p><b>Get notifications via Twitter</b></p>
-          <a href="https://twitter.com/WatchPeopleCode" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @WatchPeopleCode</a>
         </form>
+        <p><b>Get notifications via Twitter</b></p>
+        <a href="https://twitter.com/WatchPeopleCode" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @WatchPeopleCode</a>
       </div>
     </div>
 
