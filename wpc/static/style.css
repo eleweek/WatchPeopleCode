@@ -52,7 +52,8 @@
     width: 100%;
 }
 
-div.email-info {
+div.email-info-form,
+div.add-video-form {
     max-width: 400px;
 }
 
@@ -95,4 +96,8 @@ div.private-info {
 
 .form-subscribe p.error {
     color: #E74C3C;
+}
+
+.tab-content {
+    padding-top: 15px;
 }

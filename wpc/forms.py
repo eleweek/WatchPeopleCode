@@ -1,5 +1,6 @@
-from wpc.models import Subscriber, Streamer, YoutubeChannel
+from wpc.models import Subscriber, Streamer, YoutubeChannel, YoutubeStream
 from wpc.flask_utils import get_or_create
+from utils import youtube_video_id
 
 from flask_wtf import Form
 from wtforms import StringField, SubmitField, validators, TextAreaField
@@ -34,6 +35,20 @@ class DashboardEmailForm(Form):
     def prepopulate(self, streamer):
         if streamer.as_subscriber:
             self.email.data = streamer.as_subscriber.email
+
+
+class DashboardAddVideoForm(Form):
+    link = StringField("Youtube link", [validators.DataRequired()])
+    submit_button = SubmitField('Add video to the archive')
+
+    def validate_link(form, field):
+        ytid = youtube_video_id(field.data)
+        if not ytid:
+            raise ValidationError("Invalid Youtube URL")
+
+        existing_stream = YoutubeStream.query.filter_by(ytid=ytid).first()
+        if existing_stream and existing_stream.streamer:
+            raise ValidationError("This video is already added by {}".format(existing_stream.streamer.reddit_username))
 
 
 class IdeaForm(Form):

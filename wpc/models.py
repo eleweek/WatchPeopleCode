@@ -202,8 +202,8 @@ class YoutubeStream(Stream):
     vod_views = db.Column(db.Integer)
     youtube_channel_id = db.Column(db.String(24), db.ForeignKey('youtube_channel.channel_id'))
 
-    def __init__(self, id):
-        self.ytid = id
+    def __init__(self, ytid):
+        self.ytid = ytid
         self.submissions = []
 
     def __eq__(self, other):
@@ -227,6 +227,8 @@ class YoutubeStream(Stream):
 
     def _update_status(self):
         app.logger.info("Updating status for {}".format(self))
+        print "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(self.ytid, app.config['YOUTUBE_KEY'])
+
         r = requests_get_with_retries(
             "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(
                 self.ytid, app.config['YOUTUBE_KEY']), retries_num=15)

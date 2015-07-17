@@ -2,7 +2,8 @@ from wpc import db, app, socketio
 from wpc.flask_utils import url_for_other_page, url_change_args, nl2br, nl2br_py, get_or_create, is_safe_url
 from wpc.models import MozillaStreamHack  # NOQA
 from wpc.models import YoutubeStream, WPCStream, Stream, Streamer, Subscriber, Idea, ChatMessage
-from wpc.forms import SubscribeForm, GLMSubscribeForm, EditStreamerInfoForm, EditStreamTitleForm, SearchForm, IdeaForm, RtmpRedirectForm, DashboardEmailForm
+from wpc.forms import SubscribeForm, GLMSubscribeForm, EditStreamerInfoForm, EditStreamTitleForm,\
+                      SearchForm, IdeaForm, RtmpRedirectForm, DashboardEmailForm, DashboardAddVideoForm  # NOQA
 
 from flask import render_template, request, redirect, url_for, flash, jsonify, g, Response, session, abort
 from flask.ext.login import login_user, logout_user, login_required, current_user
@@ -11,6 +12,8 @@ from jinja2 import Markup
 from flask.views import View
 
 from sqlalchemy import case
+
+from utils import youtube_video_id
 
 from uuid import uuid4
 import praw
@@ -291,6 +294,7 @@ app.add_url_rule('/streamer/<streamer_name>/<int:page>',
 def dashboard():
     rtmp_redirect_form = RtmpRedirectForm(prefix='rtmpform')
     email_form = DashboardEmailForm(prefix='emailform')
+    add_video_form = DashboardAddVideoForm(prefix='addvideoform')
 
     if request.method == "GET":
         rtmp_redirect_form.prepopulate(current_user)
@@ -308,7 +312,24 @@ def dashboard():
         flash('Successfully updated your email address!', 'success')
         return redirect(url_for("dashboard"))
 
-    return render_template("dashboard.html", rtmp_redirect_form=rtmp_redirect_form, email_form=email_form)
+    if add_video_form.validate_on_submit():
+        ytid = youtube_video_id(add_video_form.link.data)
+        ys = get_or_create(YoutubeStream, ytid=ytid)
+        ys.streamer = current_user
+
+        for i in xrange(10):
+            try:
+                ys._update_status()
+                db.session.commit()
+                break
+            except Exception as e:
+                app.logger.error("Failed to add youtube video {}".format(ys))
+                app.logger.exception(e)
+        else:
+            flash("Failed to add youtube video! Try again?", 'error')
+            app.logger.error("Failed to add youtube video multiple times {}".format(ys))
+
+    return render_template("dashboard.html", rtmp_redirect_form=rtmp_redirect_form, email_form=email_form, add_video_form=add_video_form)
 
 
 @app.route('/_subscribe_to_streamer', methods=["POST"])
