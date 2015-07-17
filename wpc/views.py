@@ -93,7 +93,7 @@ def index():
 
     random_stream = YoutubeStream.query.filter(YoutubeStream.status != 'upcoming').order_by(db.func.random()).first()
     upcoming_streams = Stream.query.filter_by(status='upcoming').order_by(Stream.scheduled_start_time.asc()).all()
-    regular_streamer = Streamer.query.filter_by(reddit_username='glm_talkshow').one()
+    regular_streamer = Streamer.query.filter_by(reddit_username='gkbrk').one()
     return render_template('index.html', subscribe_form=subscribe_form, idea_form=idea_form, live_streams=live_streams,
                            random_stream=random_stream,
                            upcoming_streams=upcoming_streams,

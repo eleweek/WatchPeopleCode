@@ -5,13 +5,11 @@
   {{super()}}
   {# do not move the next string, it's here because it's needed before using jwplayer #}
   <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
-  {% if false %}
-    <div class="alert alert-info alert-dismissible regular-streamer-alert" role="alert">
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <strong> 5th episode of programming talk show is today at 16:00 UTC! </strong> <a href="http://watchpeoplecode.com/streamer/glm_talkshow">Talking to Geoff Greer, ag, floobits.</a> <button class="btn btn-success btn-xs subscribe-button subscribe-button-{{regular_streamer.id}} regular-streamer-subscribe-button">Subscribe</button>
+  <div class="alert alert-info alert-dismissible regular-streamer-alert" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    Check out <a class="alert-link" href="https://www.youtube.com/watch?v=FYHGKYgFlXQ">latest gamedev timelapse</a> by <a class="alert-link" href="{{url_for("streamer_page", streamer_name='gkbrk')}}">gkbrk</a> {#<button class="btn btn-success btn-xs subscribe-button subscribe-button-{{regular_streamer.id}} regular-streamer-subscribe-button"> Follow </button> #}
 
-    </div>
-  {% endif %}
+  </div>
   <div class="container">
     <h2 class="text-center">Livestreams right now: {{ live_streams|length }}</h2>
     <div class="row">
