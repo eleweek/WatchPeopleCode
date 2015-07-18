@@ -81,7 +81,7 @@
         <ul class="nav navbar-nav navbar-right">
           <a href={{url_for(".streaming_guide")}} class="btn navbar-btn btn-primary">Streaming Guide</a>
           {% if current_user.is_anonymous() %}
-            <a href={{url_for(".authorize")}} class="btn navbar-btn btn-success"><i class="fa fa-reddit"></i>Sign in with reddit</a>
+            <a href={{url_for(".authorize")}} class="btn navbar-btn btn-success"><i class="fa fa-reddit"></i>&nbsp; Sign in with reddit</a>
           {% else %}
             <a href={{url_for(".logout")}} class="btn navbar-btn ">Logout</a>
           {% endif %}
