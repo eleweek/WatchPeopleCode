@@ -112,7 +112,6 @@ def idea_list():
     return render_template("idea_list.html", ideas=ideas, idea_form=idea_form)
 
 
-# TODO it is copypasted from index(), but whatever, this is one time change
 @app.route('/onlineconf', methods=['GET', 'POST'])
 def onlineconf():
     streams = YoutubeStream.query.filter_by(confstream=True).filter(
