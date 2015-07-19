@@ -15,13 +15,13 @@
     </div>
     <div class="row">
         <ul class="nav nav-tabs" role="tablist">
-          <li role="presentation" class="active"><a href="#streaming" aria-controls="home" role="tab" data-toggle="tab">Streaming</a></li>
-          <li role="presentation"><a href="#email" aria-controls="profile" role="tab" data-toggle="tab">Email</a></li>
-          <li role="presentation"><a href="#video-archive" aria-controls="messages" role="tab" data-toggle="tab">Video archive</a></li>
+          <li role="presentation" {% if tab == "streaming" %} class="active" {% endif %}><a href="#streaming" aria-controls="home" role="tab" data-toggle="tab">Streaming</a></li>
+          <li role="presentation" {% if tab == "email" %} class="active" {% endif %}><a href="#email" aria-controls="profile" role="tab" data-toggle="tab">Email</a></li>
+          <li role="presentation" {% if tab == "video-archive" %} class="active" {% endif %}><a href="#video-archive" aria-controls="messages" role="tab" data-toggle="tab">Video archive</a></li>
         </ul>
 
         <div class="tab-content">
-          <div role="tabpanel" class="tab-pane active" id="streaming">
+          <div role="tabpanel" class="tab-pane {% if tab == 'streaming' %} active {% endif %}" id="streaming">
             <button type="button" class="btn btn-default btn-primary show-private-info-button">Show private info <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button>
             <button type="button" class="btn btn-default btn-primary hide-private-info-button" style="display:none;">Hide private info <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span></button>
             <div class="private-info" style="display:none;">
@@ -49,12 +49,12 @@
               </div>
             </div>
           </div>
-          <div role="tabpanel" class="tab-pane" id="email">
+          <div role="tabpanel" class="tab-pane {% if tab == 'email' %} active {% endif %}" id="email">
             <div class="email-info-form">
               {{ wtf.quick_form(email_form) }}
             </div>
           </div>
-          <div role="tabpanel" class="tab-pane" id="video-archive">
+          <div role="tabpanel" class="tab-pane {% if tab == 'video-archive' %} active {% endif %}" id="video-archive">
             <div class="add-video-form">
               {{ wtf.quick_form(add_video_form) }}
             </div>

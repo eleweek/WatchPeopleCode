@@ -289,9 +289,10 @@ app.add_url_rule('/streamer/<streamer_name>/<int:page>',
                  view_func=streamer_page)
 
 
-@app.route('/dashboard', methods=['POST', 'GET'])
+@app.route('/dashboard/<tab>', methods=['POST', 'GET'])
+@app.route('/dashboard', defaults={"tab": "streaming"}, methods=['POST', 'GET'])
 @login_required
-def dashboard():
+def dashboard(tab):
     rtmp_redirect_form = RtmpRedirectForm(prefix='rtmpform')
     email_form = DashboardEmailForm(prefix='emailform')
     add_video_form = DashboardAddVideoForm(prefix='addvideoform')
@@ -304,13 +305,13 @@ def dashboard():
         rtmp_redirect_form.populate_obj(current_user)
         db.session.commit()
         flash('Successfully updated RTMP redirects!', 'success')
-        return redirect(url_for("dashboard"))
+        return redirect(url_for("dashboard", tab="streaming"))
 
     if email_form.validate_on_submit():
         current_user.populate_email(email_form.email.data)
         db.session.commit()
         flash('Successfully updated your email address!', 'success')
-        return redirect(url_for("dashboard"))
+        return redirect(url_for("dashboard", tab="email"))
 
     if add_video_form.validate_on_submit():
         ytid = youtube_video_id(add_video_form.link.data)
@@ -321,6 +322,7 @@ def dashboard():
             try:
                 ys._update_status()
                 db.session.commit()
+                flash("Successfully added youtube video!", 'success')
                 break
             except Exception as e:
                 app.logger.error("Failed to add youtube video {}".format(ys))
@@ -328,8 +330,13 @@ def dashboard():
         else:
             flash("Failed to add youtube video! Try again?", 'error')
             app.logger.error("Failed to add youtube video multiple times {}".format(ys))
+        return redirect(url_for("dashboard", tab="video-archive"))
 
-    return render_template("dashboard.html", rtmp_redirect_form=rtmp_redirect_form, email_form=email_form, add_video_form=add_video_form)
+    return render_template("dashboard.html",
+                           rtmp_redirect_form=rtmp_redirect_form,
+                           email_form=email_form,
+                           add_video_form=add_video_form,
+                           tab=tab)
 
 
 @app.route('/_subscribe_to_streamer', methods=["POST"])
