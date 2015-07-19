@@ -52,7 +52,8 @@
     width: 100%;
 }
 
-div.email-info {
+div.email-info-form,
+div.add-video-form {
     max-width: 400px;
 }
 
@@ -99,4 +100,8 @@ div.private-info {
 
 form[role=search] .form-control:focus {
     border-color: #98BEC2;
+}
+
+.tab-content {
+    padding-top: 15px;
 }
