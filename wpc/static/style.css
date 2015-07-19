@@ -96,3 +96,7 @@ div.private-info {
 .form-subscribe p.error {
     color: #E74C3C;
 }
+
+form[role=search] .form-control:focus {
+    border-color: #98BEC2;
+}

@@ -74,8 +74,12 @@
         <ul class="nav navbar-nav">
           <form action="{{url_for('search')}}" method="POST" class="navbar-form" role="search">
             {{ g.search_form.hidden_tag() }}
-            <input class="form-control" id="query" name="query" required type="text" value="">
-            {{ wtf.form_field(g.search_form.search_button) }}
+            <div class="input-group">
+              <input class="form-control" id="query" name="query" required type="text" value="">
+              <span class="input-group-btn">
+                {{ wtf.form_field(g.search_form.search_button) }}
+              </span>
+            </div>
           </form>
         </ul>
         <ul class="nav navbar-nav navbar-right">
