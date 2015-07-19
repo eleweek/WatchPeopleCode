@@ -321,7 +321,7 @@ def dashboard(tab):
             try:
                 ys._update_status()
                 db.session.commit()
-                flash("Successfully added youtube video!", 'success')
+                flash('Successfully added youtube video "{}"'.format(ys.title), 'success')
                 break
             except Exception as e:
                 app.logger.error("Failed to add youtube video {}".format(ys))

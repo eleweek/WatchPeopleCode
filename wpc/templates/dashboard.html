@@ -55,6 +55,9 @@
             </div>
           </div>
           <div role="tabpanel" class="tab-pane {% if tab == 'video-archive' %} active {% endif %}" id="video-archive">
+            <p>
+              Here you can add videos to the video archive.
+            </p>
             <div class="add-video-form">
               {{ wtf.quick_form(add_video_form) }}
             </div>
