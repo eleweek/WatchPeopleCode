@@ -109,3 +109,12 @@ form[role=search] .form-control:focus {
 .dashboard-tab-content {
     margin-top: 15px;
 }
+    
+.heading {
+    margin-bottom: 25px;
+}
+
+.pagination > .disabled > span,
+.pagination > .disabled > span:hover {
+    background-color: #50CCB3;
+}

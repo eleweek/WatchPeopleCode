@@ -15,8 +15,10 @@
   {% endif %}
 
   <div class="container">
-    <h2 class="text-center">Livestreams right now: {{ live_streams|length }}</h2>
-    <p class="text-center"> The website is closely integrated with <a href="http://www.reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode</a> subreddit. If you want to start streaming, check out <a href="{{url_for('streaming_guide')}}">Streaming guide</a></p>
+    <div class="heading">
+      <h2 class="text-center">Livestreams right now: {{ live_streams|length }}</h2>
+      <p class="text-center"> The website is closely integrated with <a href="http://www.reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode</a> subreddit. If you want to start streaming, check out <a href="{{url_for('streaming_guide')}}">Streaming guide</a></p>
+    </div>
 
     <div class="row">
 
