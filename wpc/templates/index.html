@@ -5,11 +5,15 @@
   {{super()}}
   {# do not move the next string, it's here because it's needed before using jwplayer #}
   <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
-  <div class="alert alert-info alert-dismissible regular-streamer-alert" role="alert">
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-    Check out <a class="alert-link" href="https://www.youtube.com/watch?v=FYHGKYgFlXQ">latest gamedev timelapse</a> by <a class="alert-link" href="{{url_for("streamer_page", streamer_name='gkbrk')}}">gkbrk</a> {#<button class="btn btn-success btn-xs subscribe-button subscribe-button-{{regular_streamer.id}} regular-streamer-subscribe-button"> Follow </button> #}
+  {# TODO: better notifcation system? #}
+  {% set rsa_id = "1" %}
+  {% if request.cookies.get('dismissed-regular-streamer-alert') != rsa_id %}
+    <div class="alert alert-info fade in alert-dismissible regular-streamer-alert regular-streamer-alert-num-{{rsa_id}}" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      Check out <a class="alert-link" href="https://www.youtube.com/watch?v=FYHGKYgFlXQ">latest gamedev timelapse</a> by <a class="alert-link" href="{{url_for("streamer_page", streamer_name='gkbrk')}}">gkbrk</a> {#<button class="btn btn-success btn-xs subscribe-button subscribe-button-{{regular_streamer.id}} regular-streamer-subscribe-button"> Follow </button> #}
+    </div>
+  {% endif %}
 
-  </div>
   <div class="container">
     <h2 class="text-center">Livestreams right now: {{ live_streams|length }}</h2>
     <p class="text-center"> The website is closely integrated with <a href="http://www.reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode</a> subreddit. If you want to start streaming, check out <a href="{{url_for('streaming_guide')}}">Streaming guide</a></p>
@@ -68,4 +72,22 @@
 {% block scripts %}
   {{ super() }}
   <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<<<<<<< HEAD
+=======
+  <script>
+    $(document).ready(function() {
+      $('.regular-streamer-alert').on('closed.bs.alert', function () {
+        var that = this;
+        var alert_num_class = $(that).attr("class").split(' ').filter(
+                function(c) {
+                    return c.indexOf("regular-streamer-alert-num-") === 0;
+                }
+            )[0];
+        var alert_num = +alert_num_class.split('-')[4];
+        console.log("ALERT: ", alert_num);
+        $.cookie('dismissed-regular-streamer-alert', alert_num, { expires: 30 });
+      })
+    });
+  </script>
+>>>>>>> d5dfe2f... Don't show regular streamer alert after it is closed
 {% endblock %}
