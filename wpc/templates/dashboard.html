@@ -14,17 +14,18 @@
       </div>
     </div>
     <div class="row">
-        <ul class="nav nav-tabs" role="tablist">
+        <ul class="nav nav-tabs dashboard-nav-tabs" role="tablist">
           <li role="presentation" {% if tab == "streaming" %} class="active" {% endif %}><a href="#streaming" aria-controls="home" role="tab" data-toggle="tab">Streaming</a></li>
           <li role="presentation" {% if tab == "email" %} class="active" {% endif %}><a href="#email" aria-controls="profile" role="tab" data-toggle="tab">Email</a></li>
           <li role="presentation" {% if tab == "video-archive" %} class="active" {% endif %}><a href="#video-archive" aria-controls="messages" role="tab" data-toggle="tab">Video archive</a></li>
         </ul>
 
-        <div class="tab-content">
+        <div class="tab-content dashboard-tab-content">
           <div role="tabpanel" class="tab-pane {% if tab == 'streaming' %} active {% endif %}" id="streaming">
             <button type="button" class="btn btn-default btn-primary show-private-info-button">Show private info <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></button>
             <button type="button" class="btn btn-default btn-primary hide-private-info-button" style="display:none;">Hide private info <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span></button>
             <div class="private-info" style="display:none;">
+              <h3> Streaming </h3>
               <div class="row">
                 <div class="col-md-8">
                   <div class="form-group">
@@ -42,6 +43,7 @@
                   </div>
                 </div>
               </div>
+              <h3> Cross-streaming </h3>
               <div class="row">
                 <div class="col-md-12">
                   {{wtf.quick_form(rtmp_redirect_form)}}

@@ -102,6 +102,10 @@ form[role=search] .form-control:focus {
     border-color: #98BEC2;
 }
 
-.tab-content {
-    padding-top: 15px;
+.dashboard-nav-tabs {
+    margin-top: 25px;
+}
+
+.dashboard-tab-content {
+    margin-top: 15px;
 }
