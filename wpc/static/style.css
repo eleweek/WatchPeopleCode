@@ -117,3 +117,7 @@ form[role=search] .form-control:focus {
 .pagination > .disabled > span {
     background-color: #50CCB3;
 }
+
+.pagination > .disabled > span:hover {
+    background-color: #50CCB3;
+}
