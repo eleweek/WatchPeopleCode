@@ -113,3 +113,7 @@ form[role=search] .form-control:focus {
 .heading {
     margin-bottom: 25px;
 }
+
+.pagination > .disabled > span {
+    background-color: #50CCB3;
+}
