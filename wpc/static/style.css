@@ -114,10 +114,7 @@ form[role=search] .form-control:focus {
     margin-bottom: 25px;
 }
 
-.pagination > .disabled > span {
-    background-color: #50CCB3;
-}
-
+.pagination > .disabled > span,
 .pagination > .disabled > span:hover {
     background-color: #50CCB3;
 }
