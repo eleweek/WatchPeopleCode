@@ -83,7 +83,11 @@
           </form>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-          <a href={{url_for(".streaming_guide")}} class="btn navbar-btn btn-primary">Streaming Guide</a>
+          <li {% if request.endpoint == "streaming_guide" %} class="active" {% endif %}>
+            <a href="{{ url_for("streaming_guide") }}">
+              Streaming Guide
+            </a>
+          </li>
           {% if current_user.is_anonymous() %}
             <a href={{url_for(".authorize")}} class="btn navbar-btn btn-success"><i class="fa fa-reddit"></i>&nbsp; Sign in with reddit</a>
           {% else %}
