@@ -338,9 +338,10 @@ def dashboard(tab):
                            tab=tab)
 
 
-@app.route('/_subscribe_to_streamer', methods=["POST"])
+@app.route('/_subscriptions', methods=["PUT", "DELETE"])
 def _subscribe_to_streamer():
-    if ('email' not in request.form and not current_user.is_authenticated()) or 'streamer_id' not in request.form:
+    if ('email' not in request.form and not current_user.is_authenticated()) or\
+            'streamer_id' not in request.form:
         abort(400)
     streamer_id = request.form['streamer_id']
     if current_user.is_anonymous() or not current_user.as_subscriber:
@@ -354,8 +355,12 @@ def _subscribe_to_streamer():
     if current_user.is_authenticated():
         current_user.as_subscriber = subscriber
 
-    if subscriber not in streamer.subscribers:
-        streamer.subscribers.append(subscriber)
+    if request.method == "PUT":
+        if subscriber not in streamer.subscribers:
+            streamer.subscribers.append(subscriber)
+    else:
+        if subscriber in streamer.subscribers:
+            streamer.subscribers.remove(subscriber)
 
     db.session.commit()
     response = app.make_response(jsonify(result="OK"))

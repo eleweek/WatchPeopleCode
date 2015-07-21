@@ -48,7 +48,11 @@
       {% endif %}
     </span>
     {% if stream.streamer and with_subscribe_button %}
-      <button class="btn btn-success btn-xs subscribe-button subscribe-button-{{stream.streamer.id}}">Subscribe</button>
+      {% if current_user.already_subscribed(stream.streamer) %}
+        <button class="btn btn-danger btn-xs subscribe-button subscribe-button-{{stream.streamer.id}}">Unsubscribe</button>
+      {% else %}
+        <button class="btn btn-success btn-xs subscribe-button subscribe-button-{{stream.streamer.id}}">Subscribe</button>
+      {% endif %}
     {% endif %}
   </div>
 
@@ -58,7 +62,7 @@
 
 {% macro streams(streams, status, with_subscribe_button=false) %}
   {% for stream in streams %}
-    {{ stream_macro(stream, true if status == 'live' and loop.index == 1 else false, none, with_subscribe_button if not current_user.already_subscribed(stream.streamer) else false) }}
+    {{ stream_macro(stream, true if status == 'live' and loop.index == 1 else false, none, with_subscribe_button if not current_user == stream.streamer else false) }}
   {% endfor %}
 {% endmacro %}
 
