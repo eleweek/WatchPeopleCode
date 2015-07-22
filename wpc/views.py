@@ -237,8 +237,6 @@ class StreamerPage(View):
             streams = streams.filter(Stream.id != wpc_stream.id)
         streams = streams.order_by(Stream.actual_start_time.desc().nullslast()).paginate(page, per_page=5)
         check_profile_alert = False
-        edit_info = False
-        edit_title = False
 
         info_form = EditStreamerInfoForm(prefix='info')
         title_form = EditStreamTitleForm(prefix='title')
@@ -251,8 +249,6 @@ class StreamerPage(View):
                         db.session.commit()
                         flash("Updated successfully", category='success')
                         return redirect(url_for('.streamer_page', streamer_name=streamer_name, page=page))
-                    else:
-                        edit_info = True
 
                 elif title_form.submit_button.data:
                     if title_form.validate_on_submit():
@@ -260,8 +256,6 @@ class StreamerPage(View):
                         db.session.commit()
                         return jsonify(newTitle=Markup.escape(title_form.title.data))
 
-                    else:
-                        edit_title = True
             else:
                 if not streamer.checked:
                     streamer.checked = True
@@ -276,8 +270,7 @@ class StreamerPage(View):
 
         return render_template('streamer.html', streamer=streamer,
                                streams=streams, info_form=info_form,
-                               title_form=title_form, edit_info=edit_info,
-                               edit_title=edit_title, wpc_stream=wpc_stream,
+                               title_form=title_form, wpc_stream=wpc_stream,
                                check_profile_alert=check_profile_alert)
 
 

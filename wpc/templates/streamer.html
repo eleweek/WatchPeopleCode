@@ -54,7 +54,7 @@
         </div>
 
       {% if streamer == current_user %}
-        <form action="" method="POST" class="form form-edit-info" role="form" {% if not edit_info %} style="display:none;" {% endif %}>
+        <form action="" method="POST" class="form form-edit-info" role="form" style="display:none;">
           <br>
           <div class="form-group">
             {{ info_form.hidden_tag() }}
