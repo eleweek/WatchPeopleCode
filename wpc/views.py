@@ -56,7 +56,7 @@ def process_idea_form(idea_form):
         idea_form.populate_obj(idea)
         db.session.add(idea)
         db.session.commit()
-        flash("Your idea was added successfully", "success")
+        flash("Your idea was added successfully!", "success")
         return redirect(url_for("idea_list"))
 
 
@@ -91,7 +91,7 @@ def index():
         subscribe_form.populate_obj(subscriber)
         db.session.add(subscriber)
         db.session.commit()
-        flash("you've subscribed successfully", "success")
+        flash("You've subscribed successfully!", "success")
         return redirect(url_for('.index'))
 
     random_stream = YoutubeStream.query.filter(YoutubeStream.status != 'upcoming').order_by(db.func.random()).first()
@@ -296,7 +296,7 @@ def dashboard(tab):
     if rtmp_redirect_form.validate_on_submit():
         rtmp_redirect_form.populate_obj(current_user)
         db.session.commit()
-        flash('Successfully updated RTMP redirects!', 'success')
+        flash('Successfully updated your RTMP redirects!', 'success')
         return redirect(url_for("dashboard", tab="streaming"))
 
     if email_form.validate_on_submit():
@@ -314,14 +314,14 @@ def dashboard(tab):
             try:
                 ys._update_status()
                 db.session.commit()
-                flash('Successfully added youtube video "{}"'.format(ys.title), 'success')
+                flash('Successfully added YouTube video "{}"'.format(ys.title), 'success')
                 break
             except Exception as e:
-                app.logger.error("Failed to add youtube video {}".format(ys))
+                app.logger.error("Failed to add YouTube video {}".format(ys))
                 app.logger.exception(e)
         else:
-            flash("Failed to add youtube video! Try again?", 'error')
-            app.logger.error("Failed to add youtube video multiple times {}".format(ys))
+            flash("Failed to add YouTube video! Try again?", 'error')
+            app.logger.error("Failed to add YouTube video multiple times {}".format(ys))
         return redirect(url_for("dashboard", tab="video-archive"))
 
     return render_template("dashboard.html",
@@ -375,10 +375,10 @@ def reddit_authorize_callback():
             user = get_or_create(Streamer, reddit_username=name)
             db.session.commit()
             login_user(user, remember=True)
-            flash("Logged in successfully", 'success')
+            flash("Logged in successfully!", 'success')
 
     if not name:
-        flash("Error while trying to log in", 'error')
+        flash("An error occurred while trying to log in.", 'error')
     next_url = session.pop('next_url_after_login', url_for("streamer_page", streamer_name=name))
 
     return redirect(next_url)
@@ -449,7 +449,7 @@ def regenerate_rtmp_key():
 @login_required
 def logout():
     logout_user()
-    flash("Logged out successfully", 'info')
+    flash("Logged out successfully!", 'info')
     return redirect(url_for(".index"))
 
 
@@ -497,13 +497,13 @@ def chat_connect():
 
 @socketio.on('initialize', namespace='/chat')
 def chat_initialize():
-    first_words = ['True', 'False', 'For', 'While', 'If', 'Else', 'Elif', 'Undefined', 'Do',
-                   'Exit', 'Continue', 'Super', 'Break', 'Try', 'Catch', 'Class', 'Object',
+    first_words = ['True', 'False', 'For', 'While', 'If', 'Else', 'Elif', 'Undefined', 'Do', 'Virtual', 'Inline',
+                   'Exit', 'Continue', 'Super', 'Break', 'Switch', 'Try', 'Catch', 'Class', 'Object', 'Abstract', 'Interface',
                    'Def', 'Var', 'Pass', 'Return', 'Static', 'Const', 'Template', 'Delete', 'Int',
                    'Float', 'Struct', 'Void', 'Self', 'This']
     second_words = ['C', 'C++', 'Lisp', 'Python', 'Java', 'JavaScript', 'Pascal', 'Objective-C',
                     'C#', 'Perl', 'Ruby', 'Ada', 'Haskell', 'Octave', 'Basic', 'Fortran', 'PHP', 'R',
-                    'Assembly', 'COBOL', 'Rust', 'Swift', 'Bash']
+                    'Assembly', 'COBOL', 'Rust', 'Swift', 'Bash', 'Brainfuck', 'OCaml', 'Clojure']
 
     if current_user.is_authenticated():
         session['username'] = current_user.reddit_username
