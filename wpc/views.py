@@ -503,7 +503,7 @@ def chat_initialize():
                    'Float', 'Struct', 'Void', 'Self', 'This']
     second_words = ['C', 'C++', 'Lisp', 'Python', 'Java', 'JavaScript', 'Pascal', 'Objective-C',
                     'C#', 'Perl', 'Ruby', 'Ada', 'Haskell', 'Octave', 'Basic', 'Fortran', 'PHP', 'R',
-                    'Assembly', 'COBOL', 'Rust', 'Swift', 'Bash', 'Brainfuck', 'Visual Basic', 'OCaml', 'Clojure']
+                    'Assembly', 'COBOL', 'Rust', 'Swift', 'Bash', 'Brainfuck', 'OCaml', 'Clojure']
 
     if current_user.is_authenticated():
         session['username'] = current_user.reddit_username
