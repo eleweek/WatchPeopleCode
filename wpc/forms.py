@@ -38,13 +38,13 @@ class DashboardEmailForm(Form):
 
 
 class DashboardAddVideoForm(Form):
-    link = StringField("Youtube link", [validators.DataRequired()])
+    link = StringField("YouTube link", [validators.DataRequired()])
     submit_button = SubmitField('Add video to the archive')
 
     def validate_link(form, field):
         ytid = youtube_video_id(field.data)
         if not ytid:
-            raise ValidationError("Invalid Youtube URL")
+            raise ValidationError("Invalid YouTube URL")
 
         existing_stream = YoutubeStream.query.filter_by(ytid=ytid).first()
         if existing_stream and existing_stream.streamer:
@@ -52,7 +52,7 @@ class DashboardAddVideoForm(Form):
 
 
 class IdeaForm(Form):
-    description = TextAreaField("Soo... Streamers need your ideas. What kind of streams would you like to see here?", [validators.DataRequired()])
+    description = TextAreaField("Streamers need your ideas. What kind of streams would you like to see here?", [validators.DataRequired()])
     submit_button = SubmitField('Submit your idea')
 
 
@@ -62,10 +62,10 @@ class EditStreamTitleForm(Form):
 
 
 class RtmpRedirectForm(Form):
-    rtmp_redirect_1 = StringField("Rtmp redirect 1")
-    rtmp_redirect_2 = StringField("Rtmp redirect 2")
-    rtmp_redirect_3 = StringField("Rtmp redirect 3")
-    submit_button = SubmitField('Submit')
+    rtmp_redirect_1 = StringField("RTMP Redirect #1")
+    rtmp_redirect_2 = StringField("RTMP Redirect #2")
+    rtmp_redirect_3 = StringField("RTMP Redirect #3")
+    submit_button = SubmitField('Save')
 
     def prepopulate(self, streamer):
         for rid in xrange(1, 4):
@@ -74,7 +74,7 @@ class RtmpRedirectForm(Form):
 
 
 class EditStreamerInfoForm(Form):
-    youtube_channel = StringField("Youtube channel", [validators.Length(max=100)])
+    youtube_channel = StringField("YouTube channel", [validators.Length(max=100)])
     twitch_channel = StringField("Twitch channel", [validators.Length(max=100)])
     info = TextAreaField("Info", [validators.Length(max=5000)])
     submit_button = SubmitField('Submit')
@@ -118,22 +118,22 @@ class EditStreamerInfoForm(Form):
         yc = form.youtube_channel_extract()
         if yc is None:
             # FIXME: add explanation here or hint to page
-            raise ValidationError("This field should contain valid youtube channel.")
+            raise ValidationError("This field should contain valid YouTube channel.")
 
         streamer = get_or_create(YoutubeChannel, channel_id=yc).streamer
         if streamer and streamer.checked and streamer != current_user:
-            raise ValidationError("There is another user with this channel. If it is your channel, please message about that to r/WatchPeoplecode moderators.")
+            raise ValidationError("There is another user with this channel. If it is your channel, please message about that to /r/WatchPeoplecode moderators.")
 
     def validate_twith_channel(form, field):
         tc = form.twitch_channel_extract()
         if tc is None:
-            raise ValidationError('This field should be valid twitch channel.')
+            raise ValidationError('This field should contain valid Twitch channel.')
 
         streamer = Streamer.query.filter_by(twitch_channel=tc).first()
         if streamer and streamer.checked and streamer != current_user:
-            raise ValidationError("There is another user with this channel. If it is your channel, please message about that to r/WatchPeoplecode moderators.")
+            raise ValidationError("There is another user with this channel. If it is your channel, please message about that to /r/WatchPeoplecode moderators.")
 
 
 class SearchForm(Form):
-    query = StringField("Query")
+    query = StringField("Search")
     search_button = SubmitField('Search video archive')
