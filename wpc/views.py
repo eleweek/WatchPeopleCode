@@ -497,13 +497,13 @@ def chat_connect():
 
 @socketio.on('initialize', namespace='/chat')
 def chat_initialize():
-    first_words = ['True', 'False', 'For', 'While', 'If', 'Else', 'Elif', 'Undefined', 'Do',
-                   'Exit', 'Continue', 'Super', 'Break', 'Try', 'Catch', 'Class', 'Object',
+    first_words = ['True', 'False', 'For', 'While', 'If', 'Else', 'Elif', 'Undefined', 'Do', 'Virtual', 'Inline',
+                   'Exit', 'Continue', 'Super', 'Break', 'Switch', 'Try', 'Catch', 'Class', 'Object', 'Abstract', 'Interface',
                    'Def', 'Var', 'Pass', 'Return', 'Static', 'Const', 'Template', 'Delete', 'Int',
                    'Float', 'Struct', 'Void', 'Self', 'This']
     second_words = ['C', 'C++', 'Lisp', 'Python', 'Java', 'JavaScript', 'Pascal', 'Objective-C',
                     'C#', 'Perl', 'Ruby', 'Ada', 'Haskell', 'Octave', 'Basic', 'Fortran', 'PHP', 'R',
-                    'Assembly', 'COBOL', 'Rust', 'Swift', 'Bash']
+                    'Assembly', 'COBOL', 'Rust', 'Swift', 'Bash', 'Brainfuck', 'Visual Basic', 'OCaml', 'Clojure']
 
     if current_user.is_authenticated():
         session['username'] = current_user.reddit_username
