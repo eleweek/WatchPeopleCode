@@ -118,7 +118,7 @@ class EditStreamerInfoForm(Form):
         yc = form.youtube_channel_extract()
         if yc is None:
             # FIXME: add explanation here or hint to page
-            raise ValidationError("This field should contain valid YouTube channel.")
+            raise ValidationError("This field should contain a valid YouTube channel.")
 
         streamer = get_or_create(YoutubeChannel, channel_id=yc).streamer
         if streamer and streamer.checked and streamer != current_user:
@@ -127,7 +127,7 @@ class EditStreamerInfoForm(Form):
     def validate_twith_channel(form, field):
         tc = form.twitch_channel_extract()
         if tc is None:
-            raise ValidationError('This field should contain valid Twitch channel.')
+            raise ValidationError('This field should contain a valid Twitch channel.')
 
         streamer = Streamer.query.filter_by(twitch_channel=tc).first()
         if streamer and streamer.checked and streamer != current_user:
