@@ -5,7 +5,7 @@
   {{super()}}
   {# do not move the next string, it's here because it's needed before using jwplayer #}
   <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
-  {# TODO: better notifcation system? #}
+  {# TODO: better notification system? #}
   {% set rsa_id = "1" %}
   {% if request.cookies.get('dismissed-regular-streamer-alert') != rsa_id %}
     <div class="alert alert-info fade in alert-dismissible regular-streamer-alert regular-streamer-alert-num-{{rsa_id}}" role="alert">
@@ -17,7 +17,7 @@
   <div class="container">
     <div class="heading">
       <h2 class="text-center">Livestreams right now: {{ live_streams|length }}</h2>
-      <p class="text-center"> The website is closely integrated with <a href="http://www.reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode</a> subreddit. If you want to start streaming, check out <a href="{{url_for('streaming_guide')}}">Streaming guide</a></p>
+      <p class="text-center">The website is closely integrated with the <a href="http://www.reddit.com/r/WatchPeopleCode">/r/WatchPeopleCode</a> subreddit. If you want to start streaming, check out the <a href="{{url_for('streaming_guide')}}">Streaming Guide</a>.</p>
     </div>
 
     <div class="row">
@@ -46,13 +46,13 @@
         <form action="" method="POST" class="form form-subscribe" role="form">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h1 class="panel-title">Subscribe to our newsletters</h1>
+              <h1 class="panel-title">Subscribe to our newsletter</h1>
             </div>
 
             <div class="panel-body">
               {{ subscribe_form.hidden_tag() }}
               <div class="input-group">
-                {{ wtf.form_field(subscribe_form.email, form_type="inline", value="", placeholder="Your e-mail") }}
+                {{ wtf.form_field(subscribe_form.email, form_type="inline", value="", placeholder="Your email") }}
                 <span class="input-group-btn">
                   {{ wtf.form_field(subscribe_form.submit_button, button_map={'submit_button': 'primary'}) }}
                 </span>
