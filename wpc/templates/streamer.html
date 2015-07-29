@@ -101,51 +101,14 @@
   {% endif %}
   <script src="http://malsup.github.com/jquery.form.js"></script>
 
-  {% if check_profile_alert %}
-    <script>
-      bootbox.alert("Please check your profile, some info there was filled based on your submissions in /r/WatchPeopleCode.");
-    </script>
-  {% endif %}
-
   <script>
-    (function($, window, undefined){
-      $(".edit-info-button").click(function() {
-        $(".form-edit-title").hide();
-        $(".editable-stream-title").show();
-        $(".edit-title-button").show();
-
-        $(".info-block").hide();
-        $(".form-edit-info").show();
-      });
-
-      $(".edit-title-button").click(function() {
-        $(".form-edit-info").hide();
-        $(".info-block").show();
-
-        $(".editable-stream-title").hide();
-        $(".edit-title-button").hide();
-        $(".form-edit-title").show();
-      });
-
-      var btn = $(".streaming-info-button")
-      btn.click(function() {
-        if (btn.html() == 'Show') {
-          btn.html('Hide');
-          $(".streaming-info").show();
-        } else {
-          btn.html('Show');
-          $(".streaming-info").hide();
-        }
-      });
-    }($, window));
-
     $(document).ready(function() {
         var options = {
             success: function(responseText){
-              $(".form-edit-title").hide();
-              $(".editable-stream-title-name").html(responseText.newTitle);
-              $(".editable-stream-title").show();
-              $(".edit-title-button").show();
+                $(".form-edit-title").hide();
+                $(".editable-stream-title-name").html(responseText.newTitle);
+                $(".editable-stream-title").show();
+                $(".edit-title-button").show();
             },
             dataType: 'json',
             clearForm: false,
@@ -155,6 +118,40 @@
         $('.form-edit-title').submit(function() {
             return false;
         });
+
+      $(".edit-info-button").click(function() {
+          $(".form-edit-title").hide();
+          $(".editable-stream-title").show();
+          $(".edit-title-button").show();
+
+          $(".info-block").hide();
+          $(".form-edit-info").show();
+      });
+
+      $(".edit-title-button").click(function() {
+          $(".form-edit-info").hide();
+          $(".info-block").show();
+
+          $(".editable-stream-title").hide();
+          $(".edit-title-button").hide();
+          $(".form-edit-title").show();
+      });
+
+      var btn = $(".streaming-info-button")
+      btn.click(function() {
+          if (btn.html() == 'Show') {
+              btn.html('Hide');
+              $(".streaming-info").show();
+          } else {
+              btn.html('Show');
+              $(".streaming-info").hide();
+          }
+      });
+
+      /* profile alert */
+      {% if check_profile_alert %}
+        bootbox.alert("Please check your profile, some info there was filled based on your submissions in /r/WatchPeopleCode.");
+      {% endif %}
     });
   </script>
 {% endblock %}
