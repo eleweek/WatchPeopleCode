@@ -6,11 +6,11 @@
   {# do not move the next string, it's here because it's needed before using jwplayer #}
   <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
   {# TODO: better notification system? #}
-  {% set rsa_id = "1" %}
+  {% set rsa_id = "2" %}
   {% if request.cookies.get('dismissed-regular-streamer-alert') != rsa_id %}
     <div class="alert alert-info fade in alert-dismissible regular-streamer-alert regular-streamer-alert-num-{{rsa_id}}" role="alert">
       <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      Check out <a class="alert-link" href="https://www.youtube.com/watch?v=FYHGKYgFlXQ">latest gamedev timelapse</a> by <a class="alert-link" href="{{url_for("streamer_page", streamer_name='gkbrk')}}">gkbrk</a> {#<button class="btn btn-success btn-xs subscribe-button subscribe-button-{{regular_streamer.id}} regular-streamer-subscribe-button"> Follow </button> #}
+      Check out <a class="alert-link" href="https://www.youtube.com/watch?v=M820JqSFDv4">the latest timelapse</a> by <a class="alert-link" href="{{url_for("streamer_page", streamer_name='gkbrk')}}">gkbrk</a>. He started working on a blog platform in python (using bottle web framework) {#<button class="btn btn-success btn-xs subscribe-button subscribe-button-{{regular_streamer.id}} regular-streamer-subscribe-button"> Follow </button> #}
     </div>
   {% endif %}
 
