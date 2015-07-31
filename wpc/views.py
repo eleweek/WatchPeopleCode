@@ -147,7 +147,7 @@ def past_streams(query, page):
 
     sort_by = request.args.get('sort_by', 'views')
     if sort_by == 'time':
-        streams = streams.order_by(YoutubeStream.scheduled_start_time.desc().nullslast())
+        streams = streams.order_by(YoutubeStream.actual_start_time.desc().nullslast())
     else:
         streams = streams.order_by(YoutubeStream.vod_views.desc().nullslast())
     streams = streams.paginate(page, per_page=5)
