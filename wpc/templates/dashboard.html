@@ -72,23 +72,23 @@
 {% block scripts %}
   {{super()}}
   <script>
-    (function($, window, undefined){
-      $(".show-private-info-button").click(function() {
-        $(".show-private-info-button").hide();
-        $(".hide-private-info-button").show();
-        $(".private-info").show();
-      });
-      $(".hide-private-info-button").click(function() {
-        $(".show-private-info-button").show();
-        $(".hide-private-info-button").hide();
-        $(".private-info").hide();
-      });
-      $(".regenerate-rtmp-key").click(function() {
-        $.ajax("/_regenerate_rtmp_key").done(function(data){
-            $('.dashboard-rtmp-key').val(data.rtmp_key);
+    $(document).ready(function(){
+        $(".show-private-info-button").click(function() {
+            $(".show-private-info-button").hide();
+            $(".hide-private-info-button").show();
+            $(".private-info").show();
         });
-      });
-    }($, window));
+        $(".hide-private-info-button").click(function() {
+            $(".show-private-info-button").show();
+            $(".hide-private-info-button").hide();
+            $(".private-info").hide();
+        });
+        $(".regenerate-rtmp-key").click(function() {
+            $.ajax("/_regenerate_rtmp_key").done(function(data){
+                $('.dashboard-rtmp-key').val(data.rtmp_key);
+            });
+        });
+    });
   </script>
 {% endblock %}
 
