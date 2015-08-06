@@ -83,20 +83,22 @@
           </form>
         </ul>
         <!-- Next two uls are displayed in reverse order. I am wondering if it is a bug or a feature -->
-        <ul class="nav navbar-nav navbar-right">
-          {% if current_user.is_anonymous() %}
-            <a href={{url_for(".authorize")}} class="btn navbar-btn btn-success"><i class="fa fa-reddit"></i>&nbsp; Sign in with reddit</a>
-          {% else %}
-            <a href={{url_for(".logout")}} class="btn navbar-btn ">Logout</a>
-          {% endif %}
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-          <li {% if request.endpoint == "streaming_guide" %} class="active" {% endif %}>
-            <a href="{{ url_for("streaming_guide") }}">
-              Streaming Guide
-            </a>
-          </li>
-        </ul>
+        <div class="navbar-right">
+          <ul class="nav navbar-nav">
+            <li {% if request.endpoint == "streaming_guide" %} class="active" {% endif %}>
+              <a href="{{ url_for("streaming_guide") }}">
+                Streaming Guide
+              </a>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav">
+            {% if current_user.is_anonymous() %}
+              <a href={{url_for(".authorize")}} class="btn navbar-btn btn-success"><i class="fa fa-reddit"></i>&nbsp; Sign in with reddit</a>
+            {% else %}
+              <a href={{url_for(".logout")}} class="btn navbar-btn ">Logout</a>
+            {% endif %}
+          </ul>
+        </div>
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
   </nav>
