@@ -188,10 +188,15 @@ def update_flairs():
         app.logger.exception(e)
 
 
+def is_blacklisted(twitch_channel):
+    blacklist = ["charitablegamersdotcom"]
+    return twitch_channel in blacklist
+
+
 def get_random_bonus_twitch_streams():
     app.logger.info("Getting random bonus twitch stream")
     r = requests_get_with_retries("https://api.twitch.tv/kraken/streams?game=Programming")
-    streams = sorted([s for s in r.json()['streams']], key=lambda s: s['viewers'], reverse=True)
+    streams = sorted([s for s in r.json()['streams'] if not is_blacklisted(s['channel']['name'])], key=lambda s: s['viewers'], reverse=True)
     for stream in streams[:2]:
         ts = get_or_create(TwitchStream, channel=stream['channel']['name'])
         ts._update_status()
