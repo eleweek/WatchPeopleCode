@@ -45,11 +45,14 @@
             </div>
 
             <div class="panel-body">
-              <div class="form-group">
-                {{ subscribe_form.hidden_tag() }}
-                {{ wtf.form_field(subscribe_form.email, value="") }}
-                {{ wtf.form_field(subscribe_form.submit_button, button_map={'submit_button': 'primary'}) }}
+              {{ subscribe_form.hidden_tag() }}
+              <div class="input-group">
+                {{ wtf.form_field(subscribe_form.email, form_type="inline", value="", placeholder="Your email") }}
+                <span class="input-group-btn">
+                  {{ wtf.form_field(subscribe_form.submit_button, button_map={'submit_button': 'primary'}) }}
+                </span>
               </div>
+              {{ wtf.form_errors(subscribe_form) }}
             </div>
           </div>
         </form>
