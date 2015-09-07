@@ -6,11 +6,11 @@
   {# do not move the next string, it's here because it's needed before using jwplayer #}
   <script type="text/javascript" src="http://jwpsrv.com/library/6VhvUr6JEeSgMBJtO5t17w.js"></script>
   {# TODO: better notification system? #}
-  {% set rsa_id = "4" %}
+  {% set rsa_id = "5" %}
   {% if request.cookies.get('dismissed-regular-streamer-alert') != rsa_id %}
     <div class="alert alert-info fade in alert-dismissible regular-streamer-alert regular-streamer-alert-num-{{rsa_id}}" role="alert">
       <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      Check out <a class="alert-link" href="https://www.youtube.com/watch?v=DeSfIj5TTPI">the latest timelapse("Making a dictionary server with Rust")</a> by <a class="alert-link" href="{{url_for("streamer_page", streamer_name='gkbrk')}}">gkbrk</a>.  {#<button class="btn btn-success btn-xs subscribe-button subscribe-button-{{regular_streamer.id}} regular-streamer-subscribe-button"> Follow </button> #}
+      Check out <a class="alert-link" href="https://www.youtube.com/watch?v=gUQu7Nm9MYM">the latest timelapse("Making an HTML5 Radio Web Application")</a> by <a class="alert-link" href="{{url_for("streamer_page", streamer_name='gkbrk')}}">gkbrk</a>.  {#<button class="btn btn-success btn-xs subscribe-button subscribe-button-{{regular_streamer.id}} regular-streamer-subscribe-button"> Follow </button> #}
     </div>
   {% endif %}
 
