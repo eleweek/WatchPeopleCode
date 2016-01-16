@@ -24,7 +24,7 @@ gevent==1.0.2
 gevent-socketio==0.3.6
 gevent-websocket==0.9.3
 greenlet==0.4.9
-gunicorn==19.4.5
+gunicorn==18.0
 humanize==0.5.1
 itsdangerous==0.24
 lxml==3.4.2
