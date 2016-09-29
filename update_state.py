@@ -274,7 +274,7 @@ def update_vod_views():
 def handle_update_stream_exception(stream, e):
     app.logger.exception("handle_update_stream_exception")
     app.logger.error("Error while updating {} with exception: {}".format(stream, e))
-    if type(e) == HTTPError and (e.response.status_code == 404 or e.response.status_code = 422):
+    if type(e) == HTTPError and (e.response.status_code == 404 or e.response.status_code == 422):
         stream.status = 'completed'
         db.session.commit()
     else:
