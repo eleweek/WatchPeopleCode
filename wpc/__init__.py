@@ -56,6 +56,8 @@ def create_app():
     app.config['REDDIT_WEB_APP_USER_AGENT'] = "/r/WatchPeopleCode web app(main contact: /u/godlikesme)"
     app.config['REDDIT_BOT_USER_AGENT'] = "/r/WatchPeopleCode flairs&streams bot (main contact: /u/godlikesme)"
 
+    app.config['TWITCH_APP_ID'] = os.environ.get('TWITCH_APP_ID', '')
+
     Bootstrap(app)
     loggers_and_levels = [(app.logger, logging.INFO),
                           (logging.getLogger('sqlalchemy'), logging.WARNING),

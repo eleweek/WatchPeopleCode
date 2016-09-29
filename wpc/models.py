@@ -227,7 +227,6 @@ class YoutubeStream(Stream):
 
     def _update_status(self):
         app.logger.info("Updating status for {}".format(self))
-        print "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(self.ytid, app.config['YOUTUBE_KEY'])
 
         r = requests_get_with_retries(
             "https://www.googleapis.com/youtube/v3/videos?id={}&part=snippet,liveStreamingDetails&key={}".format(
@@ -321,7 +320,7 @@ class TwitchStream(Stream):
         return '<TwitchStream {} {}>'.format(self.id, self.channel)
 
     def _update_title_from_channel(self):
-        r = requests_get_with_retries("https://api.twitch.tv/kraken/channels/{}".format(self.channel))
+        r = requests_get_with_retries("https://api.twitch.tv/kraken/channels/{}".format(self.channel), headers={'Client-ID': app.config['TWITCH_APP_ID']})
         r.raise_for_status()
         stream = r.json()
         if stream is not None:
@@ -344,7 +343,7 @@ class TwitchStream(Stream):
             else:
                 self.streamer = None
 
-        r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel))
+        r = requests_get_with_retries("https://api.twitch.tv/kraken/streams/{}".format(self.channel), headers={'Client-ID': app.config['TWITCH_APP_ID']})
         r.raise_for_status()
 
         stream = r.json()['stream']
