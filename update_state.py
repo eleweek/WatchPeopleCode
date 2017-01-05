@@ -195,9 +195,10 @@ def is_blacklisted(twitch_channel):
 
 def get_random_bonus_twitch_streams():
     app.logger.info("Getting random bonus twitch stream")
-    r = requests_get_with_retries("https://api.twitch.tv/kraken/streams?game=Programming", headers={'Client-ID': app.config['TWITCH_APP_ID']})
-    streams = sorted([s for s in r.json()['streams'] if not is_blacklisted(s['channel']['name'])], key=lambda s: s['viewers'], reverse=True)
-    for stream in streams[:2]:
+    r = requests_get_with_retries("https://api.twitch.tv/kraken/streams?game=Creative", headers={'Client-ID': app.config['TWITCH_APP_ID']})
+    streams = sorted([s for s in r.json()['streams'] if '#programming' in s['channel']['status'] and not is_blacklisted(s['channel']['name'])], key=lambda s: s['viewers'], reverse=True)
+    print streams
+    for stream in streams[:4]:
         ts = get_or_create(TwitchStream, channel=stream['channel']['name'])
         ts._update_status()
         db.session.add(ts)

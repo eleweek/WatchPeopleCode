@@ -15,20 +15,20 @@ from logentries import LogentriesHandler
 def setup_logging(loggers_and_levels, logentries_id=None):
     log = logging.getLogger('logentries')
     log.setLevel(logging.INFO)
-    if logentries_id:
-        logentries_handler = LogentriesHandler(logentries_id)
-        handler = logentries_handler
-    else:
-        handler = logging.StreamHandler()
+    logentries_handler = LogentriesHandler(logentries_id)
+    handler = logging.StreamHandler()
 
     FORMAT = "%(asctime)s:%(levelname)s:%(name)s:%(message)s"
     formatter = logging.Formatter(fmt=FORMAT)
     handler.setFormatter(formatter)
+    logentries_handler.setFormatter(formatter)
 
     log.addHandler(handler)
+    log.addHandler(logentries_handler)
     for logger, level in loggers_and_levels:
         logger.setLevel(level)
         logger.addHandler(handler)
+        logger.addHandler(logentries_handler)
 
 
 def create_app():
