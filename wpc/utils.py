@@ -53,4 +53,4 @@ def requests_get_with_retries(url, headers={}, retries_num=5):
     session.mount("https://", requests.adapters.HTTPAdapter(max_retries=retries_num))
 
     # Rejoice with new fault tolerant behaviour!
-    return session.get(url=url, headers=headers)
+    return session.get(url=url, headers=headers, timeout=42)
