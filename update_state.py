@@ -159,7 +159,7 @@ def update_flairs():
 
                     allow_flair_change = True
 
-                    isnt_youtube_stream = (stream.type != 'youtube')
+                    isnt_youtube_stream = (stream.type != 'youtube_stream')
                     if isnt_youtube_stream:
                         created_dt = datetime.datetime.utcfromtimestamp(s.created_utc)
                         now = datetime.datetime.utcnow()
