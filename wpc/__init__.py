@@ -54,7 +54,9 @@ def create_app():
     app.config['SERVER_NAME'] = os.environ.get('SERVER_NAME', '')
 
     app.config['REDDIT_WEB_APP_USER_AGENT'] = "/r/WatchPeopleCode web app(main contact: /u/godlikesme)"
-    app.config['REDDIT_BOT_USER_AGENT'] = "/r/WatchPeopleCode flairs&streams bot (main contact: /u/godlikesme)"
+    app.config['REDDIT_BOT_USER_AGENT'] = "/r/WatchPeopleCode helper (main contact: /u/godlikesme)"
+    app.config['REDDIT_BOT_CLIENT_ID'] = os.environ.get('WPC_REDDIT_BOT_CLIENT_ID')
+    app.config['REDDIT_BOT_SECRET'] = os.environ.get('WPC_REDDIT_BOT_SECRET')
 
     app.config['TWITCH_APP_ID'] = os.environ.get('TWITCH_APP_ID', '')
 

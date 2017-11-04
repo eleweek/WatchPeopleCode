@@ -44,13 +44,14 @@ def wpc_channel(url):
         return path_elements[1]
 
 
-def requests_get_with_retries(url, headers={}, retries_num=5):
+def requests_get_with_retries(url, headers={}, retries_num=5, verify=True):
     # Use a `Session` instance to customize how `requests` handles making HTTP requests.
     session = requests.Session()
 
     # `mount` a custom adapter that retries failed connections for HTTP and HTTPS requests.
     session.mount("http://", requests.adapters.HTTPAdapter(max_retries=retries_num))
     session.mount("https://", requests.adapters.HTTPAdapter(max_retries=retries_num))
+    session.verify = verify
 
     # Rejoice with new fault tolerant behaviour!
-    return session.get(url=url, headers=headers, timeout=42)
+    return session.get(url=url, headers=headers, timeout=42, verify=verify)

@@ -12,11 +12,14 @@ from sqlalchemy import or_
 import datetime
 import re
 
+r = praw.Reddit(user_agent=app.config['REDDIT_BOT_USER_AGENT'],
+                client_id=app.config['REDDIT_BOT_CLIENT_ID'],
+                client_secret=app.config['REDDIT_BOT_SECRET'],
+                username=app.config['REDDIT_USERNAME'],
+                password=app.config['REDDIT_PASSWORD']
+)
 
-r = praw.Reddit(user_agent=app.config['REDDIT_BOT_USER_AGENT'])
 r.config.decode_html_entities = True
-if app.config['REDDIT_PASSWORD']:
-    r.login(app.config['REDDIT_USERNAME'], app.config['REDDIT_PASSWORD'])
 
 
 def get_stream_from_url(url, submission_id=None, only_new=False):
@@ -28,7 +31,9 @@ def get_stream_from_url(url, submission_id=None, only_new=False):
         db_stream = YoutubeStream.query.filter_by(ytid=ytid).first()
         if db_stream is None:
             r = requests_get_with_retries(
-                "https://www.googleapis.com/youtube/v3/videos?id={}&part=liveStreamingDetails&key={}".format(ytid, app.config['YOUTUBE_KEY']), retries_num=15)
+                "https://www.googleapis.com/youtube/v3/videos?id={}&part=liveStreamingDetails&key={}".format(ytid, app.config['YOUTUBE_KEY']),
+                retries_num=15,
+                verify=False)
             item = r.json()['items']
             if item:
                 if 'liveStreamingDetails' in item[0]:
@@ -77,13 +82,13 @@ def get_reddit_username(submission, url):
 
 def get_new_streams():
     if app.config['REDDIT_PASSWORD']:
-        moditem = list(r.get_subreddit('watchpeoplecode').get_mod_queue(limit=1))
+        moditem = list(r.subreddit('watchpeoplecode').mod.modqueue(limit=1))
         if moditem and datetime.datetime.now() - datetime.datetime.utcfromtimestamp(moditem[0].created_utc) < datetime.timedelta(hours=2):
             if Streamer.query.filter_by(reddit_username=moditem[0].author.name).first() is not None:
                 moditem[0].approve()
     db.session.close()
 
-    submissions = r.get_subreddit('watchpeoplecode').get_new(limit=50)
+    submissions = r.subreddit('watchpeoplecode').new(limit=50)
     # TODO : don't forget about http vs https
     # TODO better way of caching api requests
     for s in submissions:
@@ -196,7 +201,7 @@ def is_blacklisted(twitch_channel):
 def get_random_bonus_twitch_streams():
     app.logger.info("Getting random bonus twitch stream")
     r = requests_get_with_retries("https://api.twitch.tv/kraken/streams?game=Creative", headers={'Client-ID': app.config['TWITCH_APP_ID']})
-    streams = sorted([s for s in r.json()['streams'] if '#programming' in s['channel']['status'] and not is_blacklisted(s['channel']['name'])], key=lambda s: s['viewers'], reverse=True)
+    streams = sorted([s for s in r.json()['streams'] if 'programming' in s['channel']['status'] and not is_blacklisted(s['channel']['name'])], key=lambda s: s['viewers'], reverse=True)
     print streams
     for stream in streams[:4]:
         ts = get_or_create(TwitchStream, channel=stream['channel']['name'])
@@ -237,6 +242,19 @@ def update_state():
         app.logger.exception(e)
 
     db.session.close()
+
+
+@sched.scheduled_job('interval', seconds=120)
+def remove_blocked_users():
+    app.logger.info("Removing blocked users")
+    for reddit_username in ['vale46vale', 'SAVYSTREAM', 'Stream2016', 'Beinwatch', 'kosovarii', 'Kosovarii']:
+        try:
+            # TODO: general code
+            s = Streamer.query.filter_by(reddit_username=reddit_username).one()
+            db.session.delete(s)
+            db.session.commit()
+        except:
+            app.logger.exception("Exception while deleting blocked users")
 
 
 @sched.scheduled_job('interval', seconds=100)
