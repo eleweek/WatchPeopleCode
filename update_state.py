@@ -124,8 +124,8 @@ def update_flairs():
         return
 
     try:
-        wpc_subreddit = r.get_subreddit('watchpeoplecode')
-        submissions = wpc_subreddit.get_new(limit=25)
+        wpc_subreddit = r.subreddit('watchpeoplecode')
+        submissions = wpc_subreddit.new(limit=25)
         for s in submissions:
             if s.id == '2v1bnt' or s.id == '2v70uo':  # ignore LCS threads TODO
                 continue
@@ -137,7 +137,7 @@ def update_flairs():
                 continue
 
             if not db_s.recording_available:
-                s.replace_more_comments()
+                s.comments.replace_more(limit=0)
                 for author, text in map(lambda c: (c.author, c.body), s.comments) + [(s.author, s.selftext)]:
                     if author is None:
                         continue
@@ -156,9 +156,9 @@ def update_flairs():
                 stream = get_stream_from_url(url, None)
                 if stream:
                     # set user flair
-                    if s.author and not wpc_subreddit.get_flair(s.author)['flair_text'] and\
+                    if s.author and not wpc_subreddit.flair(s.author).next()['flair_text'] and\
                             stream.streamer and stream.streamer.reddit_username == s.author.name:
-                        wpc_subreddit.set_flair(s.author, flair_text='Streamer', flair_css_class='text-white background-blue')
+                        wpc_subreddit.flair.set(s.author, text='Streamer', css_class='text-white background-blue')
 
                     # set link flairs
 
@@ -186,7 +186,11 @@ def update_flairs():
                 db.session.close()
 
             if new_flair_text and new_flair_css:
-                s.set_flair(new_flair_text, new_flair_css)
+                flair_template_id = None
+                for c in s.flair.choices():
+                    if c['flair_css_class'] == new_flair_css:
+                        flair_template_id = c['flair_template_id']
+                s.flair.select(text=new_flair_text, flair_template_id=flair_template_id)
 
     except Exception as e:
         db.session.rollback()
