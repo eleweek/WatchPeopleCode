@@ -13,7 +13,7 @@ Mako==1.0.1
 MarkupSafe==0.23
 SQLAlchemy==0.9.8
 WTForms==2.0.2
-Werkzeug==0.9.6
+Werkzeug==0.15.3
 alembic==0.7.4
 argparse==1.2.1
 beautifulsoup4==4.3.2
