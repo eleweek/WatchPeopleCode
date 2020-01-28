@@ -20,7 +20,7 @@ beautifulsoup4==4.3.2
 certifi==2017.7.27.1
 chardet==3.0.4
 dateutils==0.6.6
-feedgen==0.3.1
+feedgen==0.9.0
 futures==2.2.0
 gevent==1.1.2
 gevent-socketio==0.3.6
