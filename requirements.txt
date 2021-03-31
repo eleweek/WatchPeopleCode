@@ -30,7 +30,7 @@ gunicorn==19.1.1
 humanize==0.5.1
 idna==2.6
 itsdangerous==0.24
-lxml==3.4.2
+lxml==4.6.3
 newrelic==2.52.0.40
 praw==5.2.0
 prawcore==0.12.0
