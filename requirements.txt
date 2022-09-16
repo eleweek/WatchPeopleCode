@@ -9,7 +9,7 @@ Flask-SocketIO==0.5.0
 Flask-WTF==0.11
 Jinja2==2.7.3
 LogentriesLogger==0.2.1
-Mako==1.0.1
+Mako==1.2.2
 MarkupSafe==0.23
 SQLAlchemy==0.9.8
 WTForms==2.0.2
