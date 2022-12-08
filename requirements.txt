@@ -17,7 +17,7 @@ Werkzeug==0.9.6
 alembic==0.7.4
 argparse==1.2.1
 beautifulsoup4==4.3.2
-certifi==2017.7.27.1
+certifi==2022.12.7
 chardet==3.0.4
 dateutils==0.6.6
 feedgen==0.3.1
